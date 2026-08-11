@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { PageTransition } from "@/components/motion/PageTransition";
 import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, ogImage } from "@/lib/seo";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -51,11 +51,13 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: site.name,
     description: site.description,
+    images: [ogImage],
   },
   twitter: {
     card: "summary_large_image",
     title: site.name,
     description: site.description,
+    images: [ogImage.url],
   },
   robots: {
     index: true,

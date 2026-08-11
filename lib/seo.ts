@@ -9,6 +9,14 @@ type PageSeoInput = {
   absoluteTitle?: string;
 };
 
+export const ogImage = {
+  url: "/og-image.png",
+  width: 1200,
+  height: 630,
+  alt: site.name,
+  type: "image/png",
+} as const;
+
 export function absoluteUrl(path = "/") {
   const normalized = path.startsWith("/") ? path : `/${path}`;
   return `${site.url}${normalized === "/" ? "" : normalized}`;
@@ -24,6 +32,7 @@ export function createPageMetadata({
   const resolvedTitle = absoluteTitle
     ? { absolute: absoluteTitle }
     : title;
+  const socialTitle = absoluteTitle ?? `${title} · ${site.name}`;
 
   return {
     title: resolvedTitle,
@@ -32,17 +41,19 @@ export function createPageMetadata({
       canonical: url,
     },
     openGraph: {
-      title: absoluteTitle ?? `${title} · ${site.name}`,
+      title: socialTitle,
       description,
       url,
       siteName: site.name,
       locale: site.locale,
       type: "website",
+      images: [ogImage],
     },
     twitter: {
       card: "summary_large_image",
-      title: absoluteTitle ?? `${title} · ${site.name}`,
+      title: socialTitle,
       description,
+      images: [ogImage.url],
     },
   };
 }
