@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #0b1426;
+  --navy: #00206f;
+  --navy-deep: #001752;
+  --orange: #fb7801;
+  --orange-soft: #fff1e6;
+  --orange-peach: #ffdbc880;
+  --muted: #5b6475;
+  --surface: #f5f7fb;
+  --surface-blue: #eef2f9;
+  --surface-blue-soft: #f7f9fc;
+  --border: #e4e9f2;
+  --success: #1a7f4b;
+  --forest: #0f3d2e;
+  --badge: #9a4d00;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-navy: var(--navy);
+  --color-navy-deep: var(--navy-deep);
+  --color-orange: var(--orange);
+  --color-orange-soft: var(--orange-soft);
+  --color-orange-peach: var(--orange-peach);
+  --color-muted: var(--muted);
+  --color-surface: var(--surface);
+  --color-surface-blue: var(--surface-blue);
+  --color-surface-blue-soft: var(--surface-blue-soft);
+  --color-border: var(--border);
+  --color-success: var(--success);
+  --color-forest: var(--forest);
+  --color-badge: var(--badge);
+  --font-sans: var(--font-montserrat);
+  --font-display: var(--font-montserrat);
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: 1rem;
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1rem;
+  --text-hero: 2rem;
+  --text-hero--line-height: 1.1;
+  --text-sm-plus: 0.9375rem;
+  --text-sm-plus--line-height: 1.5rem;
+  --leading-hero: 1.1;
+  --shadow-brand: 0 8px 24px rgba(0, 32, 111, 0.18);
+  --shadow-orange: 0 8px 24px rgba(251, 120, 1, 0.25);
+  --shadow-header: 0 8px 30px rgba(0, 32, 111, 0.08);
+  --shadow-card: 0 20px 60px rgba(0, 32, 111, 0.06);
+  --shadow-hero: 0 30px 80px rgba(0, 32, 111, 0.14);
+  --shadow-roadmap-dot: 0 4px 14px rgba(0, 32, 111, 0.28);
+  --background-image-hero-fade: linear-gradient(
+    180deg,
+    #f7f9fd 0%,
+    #ffffff 70%
+  );
+  --background-image-hero-fade-soft: linear-gradient(
+    180deg,
+    #f7f9fd 0%,
+    #ffffff 80%
+  );
+  --background-image-bootcamp-overlay: linear-gradient(
+    0deg,
+    rgba(0, 32, 111, 0.95) 0%,
+    rgba(0, 32, 111, 0.4) 64.3%,
+    rgba(0, 32, 111, 0) 100%
+  );
+  --aspect-portrait: 3 / 4;
+  --aspect-wide: 16 / 10;
+  --scale-98: 0.98;
+  --grid-template-columns-hero: 1.05fr 0.95fr;
+  --grid-template-columns-hero-form: 1fr 0.95fr;
+  --grid-template-columns-content: 1.1fr 0.9fr;
+  --grid-template-columns-split: 0.9fr 1.1fr;
+  --grid-template-columns-contact: 0.85fr 1.15fr;
+  --grid-template-columns-footer: 1.4fr 1fr 1fr 1fr;
+  --max-height-mobile-nav: calc(100dvh - 3.5rem);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-montserrat), "Montserrat", sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--orange) 28%, white);
+  color: var(--navy);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
