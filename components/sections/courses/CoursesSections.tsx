@@ -146,7 +146,7 @@ export function CoursesCatalog() {
               className="relative flex min-h-72 flex-col items-center justify-center overflow-hidden rounded-3xl p-6 text-center sm:min-h-80"
             >
               <Image
-                src="/courses.png"
+                src={course.image}
                 alt=""
                 fill
                 className="object-cover"

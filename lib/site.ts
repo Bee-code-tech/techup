@@ -120,38 +120,47 @@ export const comingSoonCourses = [
   {
     title: "Digital Marketing",
     topics: "Content Strategy • SEO • Social Media",
+    image: "/soon-marketing.jpg",
   },
   {
     title: "Video Editing",
     topics: "Motion Graphics • Premiere Pro • VFX",
+    image: "/soon-video.jpg",
   },
   {
     title: "Cybersecurity",
     topics: "Threat Defense • Networks • Ethical Hacking",
+    image: "/soon-cyber.jpg",
   },
   {
     title: "Product Management",
     topics: "Roadmaps • Discovery • Delivery",
+    image: "/soon-product.jpg",
   },
   {
     title: "DevOps Engineering",
     topics: "CI/CD • Cloud • Automation",
+    image: "/soon-devops.jpg",
   },
   {
     title: "AI & Machine Learning",
     topics: "Python • Models • Applied AI",
+    image: "/soon-ai.jpg",
   },
   {
     title: "Cloud Computing",
     topics: "AWS • Azure • Infrastructure",
+    image: "/soon-cloud.jpg",
   },
   {
     title: "Mobile App Development",
     topics: "Flutter • React Native • UX",
+    image: "/soon-mobile.jpg",
   },
   {
     title: "Data Engineering",
     topics: "Pipelines • SQL • Warehousing",
+    image: "/soon-dataeng.jpg",
   },
 ] as const;
 

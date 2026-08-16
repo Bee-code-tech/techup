@@ -327,9 +327,33 @@ const roadmapItems = [
 ] as const;
 
 const bootcampFaqs = [
-  "Do I need prior experience for the bootcamp?",
-  "How long does the bootcamp run for?",
-  "Will I receive a certificate after completion?",
+  {
+    q: "Do I need prior experience to join the bootcamp?",
+    a: "No. The bootcamp is beginner-friendly and open to anyone who is interested in learning technology.",
+  },
+  {
+    q: "What will I learn during the bootcamp?",
+    a: "You’ll get practical exposure to technology, explore different career paths, and experience what learning with TechUp is like.",
+  },
+  {
+    q: "How long does the bootcamp run for?",
+    a: (
+      <>
+        The bootcamp runs for <strong>2 weeks</strong> of practical learning,
+        activities, and engagement.
+      </>
+    ),
+  },
+  {
+    q: "What happens after the bootcamp?",
+    a: (
+      <>
+        Participants who want to continue their learning can apply to join the{" "}
+        <strong>TechUp Academy Main Cohort</strong>, where they can receive
+        structured training and a certificate upon completion.
+      </>
+    ),
+  },
 ] as const;
 
 function CommunityIcon() {
@@ -660,19 +684,24 @@ export function BootcampBody() {
               align="left"
               className="text-left"
               title="Frequently Asked Questions"
-              subtitle="Everything you need to know before joining the free bootcamp."
+              subtitle="Everything you need to know before joining the TechUp Free Bootcamp."
             />
             <div className="mt-8 space-y-3">
               {bootcampFaqs.map((item) => (
-                <div
-                  key={item}
-                  className="rounded-2xl border border-border bg-white px-5 py-4 shadow-sm"
+                <details
+                  key={item.q}
+                  className="group rounded-2xl border border-border bg-white px-5 py-4 shadow-sm"
                 >
-                  <div className="flex items-center justify-between gap-4">
-                    <p className="text-sm font-semibold text-navy">{item}</p>
-                    <span className="text-muted">▾</span>
-                  </div>
-                </div>
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-navy [&::-webkit-details-marker]:hidden">
+                    {item.q}
+                    <span className="shrink-0 text-muted transition group-open:rotate-180">
+                      ▾
+                    </span>
+                  </summary>
+                  <p className="mt-3 border-t border-border pt-3 text-sm leading-relaxed text-muted">
+                    {item.a}
+                  </p>
+                </details>
               ))}
             </div>
           </div>
@@ -689,7 +718,7 @@ export function BootcampBody() {
                 digital skills.
               </p>
               <Button
-                href="/bootcamp"
+                href="#reserve"
                 variant="orange"
                 size="lg"
                 className="mt-8 w-full sm:w-auto"
