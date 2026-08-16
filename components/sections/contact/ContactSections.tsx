@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Field, Input, Textarea } from "@/components/ui/Field";
 import { Select } from "@/components/ui/Select";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SocialLinks } from "@/components/ui/SocialLinks";
 import { site } from "@/lib/site";
 
 export function ContactHero() {
@@ -54,7 +55,9 @@ export function ContactBody() {
                 Fastest response time for quick inquiries.
               </p>
               <a
-                href="#"
+                href={site.whatsappChatUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-orange"
               >
                 Message on WhatsApp →
@@ -83,16 +86,7 @@ export function ContactBody() {
               className="rounded-[1.75rem] border border-border bg-white p-6 sm:col-span-2 lg:col-span-1"
             >
               <h3 className="font-semibold text-navy">Follow our journey:</h3>
-              <div className="mt-3 flex gap-2">
-                {["🔗", "@", "ig"].map((icon) => (
-                  <span
-                    key={icon}
-                    className="flex size-9 items-center justify-center rounded-full bg-surface text-sm text-muted"
-                  >
-                    {icon}
-                  </span>
-                ))}
-              </div>
+              <SocialLinks className="mt-3" />
             </article>
           </Stagger>
 

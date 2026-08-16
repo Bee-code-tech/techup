@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { Section } from "@/components/layout/Section";
 import { HeroIntro } from "@/components/motion/HeroIntro";
 import { Reveal } from "@/components/motion/Reveal";
@@ -213,7 +214,7 @@ export function AboutBody() {
             title="Meet the Experts"
             subtitle="Instructors with industry experience and a bias for hands-on mentorship."
           />
-          <Stagger className="mt-8 grid gap-4 sm:mt-12 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <Stagger className="mt-8 grid gap-4 sm:mt-12 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {experts.map((expert) => (
               <article
                 key={expert.name}
@@ -234,16 +235,16 @@ export function AboutBody() {
                   {expert.role}
                 </p>
                 <p className="mt-3 text-sm text-muted">{expert.bio}</p>
-                <div className="mt-4 flex justify-center gap-2">
-                  {["in", "🔗", "ig"].map((icon) => (
-                    <span
-                      key={icon}
-                      className="flex size-8 items-center justify-center rounded-full bg-orange-soft text-xs text-orange"
-                    >
-                      {icon}
-                    </span>
-                  ))}
-                </div>
+                <Button
+                  href={expert.linkedin}
+                  variant="outline"
+                  size="sm"
+                  className="mt-5"
+                  aria-label={`${expert.name} on LinkedIn`}
+                >
+                  <ArrowTopRightOnSquareIcon className="size-4" aria-hidden />
+                  LinkedIn
+                </Button>
               </article>
             ))}
           </Stagger>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { Container } from "@/components/layout/Container";
+import { SocialLinks } from "@/components/ui/SocialLinks";
 import { gsap, prefersReducedMotion, registerGsap } from "@/lib/gsap";
 import { site } from "@/lib/site";
 
@@ -85,16 +86,7 @@ export function SiteFooter() {
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
             {site.tagline}
           </p>
-          <div className="mt-5 flex gap-2">
-            {["@", "in", "ig"].map((item) => (
-              <span
-                key={item}
-                className="flex size-9 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-white/80"
-              >
-                {item}
-              </span>
-            ))}
-          </div>
+          <SocialLinks tone="dark" className="mt-5" />
         </div>
 
         <nav

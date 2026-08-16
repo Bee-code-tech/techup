@@ -5,16 +5,36 @@ export const site = {
     "Empowering Nigeria's Tech Talent with skills that matter in the global digital economy.",
   description:
     "TechUp Academy is a Nigerian ed-tech platform offering free bootcamps, scholarships, and career-ready courses in web development, design, data analytics, and more.",
-  email: "hello@techupacademy.com",
+  email: "techupacademy22@gmail.com",
   scholarshipFormUrl:
     "https://docs.google.com/forms/d/e/1FAIpQLSd8r6SQAiOhoISAZBF4bIfQ7y7VIVnHbt8CxUQ2_VjnoEgVdg/viewform",
   whatsappGroupUrl: "https://chat.whatsapp.com/LgXHouemXT4AxFV0F6TcO5",
+  whatsappChatUrl: "https://wa.link/nh1rt9",
   adminEmail: "techupacademy22@gmail.com",
   url:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
     "https://techupacademy.com",
   locale: "en_NG",
 } as const;
+
+export const socialLinks = [
+  {
+    name: "X",
+    href: "https://x.com/techupacademyng",
+  },
+  {
+    name: "Instagram",
+    href: "https://www.instagram.com/techupacademyinnovations",
+  },
+  {
+    name: "Facebook",
+    href: "https://www.facebook.com/share/1E1g8bLajo/",
+  },
+  {
+    name: "LinkedIn",
+    href: "https://www.linkedin.com/company/techup-academy-innovations/",
+  },
+] as const;
 
 export const navLinks = [
   { href: "/", label: "Home" },
@@ -219,27 +239,24 @@ export const aboutFaqs = [
 
 export const experts = [
   {
-    name: "Fawwaz Olajide",
+    name: "Fawwas Olajide",
     role: "Lead Web Developer",
     bio: "Builds production-ready full-stack applications and mentors portfolio-driven learners.",
-    image: "/tutor1.png",
-  },
-  {
-    name: "Faleye Olumide",
-    role: "Lead Data Analytics Instructor",
-    bio: "Specializes in Excel, SQL, Python, and Power BI for business decision systems.",
-    image: "/tutor2.png",
+    image: "/tutor4.png",
+    linkedin: "https://www.linkedin.com/in/emblemprograms",
   },
   {
     name: "Udeme Victor",
     role: "Lead Graphic Designer/Illustrator",
     bio: "Focuses on branding, visual systems, and communication design for digital products.",
-    image: "/tutor3.png",
+    image: "/tutor2.png",
+    linkedin: "https://www.linkedin.com/in/udeme-victor-b47235303",
   },
   {
-    name: "Sodiq Olajide",
-    role: "Senior UI/UX Designer",
-    bio: "Designs user-centered product experiences and coaches learners on practical design craft.",
-    image: "/tutor4.png",
+    name: "Olumide David",
+    role: "Lead Data Analytics Instructor",
+    bio: "Specializes in Excel, SQL, Python, and Power BI for business decision systems.",
+    image: "/tutor3.png",
+    linkedin: "https://www.linkedin.com/in/olumide-david-79b17726a",
   },
 ] as const;
