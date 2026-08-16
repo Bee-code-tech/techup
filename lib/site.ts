@@ -6,6 +6,10 @@ export const site = {
   description:
     "TechUp Academy is a Nigerian ed-tech platform offering free bootcamps, scholarships, and career-ready courses in web development, design, data analytics, and more.",
   email: "hello@techupacademy.com",
+  scholarshipFormUrl:
+    "https://docs.google.com/forms/d/e/1FAIpQLSd8r6SQAiOhoISAZBF4bIfQ7y7VIVnHbt8CxUQ2_VjnoEgVdg/viewform",
+  whatsappGroupUrl: "https://chat.whatsapp.com/LgXHouemXT4AxFV0F6TcO5",
+  adminEmail: "techupacademy22@gmail.com",
   url:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
     "https://techupacademy.com",
@@ -76,7 +80,9 @@ export const courses = [
     description:
       "Build modern web applications from frontend to backend with real client-ready projects.",
     duration: "12 Weeks",
-    price: "₦250,000",
+    originalPrice: "₦150,000",
+    price: "₦30,000",
+    image: "/course-web.jpg",
   },
   {
     title: "UI/UX Design",
@@ -84,7 +90,9 @@ export const courses = [
     description:
       "Design intuitive digital products with research-driven UX and polished UI systems.",
     duration: "12 Weeks",
-    price: "₦180,000",
+    originalPrice: "₦150,000",
+    price: "₦30,000",
+    image: "/course-ux.jpg",
   },
   {
     title: "Data Analytics",
@@ -92,7 +100,9 @@ export const courses = [
     description:
       "Transform raw data into actionable business insights using industry-standard tools.",
     duration: "12 Weeks",
-    price: "₦150,000",
+    originalPrice: "₦150,000",
+    price: "₦30,000",
+    image: "/course-data.jpg",
   },
   {
     title: "Graphic Design",
@@ -100,7 +110,9 @@ export const courses = [
     description:
       "Unlock creative communication through brand systems, layout, and visual storytelling.",
     duration: "12 Weeks",
-    price: "₦150,000",
+    originalPrice: "₦150,000",
+    price: "₦30,000",
+    image: "/course-graphic.jpg",
   },
 ] as const;
 
@@ -201,20 +213,24 @@ export const experts = [
     name: "Fawwaz Olajide",
     role: "Lead Web Developer",
     bio: "Builds production-ready full-stack applications and mentors portfolio-driven learners.",
+    image: "/tutor1.png",
   },
   {
     name: "Faleye Olumide",
     role: "Lead Data Analytics Instructor",
     bio: "Specializes in Excel, SQL, Python, and Power BI for business decision systems.",
+    image: "/tutor2.png",
   },
   {
     name: "Udeme Victor",
     role: "Lead Graphic Designer/Illustrator",
     bio: "Focuses on branding, visual systems, and communication design for digital products.",
+    image: "/tutor3.png",
   },
   {
     name: "Sodiq Olajide",
     role: "Senior UI/UX Designer",
     bio: "Designs user-centered product experiences and coaches learners on practical design craft.",
+    image: "/tutor4.png",
   },
 ] as const;

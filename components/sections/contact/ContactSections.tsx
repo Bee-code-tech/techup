@@ -3,7 +3,8 @@ import { HeroIntro } from "@/components/motion/HeroIntro";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger } from "@/components/motion/Stagger";
 import { Button } from "@/components/ui/Button";
-import { Field, Input, Select, Textarea } from "@/components/ui/Field";
+import { Field, Input, Textarea } from "@/components/ui/Field";
+import { Select } from "@/components/ui/Select";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { site } from "@/lib/site";
 
@@ -117,15 +118,16 @@ export function ContactBody() {
                 </Field>
               </div>
               <Field label="Subject" className="mt-4">
-                <Select name="subject" defaultValue="">
-                  <option value="" disabled>
-                    Select an inquiry type
-                  </option>
-                  <option>Bootcamp</option>
-                  <option>Scholarship</option>
-                  <option>Courses</option>
-                  <option>Partnership</option>
-                </Select>
+                <Select
+                  name="subject"
+                  placeholder="Select an inquiry type"
+                  options={[
+                    { value: "Bootcamp", label: "Bootcamp" },
+                    { value: "Scholarship", label: "Scholarship" },
+                    { value: "Courses", label: "Courses" },
+                    { value: "Partnership", label: "Partnership" },
+                  ]}
+                />
               </Field>
               <Field label="Message" className="mt-4">
                 <Textarea placeholder="How can we help you?" name="message" />

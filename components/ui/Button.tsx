@@ -64,18 +64,38 @@ export function Button({
 
   if ("href" in props && props.href) {
     const { href, onMouseEnter, onMouseLeave, ...rest } = props;
+    const isExternal = /^https?:\/\//.test(href);
+    const hoverProps = {
+      onMouseEnter: (e: React.MouseEvent<HTMLAnchorElement>) => {
+        onMouseEnter?.(e);
+        bindHover(e.currentTarget);
+      },
+      onMouseLeave: (e: React.MouseEvent<HTMLAnchorElement>) => {
+        onMouseLeave?.(e);
+        bindLeave(e.currentTarget);
+      },
+    };
+
+    if (isExternal) {
+      return (
+        <a
+          href={href}
+          className={classes}
+          target="_blank"
+          rel="noopener noreferrer"
+          {...hoverProps}
+          {...rest}
+        >
+          {children}
+        </a>
+      );
+    }
+
     return (
       <Link
         href={href}
         className={classes}
-        onMouseEnter={(e) => {
-          onMouseEnter?.(e);
-          bindHover(e.currentTarget);
-        }}
-        onMouseLeave={(e) => {
-          onMouseLeave?.(e);
-          bindLeave(e.currentTarget);
-        }}
+        {...hoverProps}
         {...rest}
       >
         {children}

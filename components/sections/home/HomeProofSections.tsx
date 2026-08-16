@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Section } from "@/components/layout/Section";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger } from "@/components/motion/Stagger";
@@ -88,14 +89,14 @@ const testimonials = [
   {
     name: "Student",
     track: "Data Analytics",
-    initials: "S",
+    image: "/student1.png",
     quote:
       "Before I came across TechUp Academy, I was learning Excel on YouTube without a structured roadmap, and I often felt frustrated. Joining TechUp Academy gave me hands-on experience and mentorship, and today I can confidently work with data.",
   },
   {
     name: "Mercy Akpubor",
     track: "Data Analytics",
-    initials: "MA",
+    image: "/student2.png",
     quote:
       "My experience with TechUp Academy has been both engaging and rewarding. The data analytics training is practical, easy to follow, and focused on building real world skills. I have gained hands on experience with Excel and I know before the cohort ends I would be a pro in both POWER BI AND SQL, and the support from the instructors has made learning enjoyable. I am grateful to be part of a community that is committed to helping people grow in tech, and I highly recommend TechUp Academy to anyone looking to build valuable digital skills.",
   },
@@ -156,9 +157,13 @@ export function StudentVoices() {
             className="rounded-[1.75rem] border border-white/70 bg-white/75 p-6 shadow-card backdrop-blur-sm sm:p-7"
           >
             <div className="flex items-center gap-3">
-              <div className="flex size-12 items-center justify-center rounded-full bg-orange/15 font-semibold text-navy">
-                {item.initials}
-              </div>
+              <Image
+                src={item.image}
+                alt={`${item.name} photo`}
+                width={96}
+                height={96}
+                className="size-12 rounded-full object-cover"
+              />
               <div>
                 <h3 className="font-semibold text-navy">{item.name}</h3>
                 <p className="text-sm text-muted">{item.track}</p>

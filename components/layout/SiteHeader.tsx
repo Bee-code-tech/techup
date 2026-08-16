@@ -16,11 +16,13 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
-  const ctaHref = pathname === "/scholarship" ? "/scholarship" : "/bootcamp";
+  const ctaHref =
+    pathname === "/scholarship" ? site.scholarshipFormUrl : "/bootcamp";
   const ctaLabel =
     pathname === "/scholarship"
       ? "Apply for Scholarship"
       : "Join Free Bootcamp";
+  const ctaIsExternal = ctaHref.startsWith("http");
 
   const closeMenu = () => setOpen(false);
 
@@ -127,7 +129,13 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden lg:block" data-nav>
-          <Button href={ctaHref} size="sm">
+          <Button
+            href={ctaHref}
+            size="sm"
+            {...(ctaIsExternal
+              ? { target: "_blank", rel: "noopener noreferrer" }
+              : {})}
+          >
             {ctaLabel}
           </Button>
         </div>
@@ -188,7 +196,14 @@ export function SiteHeader() {
               );
             })}
             <div data-mobile-cta>
-              <Button href={ctaHref} className="mt-2 w-full" onClick={closeMenu}>
+              <Button
+                href={ctaHref}
+                className="mt-2 w-full"
+                onClick={closeMenu}
+                {...(ctaIsExternal
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+              >
                 {ctaLabel}
               </Button>
             </div>

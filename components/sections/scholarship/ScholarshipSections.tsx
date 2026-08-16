@@ -6,6 +6,7 @@ import { Stagger } from "@/components/motion/Stagger";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { site } from "@/lib/site";
 
 const criteria = [
   {
@@ -176,7 +177,13 @@ export function ScholarshipHero() {
             data-hero
             className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap"
           >
-            <Button href="/contact" size="lg" className="w-full sm:w-auto">
+            <Button
+              href={site.scholarshipFormUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              size="lg"
+              className="w-full sm:w-auto"
+            >
               Apply Now
             </Button>
             <Button
@@ -424,6 +431,16 @@ export function ScholarshipBody() {
               ))}
             </div>
           </Reveal>
+        </div>
+
+        <div className="mt-10 sm:mt-12">
+          <Button
+            href={site.scholarshipFormUrl}
+            size="lg"
+            className="w-full sm:w-auto"
+          >
+            Apply Now
+          </Button>
         </div>
       </Section>
     </>

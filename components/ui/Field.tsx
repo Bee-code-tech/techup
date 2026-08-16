@@ -9,7 +9,7 @@ type FieldProps = {
 
 export function Field({ label, hint, className, children }: FieldProps) {
   return (
-    <label className={cn("block space-y-2", className)}>
+    <div className={cn("block space-y-2", className)}>
       <span className="flex items-center justify-between gap-3 text-xs font-semibold tracking-wider text-muted uppercase">
         {label}
         {hint ? (
@@ -17,32 +17,32 @@ export function Field({ label, hint, className, children }: FieldProps) {
         ) : null}
       </span>
       {children}
-    </label>
+    </div>
   );
 }
 
 const controlClass =
-  "w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-foreground outline-none transition focus:border-navy/40 focus:ring-4 focus:ring-navy/10 placeholder:text-muted/70";
+  "flex h-11 w-full rounded-md border border-border bg-white px-3 text-sm text-foreground shadow-xs outline-none transition placeholder:text-muted/70 focus-visible:border-navy/40 focus-visible:ring-2 focus-visible:ring-navy/15 disabled:cursor-not-allowed disabled:opacity-50";
 
-export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={cn(controlClass, props.className)} {...props} />;
+export function Input({
+  className,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement>) {
+  return <input className={cn(controlClass, className)} {...props} />;
 }
 
-export function Textarea(
-  props: React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-) {
+export function Textarea({
+  className,
+  ...props
+}: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
-      className={cn(controlClass, "min-h-28 resize-y", props.className)}
+      className={cn(
+        controlClass,
+        "h-auto min-h-28 resize-y py-2.5",
+        className,
+      )}
       {...props}
     />
-  );
-}
-
-export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <select className={cn(controlClass, props.className)} {...props}>
-      {props.children}
-    </select>
   );
 }

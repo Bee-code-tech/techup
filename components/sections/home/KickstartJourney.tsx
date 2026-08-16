@@ -3,6 +3,7 @@ import { Section } from "@/components/layout/Section";
 import { Stagger } from "@/components/motion/Stagger";
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { site } from "@/lib/site";
 
 const paths = [
   {
@@ -14,6 +15,7 @@ const paths = [
     cta: "Register Now",
     href: "/bootcamp",
     solid: false,
+    image: "/journey.png",
   },
   {
     title: "New Cohort",
@@ -24,6 +26,7 @@ const paths = [
     cta: "Join Cohort",
     href: "/courses",
     solid: true,
+    image: "/journey-cohort.jpg",
   },
   {
     title: "Scholarship Program",
@@ -32,8 +35,9 @@ const paths = [
     badge: "SCHOLARSHIP",
     badgeTone: "orange" as const,
     cta: "Apply Now",
-    href: "/scholarship",
+    href: site.scholarshipFormUrl,
     solid: false,
+    image: "/journey-scholarship.jpg",
   },
 ];
 
@@ -53,10 +57,10 @@ export function KickstartJourney() {
           >
             <div className="relative">
               <Image
-                src="/journey.png"
+                src={path.image}
                 alt={`${path.title} preview image`}
-                width={796}
-                height={615}
+                width={1400}
+                height={900}
                 className="aspect-wide w-full border-b border-border object-cover"
               />
               <span
@@ -78,6 +82,9 @@ export function KickstartJourney() {
                 href={path.href}
                 variant={path.solid ? "primary" : "ghost"}
                 className="mt-5 w-full rounded-xl sm:mt-6"
+                {...(path.href.startsWith("http")
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
               >
                 {path.cta}
               </Button>

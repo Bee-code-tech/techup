@@ -42,7 +42,7 @@ export function CoursesCatalog() {
           title="Our Featured Courses"
           subtitle="Deep dive into specialized tracks designed to make you industry-ready in record time."
         />
-        <Stagger className="mt-8 grid gap-5 sm:mt-12 sm:gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        <Stagger className="mt-8 grid gap-6 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
           {courses.map((course) => (
             <div key={course.title} data-reveal>
               <CourseCard {...course} />
@@ -50,7 +50,7 @@ export function CoursesCatalog() {
           ))}
         </Stagger>
 
-        <div className="mt-14 grid items-start gap-8 sm:mt-16 lg:mt-20 lg:grid-cols-content lg:gap-10">
+        <div className="mt-12 grid items-start gap-8 sm:mt-14 lg:grid-cols-content lg:gap-10">
           <Reveal>
             <h2 className="font-display text-2xl font-bold text-navy sm:text-3xl md:text-4xl">
               What You&apos;ll Learn

@@ -5,6 +5,7 @@ import { HeroIntro } from "@/components/motion/HeroIntro";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { MediaBox } from "@/components/ui/MediaBox";
+import { site } from "@/lib/site";
 
 function SuccessStoryIcon() {
   return (
@@ -59,7 +60,13 @@ export function HomeHero() {
             data-hero
             className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap"
           >
-            <Button href="/scholarship" size="lg" className="w-full sm:w-auto">
+            <Button
+              href={site.scholarshipFormUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              size="lg"
+              className="w-full sm:w-auto"
+            >
               Apply For Scholarship
             </Button>
             <Button

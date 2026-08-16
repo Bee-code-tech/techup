@@ -221,7 +221,7 @@ export function AboutBody() {
                 className="rounded-2xl border border-border bg-white p-5 text-center sm:p-6"
               >
                 <Image
-                  src="/tutor.png"
+                  src={expert.image}
                   alt={`${expert.name} photo`}
                   width={160}
                   height={160}
@@ -287,10 +287,10 @@ export function AboutBody() {
 
           <Reveal delay={0.1} className="relative">
             <Image
-              src="/tinlab.png"
-              alt="Students collaborating in the TechUp Innovation Lab"
-              width={1120}
-              height={1462}
+              src="/tinlab.jpg"
+              alt="Engineer prototyping in the TechUp Innovation Lab"
+              width={1400}
+              height={1600}
               className="w-full rounded-3xl object-cover shadow-card sm:rounded-4xl"
               sizes="(max-width: 1024px) 100vw, 45vw"
             />
