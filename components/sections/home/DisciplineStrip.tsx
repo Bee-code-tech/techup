@@ -1,55 +1,21 @@
-"use client";
-
-import { useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import { Container } from "@/components/layout/Container";
-import { gsap, prefersReducedMotion, registerGsap } from "@/lib/gsap";
 import { disciplines } from "@/lib/site";
 
 export function DisciplineStrip() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useGSAP(
-    () => {
-      registerGsap();
-      const root = ref.current;
-      if (!root || prefersReducedMotion()) return;
-
-      gsap.fromTo(
-        root.querySelectorAll("[data-strip]"),
-        { opacity: 0, y: 10 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          stagger: 0.06,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: root,
-            start: "top 95%",
-            toggleActions: "play none none none",
-          },
-        },
-      );
-    },
-    { scope: ref },
-  );
+  const items = [...disciplines, ...disciplines];
 
   return (
-    <div ref={ref} className="bg-navy">
-      <Container className="py-3 sm:py-4">
-        <div className="-mx-4 flex gap-6 overflow-x-auto px-4 pb-1 text-sm font-medium whitespace-nowrap text-white/90 scrollbar-none sm:mx-0 sm:flex-wrap sm:justify-between sm:gap-x-6 sm:gap-y-3 sm:overflow-visible sm:px-0 sm:pb-0 sm:whitespace-normal md:text-sm-plus">
-          {disciplines.map((item) => (
-            <span
-              key={item}
-              data-strip
-              className="shrink-0 sm:min-w-28 sm:text-center"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-      </Container>
+    <div className="overflow-hidden bg-navy">
+      <div className="flex w-max animate-marquee py-3.5 hover:[animation-play-state:paused] motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center">
+        {items.map((item, index) => (
+          <span
+            key={`${item}-${index}`}
+            className="flex shrink-0 items-center gap-8 px-8 text-sm font-medium tracking-wide text-white/90 sm:text-sm-plus"
+          >
+            {item}
+            <span className="size-1.5 rounded-full bg-orange" aria-hidden="true" />
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
