@@ -11,19 +11,23 @@ import { site } from "@/lib/site";
 const criteria = [
   {
     title: "Nationality & Residency",
-    body: "Must be a Nigerian citizen currently residing in Nigeria.",
+    body: "Open to applicants from Nigeria and other countries.",
   },
   {
-    title: "Age Bracket",
-    body: "Applicants must be between 18 and 35 years of age.",
+    title: "Age Requirement",
+    body: "Applicants must be 15 years or older.",
   },
   {
     title: "Educational Background",
-    body: "Minimum of SSCE/O'Level. Undergraduates and graduates are encouraged to apply.",
+    body: "Minimum of SSCE/O'Level is preferred, but not strictly required.",
   },
   {
-    title: "Technical Potential",
-    body: "A strong passion for tech and a commitment to completing the 6-month intensive training.",
+    title: "Interest in Technology",
+    body: "Applicants must have a genuine interest in learning and building skills in technology.",
+  },
+  {
+    title: "Commitment to Learning",
+    body: "Applicants must be willing to commit to the programme and actively participate throughout the training.",
   },
 ] as const;
 
