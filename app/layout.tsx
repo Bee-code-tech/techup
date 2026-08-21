@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { PageTransition } from "@/components/motion/PageTransition";
@@ -81,6 +82,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${montserrat.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col overflow-x-hidden font-sans">
+        <MetaPixel />
         <OrganizationJsonLd />
         <SiteHeader />
         <main className="flex flex-1 flex-col">
