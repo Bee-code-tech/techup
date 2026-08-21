@@ -1,7 +1,9 @@
 export const bootcampTracks: Record<string, string> = {
-  uiux: "UI/UX Design",
-  web: "Web Development",
-  data: "Data Analytics",
+  frontend: "Frontend Web Development",
+  backend: "Backend Development",
+  uiux: "UI/UX (Product Design)",
+  graphic: "Graphic Design",
+  data: "Data Analysis",
 };
 
 export const laptopLabels: Record<string, string> = {

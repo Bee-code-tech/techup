@@ -5,6 +5,12 @@ import { BootcampSuccessModal } from "@/components/sections/bootcamp/BootcampSuc
 import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
 import { Select } from "@/components/ui/Select";
+import { bootcampTracks } from "@/lib/bootcamp";
+
+const trackOptions = Object.entries(bootcampTracks).map(([value, label]) => ({
+  value,
+  label,
+}));
 
 export function BootcampForm() {
   const [pending, setPending] = useState(false);
@@ -122,13 +128,9 @@ export function BootcampForm() {
             <Field label="Bootcamp Track">
               <Select
                 name="track"
-                defaultValue="uiux"
+                defaultValue="frontend"
                 required
-                options={[
-                  { value: "uiux", label: "UI/UX Design" },
-                  { value: "web", label: "Web Development" },
-                  { value: "data", label: "Data Analytics" },
-                ]}
+                options={trackOptions}
               />
             </Field>
           </div>
