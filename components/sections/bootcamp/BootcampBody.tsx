@@ -515,7 +515,7 @@ export function BootcampBody() {
 
         <div className="mt-14 sm:mt-16">
           <SectionHeading
-            title="What Sets TechUp Academy Apart"
+            title="Who Is This For?"
             subtitle="Everything you need to launch your tech career with confidence"
           />
           <Stagger className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
