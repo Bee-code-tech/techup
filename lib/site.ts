@@ -13,7 +13,7 @@ export const site = {
   adminEmail: "techupacademy22@gmail.com",
   url:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    "https://techupacademy.com",
+    "https://techupacademyng.com",
   locale: "en_NG",
 } as const;
 

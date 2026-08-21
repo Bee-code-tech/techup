@@ -56,6 +56,7 @@ export async function POST(request: Request) {
       to: adminEmail,
       replyTo: application.email,
       subject: adminMail.subject,
+      text: adminMail.text,
       html: adminMail.html,
     }),
     resend.emails.send({
@@ -63,6 +64,7 @@ export async function POST(request: Request) {
       to: application.email,
       replyTo: adminEmail,
       subject: studentMail.subject,
+      text: studentMail.text,
       html: studentMail.html,
     }),
   ]);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/Button";
 import { site } from "@/lib/site";
@@ -20,6 +21,7 @@ function fireConfetti() {
     origin: { y: 0.35 },
     colors,
     scalar: 1.05,
+    zIndex: 90,
   });
 
   window.setTimeout(() => {
@@ -29,6 +31,7 @@ function fireConfetti() {
       spread: 55,
       origin: { x: 0, y: 0.55 },
       colors,
+      zIndex: 90,
     });
     confetti({
       particleCount: 50,
@@ -36,6 +39,7 @@ function fireConfetti() {
       spread: 55,
       origin: { x: 1, y: 0.55 },
       colors,
+      zIndex: 90,
     });
   }, 180);
 }
@@ -52,37 +56,41 @@ export function BootcampSuccessModal({
     document.body.style.overflow = "hidden";
     const timeout = window.setTimeout(fireConfetti, 80);
 
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+
     return () => {
       document.body.style.overflow = previous;
       window.clearTimeout(timeout);
+      window.removeEventListener("keydown", onKeyDown);
     };
-  }, [open]);
+  }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
   const firstName = name.split(" ")[0] || "there";
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
       <button
         type="button"
         aria-label="Close dialog"
-        className="absolute inset-0 bg-navy/70 backdrop-blur-md"
+        className="absolute inset-0 z-0 bg-black/20 backdrop-blur-sm"
         onClick={onClose}
       />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="bootcamp-success-title"
-        className="relative w-full max-w-md overflow-hidden rounded-[2rem] bg-white shadow-[0_30px_80px_rgba(0,32,111,0.28)]"
+        className="relative z-10 w-full max-w-md overflow-hidden rounded-3xl border border-border bg-white shadow-card"
       >
-        <div className="relative overflow-hidden bg-[linear-gradient(135deg,#00206F_0%,#0133A0_55%,#001752_100%)] px-6 pb-10 pt-8 text-white sm:px-8">
-          <div className="pointer-events-none absolute -top-10 -right-8 size-40 rounded-full bg-orange/30 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-12 -left-10 size-36 rounded-full bg-white/10 blur-2xl" />
-          <div className="relative mx-auto flex size-16 items-center justify-center rounded-full bg-orange shadow-orange">
+        <div className="bg-navy px-6 pb-8 pt-8 text-white sm:px-8">
+          <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-orange">
             <svg
-              width="28"
-              height="28"
+              width="26"
+              height="26"
               viewBox="0 0 24 24"
               fill="none"
               aria-hidden="true"
@@ -96,18 +104,18 @@ export function BootcampSuccessModal({
               />
             </svg>
           </div>
-          <p className="relative mt-5 text-center text-xs font-bold tracking-[0.2em] text-orange uppercase">
-            Spot reserved
+          <p className="mt-5 text-center text-xs font-bold tracking-[0.18em] text-orange uppercase">
+            Registration confirmed
           </p>
           <h2
             id="bootcamp-success-title"
-            className="relative mt-2 text-center font-display text-3xl font-bold"
+            className="mt-2 text-center font-display text-3xl font-bold"
           >
             You&apos;re in, {firstName}!
           </h2>
-          <p className="relative mx-auto mt-3 max-w-sm text-center text-sm leading-6 text-white/80">
-            A confirmation email is on its way. Jump into the community so you
-            get onboarding updates, schedules, and mentor notes.
+          <p className="mx-auto mt-3 max-w-sm text-center text-sm leading-6 text-white/80">
+            A confirmation email is on its way. Join the WhatsApp group for
+            onboarding updates and session links.
           </p>
         </div>
 
@@ -130,6 +138,7 @@ export function BootcampSuccessModal({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
