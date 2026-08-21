@@ -95,14 +95,24 @@ export const disciplines = [
 
 export const courses = [
   {
-    title: "Web Development",
-    category: "FULL-STACK",
+    title: "Frontend Web Development",
+    category: "FRONTEND",
     description:
-      "Build modern web applications from frontend to backend with real client-ready projects.",
+      "Build responsive, interactive user interfaces with modern HTML, CSS, JavaScript, and React.",
     duration: "12 Weeks",
     originalPrice: "₦150,000",
     price: "₦30,000",
-    image: "/course-web.jpg",
+    image: "/course-frontend.jpg",
+  },
+  {
+    title: "Backend Development",
+    category: "BACKEND",
+    description:
+      "Design APIs, databases, and server-side systems that power reliable web applications.",
+    duration: "12 Weeks",
+    originalPrice: "₦150,000",
+    price: "₦30,000",
+    image: "/course-backend.jpg",
   },
   {
     title: "UI/UX Design",
