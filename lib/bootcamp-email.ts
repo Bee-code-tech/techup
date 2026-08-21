@@ -6,10 +6,12 @@ import {
 import { site } from "@/lib/site";
 
 const navy = "#00206F";
+const navyDeep = "#001752";
 const orange = "#FB7801";
+const orangeSoft = "#FFF4EB";
 const muted = "#5B6475";
 const border = "#E4E9F2";
-const surface = "#F7F8FA";
+const surface = "#F4F7FC";
 
 const logoUrl = `${site.url}/logo.png`;
 
@@ -28,6 +30,8 @@ function firstName(fullName: string) {
 function emailShell(options: {
   title: string;
   eyebrow: string;
+  heading: string;
+  subheading: string;
   body: string;
 }) {
   return `<!DOCTYPE html>
@@ -38,30 +42,30 @@ function emailShell(options: {
     <title>${options.title}</title>
   </head>
   <body style="margin:0;padding:0;background:${surface};font-family:Arial,Helvetica,sans-serif;color:${navy};">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${surface};padding:28px 12px;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${surface};padding:32px 12px;">
       <tr>
         <td align="center">
-          <table role="presentation" width="560" cellspacing="0" cellpadding="0" style="max-width:560px;width:100%;background:#ffffff;border:1px solid ${border};border-radius:16px;overflow:hidden;">
+          <table role="presentation" width="580" cellspacing="0" cellpadding="0" style="max-width:580px;width:100%;background:#ffffff;border:1px solid ${border};border-radius:20px;overflow:hidden;">
             <tr>
-              <td style="background:${navy};padding:22px 24px;">
+              <td style="background:${navyDeep};padding:26px 28px 22px;">
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                   <tr>
-                    <td valign="middle" style="width:48px;">
+                    <td valign="middle" style="width:52px;">
                       <a href="${site.url}" style="text-decoration:none;">
                         <img
                           src="${logoUrl}"
                           alt="TechUp Academy"
-                          width="40"
-                          height="40"
-                          style="display:block;width:40px;height:40px;border:0;border-radius:999px;background:#ffffff;"
+                          width="44"
+                          height="44"
+                          style="display:block;width:44px;height:44px;border:0;border-radius:999px;"
                         />
                       </a>
                     </td>
-                    <td valign="middle" style="padding-left:12px;">
-                      <p style="margin:0;font-size:16px;font-weight:700;color:#ffffff;line-height:1.2;">
+                    <td valign="middle" style="padding-left:14px;">
+                      <p style="margin:0;font-size:17px;font-weight:700;color:#ffffff;line-height:1.2;">
                         TechUp Academy
                       </p>
-                      <p style="margin:4px 0 0;font-size:12px;color:rgba(255,255,255,0.72);line-height:1.3;">
+                      <p style="margin:5px 0 0;font-size:12px;color:rgba(255,255,255,0.7);letter-spacing:0.04em;">
                         ${options.eyebrow}
                       </p>
                     </td>
@@ -70,25 +74,50 @@ function emailShell(options: {
               </td>
             </tr>
             <tr>
-              <td style="height:4px;background:${orange};font-size:0;line-height:0;">&nbsp;</td>
+              <td style="height:5px;background:${orange};font-size:0;line-height:0;">&nbsp;</td>
             </tr>
             <tr>
-              <td style="padding:28px 24px 8px;">
+              <td style="padding:30px 28px 8px;">
+                <p style="margin:0 0 10px;display:inline-block;background:${orangeSoft};color:${orange};font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:7px 12px;border-radius:999px;">
+                  ${options.eyebrow}
+                </p>
+                <h1 style="margin:0 0 10px;font-size:26px;line-height:1.25;font-weight:700;color:${navy};">
+                  ${options.heading}
+                </h1>
+                <p style="margin:0 0 22px;font-size:15px;line-height:1.7;color:${muted};">
+                  ${options.subheading}
+                </p>
                 ${options.body}
               </td>
             </tr>
             <tr>
-              <td style="padding:16px 24px 24px;">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${surface};border-radius:12px;">
+              <td style="padding:8px 28px 28px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${surface};border-radius:14px;border:1px solid ${border};">
                   <tr>
-                    <td style="padding:16px 18px;">
-                      <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:${navy};">
-                        TechUp Academy
-                      </p>
-                      <p style="margin:0;font-size:12px;line-height:1.6;color:${muted};">
-                        ${site.email}<br />
-                        <a href="${site.url}" style="color:${navy};text-decoration:underline;">${site.url.replace(/^https?:\/\//, "")}</a>
-                      </p>
+                    <td style="padding:18px 20px;">
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                        <tr>
+                          <td valign="middle" style="width:36px;">
+                            <img
+                              src="${logoUrl}"
+                              alt=""
+                              width="32"
+                              height="32"
+                              style="display:block;width:32px;height:32px;border:0;border-radius:999px;"
+                            />
+                          </td>
+                          <td valign="middle" style="padding-left:12px;">
+                            <p style="margin:0;font-size:13px;font-weight:700;color:${navy};">
+                              TechUp Academy
+                            </p>
+                            <p style="margin:3px 0 0;font-size:12px;line-height:1.5;color:${muted};">
+                              <a href="mailto:${site.email}" style="color:${muted};text-decoration:none;">${site.email}</a>
+                              &nbsp;·&nbsp;
+                              <a href="${site.url}" style="color:${muted};text-decoration:none;">${site.url.replace(/^https?:\/\//, "")}</a>
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
                     </td>
                   </tr>
                 </table>
@@ -102,8 +131,64 @@ function emailShell(options: {
 </html>`;
 }
 
-function detailLine(label: string, value: string) {
-  return `<p style="margin:0 0 8px;font-size:14px;line-height:1.6;color:${navy};"><strong>${label}:</strong> ${value}</p>`;
+function infoCard(rows: Array<[string, string]>) {
+  const items = rows
+    .map(([label, value], index) => {
+      const isLast = index === rows.length - 1;
+      return `
+        <tr>
+          <td style="padding:${isLast ? "14px 0 0" : "14px 0"};border-bottom:${isLast ? "0" : `1px solid ${border}`};width:34%;font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:${muted};">
+            ${label}
+          </td>
+          <td style="padding:${isLast ? "14px 0 0" : "14px 0"};border-bottom:${isLast ? "0" : `1px solid ${border}`};font-size:15px;font-weight:700;color:${navy};text-align:right;">
+            ${value}
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  return `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 22px;border:1px solid ${border};border-radius:16px;background:#ffffff;">
+      <tr>
+        <td style="padding:6px 20px 12px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            ${items}
+          </table>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+function primaryButton(href: string, label: string) {
+  return `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 18px;">
+      <tr>
+        <td align="center" style="background:${orange};border-radius:12px;">
+          <a href="${href}" style="display:block;padding:15px 22px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;">
+            ${label}
+          </a>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+function nextStep(number: string, title: string, copy: string) {
+  return `
+    <tr>
+      <td valign="top" style="padding:0 12px 14px 0;width:34px;">
+        <div style="width:28px;height:28px;border-radius:999px;background:${navy};color:#ffffff;font-size:13px;font-weight:700;line-height:28px;text-align:center;">
+          ${number}
+        </div>
+      </td>
+      <td valign="top" style="padding:0 0 14px;">
+        <p style="margin:0 0 3px;font-size:15px;font-weight:700;color:${navy};">${title}</p>
+        <p style="margin:0;font-size:13px;line-height:1.6;color:${muted};">${copy}</p>
+      </td>
+    </tr>
+  `;
 }
 
 export function studentWelcomeEmail(application: BootcampApplication) {
@@ -129,20 +214,22 @@ export function studentWelcomeEmail(application: BootcampApplication) {
   ].join("\n");
 
   const body = `
-    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Hi ${name},</p>
-    <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:${muted};">
-      Thank you for registering for the TechUp Academy free bootcamp. Your registration has been received.
+    ${infoCard([
+      ["Track", track],
+      ["Cohort", "Free Bootcamp · October 2026"],
+      ["Status", "Confirmed"],
+    ])}
+    <p style="margin:0 0 14px;font-size:16px;font-weight:700;color:${navy};">
+      What to do next
     </p>
-    ${detailLine("Track", track)}
-    ${detailLine("Cohort", "Free Bootcamp - October 2026")}
-    <p style="margin:16px 0;font-size:15px;line-height:1.7;color:${muted};">
-      Please join the WhatsApp group for onboarding details and session links:
-    </p>
-    <p style="margin:0 0 16px;">
-      <a href="${site.whatsappGroupUrl}" style="color:${navy};font-weight:700;">Join the WhatsApp group</a>
-    </p>
-    <p style="margin:0;font-size:14px;line-height:1.7;color:${muted};">
-      If you have any questions, reply to this email and our team will help.
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 8px;">
+      ${nextStep("1", "Join the WhatsApp group", "Onboarding notes and session links are shared there first.")}
+      ${nextStep("2", "Keep this confirmation", "Save this email for your registration details.")}
+      ${nextStep("3", "Reply if you need help", "Our team will respond if anything is unclear.")}
+    </table>
+    ${primaryButton(site.whatsappGroupUrl, "Join WhatsApp Group")}
+    <p style="margin:0;font-size:13px;line-height:1.7;color:${muted};">
+      Questions? Reply to this email and the TechUp team will assist you.
     </p>
   `;
 
@@ -151,7 +238,10 @@ export function studentWelcomeEmail(application: BootcampApplication) {
     text,
     html: emailShell({
       title: "Bootcamp registration confirmation",
-      eyebrow: "Bootcamp registration confirmation",
+      eyebrow: "Registration confirmed",
+      heading: `Welcome, ${name}`,
+      subheading:
+        "Your TechUp Academy free bootcamp registration has been received successfully.",
       body,
     }),
   };
@@ -161,6 +251,9 @@ export function adminAlertEmail(application: BootcampApplication) {
   const track = bootcampTracks[application.track];
   const laptop = laptopLabels[application.laptop] ?? application.laptop;
   const name = escapeHtml(application.fullName);
+  const shortName = escapeHtml(
+    application.fullName.split(" ")[0] || application.fullName,
+  );
 
   const text = [
     "New TechUp Academy bootcamp registration",
@@ -178,19 +271,30 @@ export function adminAlertEmail(application: BootcampApplication) {
   ].join("\n");
 
   const body = `
-    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">
-      New bootcamp registration received.
-    </p>
-    ${detailLine("Name", name)}
-    ${detailLine("Email", escapeHtml(application.email))}
-    ${detailLine("WhatsApp", escapeHtml(application.whatsapp))}
-    ${detailLine("Age", escapeHtml(application.age))}
-    ${detailLine("Gender", escapeHtml(application.gender))}
-    ${detailLine("Education", escapeHtml(application.education))}
-    ${detailLine("Laptop", escapeHtml(laptop))}
-    ${detailLine("Track", track)}
-    <p style="margin:16px 0 0;font-size:14px;line-height:1.7;color:${muted};">
-      Reply to this email to contact the applicant.
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 18px;background:${orangeSoft};border-radius:14px;">
+      <tr>
+        <td style="padding:14px 16px;">
+          <p style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:${orange};">
+            Selected track
+          </p>
+          <p style="margin:6px 0 0;font-size:18px;font-weight:700;color:${navy};">
+            ${track}
+          </p>
+        </td>
+      </tr>
+    </table>
+    ${infoCard([
+      ["Name", name],
+      ["Email", escapeHtml(application.email)],
+      ["WhatsApp", escapeHtml(application.whatsapp)],
+      ["Age", escapeHtml(application.age)],
+      ["Gender", escapeHtml(application.gender)],
+      ["Education", escapeHtml(application.education)],
+      ["Laptop", escapeHtml(laptop)],
+      ["Track", track],
+    ])}
+    <p style="margin:0;font-size:14px;line-height:1.7;color:${muted};">
+      Reply to this email to reach ${shortName} directly.
     </p>
   `;
 
@@ -199,7 +303,10 @@ export function adminAlertEmail(application: BootcampApplication) {
     text,
     html: emailShell({
       title: "New bootcamp registration",
-      eyebrow: "New bootcamp registration",
+      eyebrow: "New registration",
+      heading: "A new applicant just registered",
+      subheading:
+        "A confirmation email has been sent to the student. Review their details below.",
       body,
     }),
   };
