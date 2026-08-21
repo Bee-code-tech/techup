@@ -2,9 +2,8 @@ import { Section } from "@/components/layout/Section";
 import { HeroIntro } from "@/components/motion/HeroIntro";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger } from "@/components/motion/Stagger";
+import { ContactForm } from "@/components/sections/contact/ContactForm";
 import { Button } from "@/components/ui/Button";
-import { Field, Input, Textarea } from "@/components/ui/Field";
-import { Select } from "@/components/ui/Select";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { site } from "@/lib/site";
@@ -91,49 +90,7 @@ export function ContactBody() {
           </Stagger>
 
           <Reveal delay={0.1}>
-            <form className="rounded-[1.75rem] border border-border bg-white p-6 shadow-card sm:p-7 md:p-8">
-              <h2 className="font-display text-2xl font-bold text-foreground sm:text-[2rem]">
-                Send a Message
-              </h2>
-              <p className="mt-2 text-sm text-muted">
-                Fill out the form below and our team will get back to you within
-                24 hours.
-              </p>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <Field label="Full Name">
-                  <Input placeholder="Philip" name="fullName" />
-                </Field>
-                <Field label="Email Address">
-                  <Input
-                    type="email"
-                    placeholder="philip@gmail.com"
-                    name="email"
-                  />
-                </Field>
-              </div>
-              <Field label="Subject" className="mt-4">
-                <Select
-                  name="subject"
-                  placeholder="Select an inquiry type"
-                  options={[
-                    { value: "Bootcamp", label: "Bootcamp" },
-                    { value: "Scholarship", label: "Scholarship" },
-                    { value: "Courses", label: "Courses" },
-                    { value: "Partnership", label: "Partnership" },
-                  ]}
-                />
-              </Field>
-              <Field label="Message" className="mt-4">
-                <Textarea placeholder="How can we help you?" name="message" />
-              </Field>
-              <Button
-                type="submit"
-                className="mt-6 w-full rounded-xl"
-                size="lg"
-              >
-                Send Message
-              </Button>
-            </form>
+            <ContactForm />
           </Reveal>
         </div>
       </Section>

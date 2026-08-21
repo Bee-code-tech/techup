@@ -87,7 +87,7 @@ const proofItems = [
 
 const testimonials = [
   {
-    name: "Student",
+    name: "Abdul Azeez",
     track: "Data Analytics",
     image: "/student1.png",
     quote:
