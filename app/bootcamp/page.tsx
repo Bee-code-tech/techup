@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TikTokPixel } from "@/components/analytics/TikTokPixel";
 import { BootcampBody } from "@/components/sections/bootcamp/BootcampBody";
 import { BootcampHero } from "@/components/sections/bootcamp/BootcampHero";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -10,6 +11,7 @@ export const metadata: Metadata = createPageMetadata(pageSeo.bootcamp);
 export default function BootcampPage() {
   return (
     <>
+      <TikTokPixel />
       <JsonLd
         data={{
           "@context": "https://schema.org",
