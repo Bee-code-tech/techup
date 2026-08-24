@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Montserrat } from "next/font/google";
 import { MetaPixel } from "@/components/analytics/MetaPixel";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -89,6 +90,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <PageTransition>{children}</PageTransition>
         </main>
         <SiteFooter />
+        <Analytics />
       </body>
     </html>
   );
