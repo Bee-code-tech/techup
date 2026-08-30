@@ -8,7 +8,7 @@ export const site = {
   email: "techupacademy22@gmail.com",
   scholarshipFormUrl:
     "https://docs.google.com/forms/d/e/1FAIpQLSd8r6SQAiOhoISAZBF4bIfQ7y7VIVnHbt8CxUQ2_VjnoEgVdg/viewform",
-  whatsappGroupUrl: "https://chat.whatsapp.com/LgXHouemXT4AxFV0F6TcO5",
+  whatsappGroupUrl: "https://chat.whatsapp.com/LVk48oBAxdU8E4AXFzyBYl",
   whatsappChatUrl: "https://wa.link/nh1rt9",
   adminEmail: "techupacademy22@gmail.com",
   url:
