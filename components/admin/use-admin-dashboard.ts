@@ -16,10 +16,18 @@ export type Registration = {
   createdAt: string
 }
 
+export type BroadcastRecord = {
+  id: string
+  subject: string
+  recipientCount: number
+  createdAt: string
+}
+
 export type DashboardData = {
   stats: { total: number; today: number; tracks: number }
   daily: Array<{ date: string; count: number }>
   trackBreakdown: Array<{ track: string; label: string; count: number }>
+  broadcasts: BroadcastRecord[]
   registrations: Registration[]
 }
 

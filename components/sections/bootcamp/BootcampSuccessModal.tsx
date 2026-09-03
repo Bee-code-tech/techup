@@ -4,11 +4,11 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/marketing/site-button";
-import { site } from "@/lib/site";
 
 type BootcampSuccessModalProps = {
   open: boolean;
   name: string;
+  whatsappGroupUrl: string;
   onClose: () => void;
 };
 
@@ -47,6 +47,7 @@ function fireConfetti() {
 export function BootcampSuccessModal({
   open,
   name,
+  whatsappGroupUrl,
   onClose,
 }: BootcampSuccessModalProps) {
   useEffect(() => {
@@ -121,7 +122,7 @@ export function BootcampSuccessModal({
 
         <div className="space-y-3 px-6 py-6 sm:px-8">
           <Button
-            href={site.whatsappGroupUrl}
+            href={whatsappGroupUrl}
             variant="orange"
             size="lg"
             className="w-full rounded-xl"

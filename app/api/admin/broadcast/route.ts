@@ -5,7 +5,10 @@ import { getResendConfig, resendErrorMessage } from "@/lib/resend-client";
 
 type BroadcastBody = {
   subject?: string;
+  heading?: string;
   message?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
   recipientIds?: string[];
   tracks?: string[];
 };
@@ -15,7 +18,10 @@ const BATCH_SIZE = 10;
 export async function POST(request: Request) {
   const body = (await request.json()) as BroadcastBody;
   const subject = String(body.subject ?? "").trim();
+  const heading = String(body.heading ?? "").trim();
   const message = String(body.message ?? "").trim();
+  const ctaLabel = String(body.ctaLabel ?? "").trim();
+  const ctaUrl = String(body.ctaUrl ?? "").trim();
   const recipientIds = Array.isArray(body.recipientIds)
     ? body.recipientIds.filter((id) => typeof id === "string" && id.length > 0)
     : [];
@@ -72,7 +78,10 @@ export async function POST(request: Request) {
       batch.map(async (recipient) => {
         const mail = broadcastEmail({
           subject,
+          heading,
           message,
+          ctaLabel,
+          ctaUrl,
           recipientName: recipient.fullName,
         });
 

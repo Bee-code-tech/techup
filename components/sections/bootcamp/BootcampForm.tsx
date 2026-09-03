@@ -6,6 +6,7 @@ import { Button } from "@/components/marketing/site-button";
 import { Field, Input } from "@/components/marketing/Field";
 import { Select } from "@/components/marketing/Select";
 import { bootcampTracks } from "@/lib/bootcamp";
+import { site } from "@/lib/site";
 
 const trackOptions = Object.entries(bootcampTracks).map(([value, label]) => ({
   value,
@@ -16,6 +17,9 @@ export function BootcampForm() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [successName, setSuccessName] = useState("");
+  const [whatsappGroupUrl, setWhatsappGroupUrl] = useState(
+    site.whatsappGroupUrl as string,
+  );
   const [modalOpen, setModalOpen] = useState(false);
   const [formKey, setFormKey] = useState(0);
 
@@ -35,6 +39,7 @@ export function BootcampForm() {
       const payload = (await response.json()) as {
         error?: string;
         code?: string;
+        whatsappGroupUrl?: string;
       };
 
       if (response.status === 409 || payload.code === "duplicate") {
@@ -51,6 +56,9 @@ export function BootcampForm() {
       }
 
       setSuccessName(String(formData.get("fullName") ?? ""));
+      if (payload.whatsappGroupUrl) {
+        setWhatsappGroupUrl(payload.whatsappGroupUrl);
+      }
       setModalOpen(true);
       setFormKey((value) => value + 1);
     } catch {
@@ -170,6 +178,7 @@ export function BootcampForm() {
       <BootcampSuccessModal
         open={modalOpen}
         name={successName}
+        whatsappGroupUrl={whatsappGroupUrl}
         onClose={() => setModalOpen(false)}
       />
     </>

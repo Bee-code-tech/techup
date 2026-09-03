@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 
 export async function GET() {
   try {
-    const [registrations, trackGroups, total] = await Promise.all([
+    const [registrations, trackGroups, total, broadcasts] = await Promise.all([
       db.bootcampRegistration.findMany({
         orderBy: { createdAt: "desc" },
       }),
@@ -13,6 +13,16 @@ export async function GET() {
         _count: { track: true },
       }),
       db.bootcampRegistration.count(),
+      db.broadcast.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        select: {
+          id: true,
+          subject: true,
+          recipientCount: true,
+          createdAt: true,
+        },
+      }),
     ]);
 
     const now = new Date();
@@ -57,6 +67,12 @@ export async function GET() {
         count,
       })),
       trackBreakdown,
+      broadcasts: broadcasts.map((row) => ({
+        id: row.id,
+        subject: row.subject,
+        recipientCount: row.recipientCount,
+        createdAt: row.createdAt.toISOString(),
+      })),
       registrations: registrations.map((row) => ({
         id: row.id,
         fullName: row.fullName,

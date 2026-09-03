@@ -1,38 +1,36 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { CheckIcon, MegaphoneIcon, UsersIcon } from "lucide-react"
 import toast from "react-hot-toast"
 
 import type { Registration } from "@/components/admin/use-admin-dashboard"
+import { broadcastEmail } from "@/lib/broadcast-email"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
 type Audience = "general" | "track"
 
+const fieldClass =
+  "h-11 px-3.5 text-[15px] md:text-[15px] bg-background"
+
 export function BroadcastPanel({
   registrations,
+  onSent,
 }: {
   registrations: Registration[]
+  onSent?: () => void
 }) {
   const [audience, setAudience] = useState<Audience>("general")
   const [selectedTracks, setSelectedTracks] = useState<string[]>([])
   const [subject, setSubject] = useState("")
+  const [heading, setHeading] = useState("")
   const [message, setMessage] = useState("")
+  const [showCta, setShowCta] = useState(false)
+  const [ctaLabel, setCtaLabel] = useState("")
+  const [ctaUrl, setCtaUrl] = useState("")
   const [pending, setPending] = useState(false)
 
   const tracks = useMemo(() => {
@@ -56,6 +54,30 @@ export function BroadcastPanel({
     return registrations.filter((row) => selectedTracks.includes(row.track))
   }, [audience, registrations, selectedTracks])
 
+  const recipientLabel =
+    audience === "general"
+      ? `All ${registrations.length} students`
+      : recipients.length === 0
+        ? "No tracks selected"
+        : `${recipients.length} student${recipients.length === 1 ? "" : "s"}`
+
+  const previewName = recipients[0]?.fullName || "Tolu"
+
+  const preview = useMemo(
+    () =>
+      broadcastEmail({
+        subject: subject.trim() || "Bootcamp update",
+        heading: heading.trim() || "Your heading goes here",
+        message:
+          message.trim() ||
+          "Write the announcement here. This is how the body will look inside the TechUp email.",
+        ctaLabel: showCta ? ctaLabel : "",
+        ctaUrl: showCta ? ctaUrl : "",
+        recipientName: previewName,
+      }),
+    [ctaLabel, ctaUrl, heading, message, previewName, showCta, subject],
+  )
+
   function toggleTrack(track: string) {
     setSelectedTracks((current) =>
       current.includes(track)
@@ -72,6 +94,16 @@ export function BroadcastPanel({
       return
     }
 
+    if (
+      showCta &&
+      ctaLabel.trim() &&
+      ctaUrl.trim() &&
+      !/^https?:\/\//i.test(ctaUrl.trim())
+    ) {
+      toast.error("Button link must start with http:// or https://")
+      return
+    }
+
     setPending(true)
 
     try {
@@ -80,7 +112,10 @@ export function BroadcastPanel({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           subject,
+          heading,
           message,
+          ctaLabel: showCta ? ctaLabel : undefined,
+          ctaUrl: showCta ? ctaUrl : undefined,
           tracks: audience === "track" ? selectedTracks : undefined,
         }),
       })
@@ -101,9 +136,14 @@ export function BroadcastPanel({
         }.`,
       )
       setSubject("")
+      setHeading("")
       setMessage("")
+      setCtaLabel("")
+      setCtaUrl("")
+      setShowCta(false)
       setSelectedTracks([])
       setAudience("general")
+      onSent?.()
     } catch {
       toast.error("Network error while sending broadcast.")
     } finally {
@@ -112,191 +152,176 @@ export function BroadcastPanel({
   }
 
   return (
-    <div className="flex flex-col gap-5 px-4 lg:px-6">
-      <Card className="py-6 shadow-xs">
-        <CardHeader className="gap-1.5">
-          <CardTitle className="text-xl font-semibold tracking-tight">
-            Recipients
-          </CardTitle>
-          <CardDescription className="text-[15px]">
-            Send to every student, or limit the email to one or more tracks.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <button
-              type="button"
-              onClick={() => setAudience("general")}
-              className={cn(
-                "flex items-start gap-3 rounded-2xl border p-4 text-left transition-colors",
-                audience === "general"
-                  ? "border-navy bg-navy/5 ring-1 ring-navy/20"
-                  : "border-border hover:bg-muted/50",
-              )}
-            >
-              <span
-                className={cn(
-                  "mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl",
-                  audience === "general"
-                    ? "bg-navy text-white"
-                    : "bg-muted text-navy",
-                )}
-              >
-                <MegaphoneIcon className="size-5" />
-              </span>
-              <span>
-                <span className="block text-[15px] font-semibold">
-                  General broadcast
-                </span>
-                <span className="mt-1 block text-sm leading-6 text-muted-foreground">
-                  All {registrations.length} registered student
-                  {registrations.length === 1 ? "" : "s"}
-                </span>
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setAudience("track")}
-              className={cn(
-                "flex items-start gap-3 rounded-2xl border p-4 text-left transition-colors",
-                audience === "track"
-                  ? "border-navy bg-navy/5 ring-1 ring-navy/20"
-                  : "border-border hover:bg-muted/50",
-              )}
-            >
-              <span
-                className={cn(
-                  "mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl",
-                  audience === "track"
-                    ? "bg-navy text-white"
-                    : "bg-muted text-navy",
-                )}
-              >
-                <UsersIcon className="size-5" />
-              </span>
-              <span>
-                <span className="block text-[15px] font-semibold">
-                  By track
-                </span>
-                <span className="mt-1 block text-sm leading-6 text-muted-foreground">
-                  Choose Frontend, Backend, design, or data
-                </span>
-              </span>
-            </button>
-          </div>
+    <div className="grid items-start gap-6 px-4 xl:grid-cols-[minmax(0,1fr)_28rem] xl:gap-8 lg:px-6">
+      <form
+        onSubmit={handleSubmit}
+        className="flex min-w-0 flex-col overflow-hidden rounded-2xl border bg-card shadow-xs"
+      >
+        <div className="border-b px-5 py-5 sm:px-6">
+          <h2 className="text-lg font-semibold tracking-tight">Compose</h2>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            Only the content changes. Header and footer stay TechUp.
+          </p>
+        </div>
 
-          {audience === "track" ? (
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {tracks.map((track) => {
-                const selected = selectedTracks.includes(track.track)
-                return (
-                  <button
-                    key={track.track}
-                    type="button"
-                    onClick={() => toggleTrack(track.track)}
+        <div className="space-y-6 px-5 py-5 sm:px-6">
+          <div className="space-y-3">
+            <p className="text-sm font-medium">Recipients</p>
+            <div className="grid grid-cols-2 gap-2">
+              {(
+                [
+                  ["general", "All students", `${registrations.length}`],
+                  ["track", "By track", `${tracks.length}`],
+                ] as const
+              ).map(([value, label, count]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setAudience(value)}
+                  className={cn(
+                    "rounded-xl border px-3.5 py-3 text-left transition-colors",
+                    audience === value
+                      ? "border-navy bg-navy text-white"
+                      : "border-border bg-background text-foreground hover:bg-muted/50",
+                  )}
+                >
+                  <span className="block text-sm font-medium">{label}</span>
+                  <span
                     className={cn(
-                      "flex items-center justify-between rounded-2xl border px-4 py-3.5 text-left transition-colors",
-                      selected
-                        ? "border-orange bg-orange-soft ring-1 ring-orange/30"
-                        : "border-border hover:bg-muted/50",
+                      "mt-0.5 block text-xs",
+                      audience === value ? "text-white/70" : "text-muted-foreground",
                     )}
                   >
-                    <span>
-                      <span className="block text-[15px] font-medium">
-                        {track.label}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        {track.count} student{track.count === 1 ? "" : "s"}
-                      </span>
-                    </span>
-                    <span
+                    {value === "general"
+                      ? `${count} registered`
+                      : `${count} tracks`}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {audience === "track" ? (
+              <div className="overflow-hidden rounded-xl border">
+                {tracks.map((track, index) => {
+                  const selected = selectedTracks.includes(track.track)
+                  return (
+                    <label
+                      key={track.track}
                       className={cn(
-                        "flex size-6 items-center justify-center rounded-full border",
-                        selected
-                          ? "border-orange bg-orange text-white"
-                          : "border-input bg-background",
+                        "flex cursor-pointer items-center justify-between gap-3 px-3.5 py-3 hover:bg-muted/40",
+                        index > 0 && "border-t",
                       )}
                     >
-                      {selected ? <CheckIcon className="size-3.5" /> : null}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-          ) : null}
-
-          <div className="rounded-2xl bg-muted/60 px-4 py-3 text-[15px]">
-            <span className="font-medium text-navy">{recipients.length}</span>
-            <span className="text-muted-foreground">
-              {" "}
-              student{recipients.length === 1 ? "" : "s"} will receive this
-              email
-              {audience === "track" && selectedTracks.length > 0
-                ? ` from ${selectedTracks.length} track${
-                    selectedTracks.length === 1 ? "" : "s"
-                  }`
-                : ""}
-              .
-            </span>
+                      <span className="flex min-w-0 items-center gap-3">
+                        <Checkbox
+                          checked={selected}
+                          onCheckedChange={() => toggleTrack(track.track)}
+                        />
+                        <span className="truncate text-sm">{track.label}</span>
+                      </span>
+                      <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                        {track.count}
+                      </span>
+                    </label>
+                  )
+                })}
+              </div>
+            ) : null}
           </div>
-        </CardContent>
-      </Card>
 
-      <Card className="py-6 shadow-xs">
-        <CardHeader className="gap-1.5">
-          <CardTitle className="text-xl font-semibold tracking-tight">
-            Message
-          </CardTitle>
-          <CardDescription className="text-[15px]">
-            Write the email that will go out to the selected audience.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit}>
-            <FieldGroup className="gap-5">
-              <Field>
-                <FieldLabel htmlFor="subject" className="text-[15px]">
-                  Subject
-                </FieldLabel>
+          <label className="block space-y-2">
+            <span className="text-sm font-medium">Subject</span>
+            <Input
+              id="subject"
+              value={subject}
+              onChange={(event) => setSubject(event.target.value)}
+              required
+              placeholder="What students see in their inbox"
+              className={fieldClass}
+            />
+          </label>
+
+          <label className="block space-y-2">
+            <span className="text-sm font-medium">Heading</span>
+            <Input
+              id="heading"
+              value={heading}
+              onChange={(event) => setHeading(event.target.value)}
+              placeholder="Title inside the email"
+              className={fieldClass}
+            />
+          </label>
+
+          <label className="block space-y-2">
+            <span className="text-sm font-medium">Body</span>
+            <Textarea
+              id="message"
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              required
+              minLength={10}
+              rows={8}
+              placeholder="The announcement students will read"
+              className="min-h-40 resize-y px-3.5 py-3 text-[15px] leading-6 md:text-[15px]"
+            />
+          </label>
+
+          <div className="space-y-3">
+            <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium">
+              <Checkbox
+                checked={showCta}
+                onCheckedChange={(checked) => setShowCta(checked === true)}
+              />
+              Add a button
+            </label>
+            {showCta ? (
+              <div className="grid gap-3 sm:grid-cols-2">
                 <Input
-                  id="subject"
-                  value={subject}
-                  onChange={(event) => setSubject(event.target.value)}
-                  required
-                  placeholder="Bootcamp update"
-                  className="h-11 px-3.5 text-[15px] md:text-[15px]"
+                  value={ctaLabel}
+                  onChange={(event) => setCtaLabel(event.target.value)}
+                  placeholder="Button label"
+                  className={fieldClass}
                 />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="message" className="text-[15px]">
-                  Message
-                </FieldLabel>
-                <Textarea
-                  id="message"
-                  value={message}
-                  onChange={(event) => setMessage(event.target.value)}
-                  required
-                  minLength={10}
-                  rows={8}
-                  placeholder="Share the announcement students should receive."
-                  className="min-h-40 px-3.5 py-3 text-[15px] md:text-[15px]"
+                <Input
+                  value={ctaUrl}
+                  onChange={(event) => setCtaUrl(event.target.value)}
+                  placeholder="https://"
+                  className={fieldClass}
                 />
-              </Field>
-              <Button
-                type="submit"
-                className="h-11 w-full text-[15px] sm:w-auto"
-                disabled={pending || recipients.length === 0}
-              >
-                {pending
-                  ? "Sending..."
-                  : `Send to ${recipients.length} student${
-                      recipients.length === 1 ? "" : "s"
-                    }`}
-              </Button>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="mt-auto flex items-center justify-between gap-4 border-t bg-muted/30 px-5 py-4 sm:px-6">
+          <p className="text-sm text-muted-foreground">{recipientLabel}</p>
+          <Button
+            type="submit"
+            className="h-10 min-w-28 px-4 text-sm"
+            disabled={pending || recipients.length === 0}
+          >
+            {pending ? "Sending..." : "Send email"}
+          </Button>
+        </div>
+      </form>
+
+      <aside className="xl:sticky xl:top-6">
+        <div className="overflow-hidden rounded-2xl border bg-[#F4F7FC] shadow-xs">
+          <div className="border-b bg-white px-4 py-3.5">
+            <p className="text-[11px] font-medium tracking-[0.14em] text-muted-foreground uppercase">
+              Preview
+            </p>
+            <p className="mt-1 truncate text-sm font-medium">
+              {subject.trim() || "Bootcamp update"}
+            </p>
+          </div>
+          <iframe
+            title="Email preview"
+            srcDoc={preview.html}
+            className="h-[720px] w-full bg-[#F4F7FC]"
+          />
+        </div>
+      </aside>
     </div>
   )
 }
