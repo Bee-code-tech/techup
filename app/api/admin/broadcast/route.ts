@@ -13,7 +13,12 @@ type BroadcastBody = {
   tracks?: string[];
 };
 
-const BATCH_SIZE = 10;
+/** Resend batch endpoint accepts up to 100 emails per API call (1 request). */
+const BATCH_SIZE = 100;
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export async function POST(request: Request) {
   const body = (await request.json()) as BroadcastBody;
@@ -73,38 +78,44 @@ export async function POST(request: Request) {
   const failures: string[] = [];
 
   for (let index = 0; index < recipients.length; index += BATCH_SIZE) {
-    const batch = recipients.slice(index, index + BATCH_SIZE);
-    const results = await Promise.all(
-      batch.map(async (recipient) => {
-        const mail = broadcastEmail({
-          subject,
-          heading,
-          message,
-          ctaLabel,
-          ctaUrl,
-          recipientName: recipient.fullName,
-        });
-
-        const result = await resend.emails.send({
-          from,
-          to: recipient.email,
-          replyTo: adminEmail,
-          subject,
-          text: mail.text,
-          html: mail.html,
-        });
-
-        return { recipient, result };
-      }),
-    );
-
-    for (const { recipient, result } of results) {
-      if (result.error) {
-        failures.push(`${recipient.email}: ${resendErrorMessage(result.error)}`);
-      } else {
-        sent += 1;
-      }
+    if (index > 0) {
+      // Stay under Resend's default 10 requests/second team limit.
+      await sleep(200);
     }
+
+    const batch = recipients.slice(index, index + BATCH_SIZE);
+    const payload = batch.map((recipient) => {
+      const mail = broadcastEmail({
+        subject,
+        heading,
+        message,
+        ctaLabel,
+        ctaUrl,
+        recipientName: recipient.fullName,
+      });
+
+      return {
+        from,
+        to: recipient.email,
+        replyTo: adminEmail,
+        subject,
+        text: mail.text,
+        html: mail.html,
+      };
+    });
+
+    const result = await resend.batch.send(payload);
+
+    if (result.error) {
+      const reason = resendErrorMessage(result.error);
+      for (const recipient of batch) {
+        failures.push(`${recipient.email}: ${reason}`);
+      }
+      continue;
+    }
+
+    // Strict batch mode: no error means the whole chunk was accepted.
+    sent += batch.length;
   }
 
   if (sent === 0) {
