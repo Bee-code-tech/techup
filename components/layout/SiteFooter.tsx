@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { Container } from "@/components/layout/Container";
-import { SocialLinks } from "@/components/ui/SocialLinks";
+import { SocialLinks } from "@/components/marketing/SocialLinks";
 import { gsap, prefersReducedMotion, registerGsap } from "@/lib/gsap";
 import { site } from "@/lib/site";
 

@@ -4,9 +4,9 @@ import { Section } from "@/components/layout/Section";
 import { HeroIntro } from "@/components/motion/HeroIntro";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger } from "@/components/motion/Stagger";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { Badge } from "@/components/marketing/Badge";
+import { Button } from "@/components/marketing/site-button";
+import { SectionHeading } from "@/components/marketing/SectionHeading";
 import { experts } from "@/lib/site";
 
 const tinlabHighlights = [
@@ -92,7 +92,7 @@ export function AboutHero() {
           </h1>
           <p
             data-hero
-            className="mt-4 max-w-2xl text-sm leading-relaxed text-muted sm:mt-5 sm:text-base md:text-lg"
+            className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:mt-5 sm:text-base md:text-lg"
           >
             TechUp Academy is a Nigerian ed-tech platform dedicated to equipping
             beginners with practical, industry-relevant digital skills,
@@ -164,7 +164,7 @@ export function AboutBody() {
             <h3 className="mt-6 font-display text-3xl font-bold text-navy">
               Registered Entity
             </h3>
-            <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-muted sm:text-base">
+            <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-muted-foreground sm:text-base">
               TechUp Academy is a fully registered organization committed to
               transparent and professional operations.
             </p>
@@ -195,12 +195,12 @@ export function AboutBody() {
               <p className="mt-2 text-xs font-semibold tracking-wider text-orange uppercase sm:text-sm">
                 Founder of TechUp Academy
               </p>
-              <p className="mt-4 text-sm leading-relaxed text-muted sm:mt-5 sm:text-base">
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:mt-5 sm:text-base">
                 Philip is building TechUp Academy to expand access to practical
                 tech education across Africa — pairing rigorous training with
                 mentorship that helps learners compete on a global stage.
               </p>
-              <p className="mt-4 text-sm italic text-muted sm:mt-5">
+              <p className="mt-4 text-sm italic text-muted-foreground sm:mt-5">
                 &ldquo;We are not just teaching tech... we are building a runway
                 for the next generation of Nigerian innovators to take flight on
                 the global stage.&rdquo;
@@ -234,7 +234,7 @@ export function AboutBody() {
                 <p className="mt-1 text-sm font-medium text-orange">
                   {expert.role}
                 </p>
-                <p className="mt-3 text-sm text-muted">{expert.bio}</p>
+                <p className="mt-3 text-sm text-muted-foreground">{expert.bio}</p>
                 <Button
                   href={expert.linkedin}
                   variant="outline"

@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { Section } from "@/components/layout/Section";
 import { Stagger } from "@/components/motion/Stagger";
-import { Button } from "@/components/ui/Button";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { Button } from "@/components/marketing/site-button";
+import { SectionHeading } from "@/components/marketing/SectionHeading";
 import { site } from "@/lib/site";
 
 const paths = [
@@ -75,7 +75,7 @@ export function KickstartJourney() {
               <h3 className="font-display text-lg font-bold text-navy sm:text-xl">
                 {path.title}
               </h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {path.description}
               </p>
               <Button

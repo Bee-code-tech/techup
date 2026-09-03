@@ -1,8 +1,8 @@
 import { Section } from "@/components/layout/Section";
 import { BootcampForm } from "@/components/sections/bootcamp/BootcampForm";
 import { HeroIntro } from "@/components/motion/HeroIntro";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/marketing/Badge";
+import { Button } from "@/components/marketing/site-button";
 
 export function BootcampHero() {
   return (
@@ -19,7 +19,7 @@ export function BootcampHero() {
         </h1>
         <p
           data-hero
-          className="mt-4 max-w-2xl text-sm leading-relaxed text-muted sm:mt-5 sm:text-base md:text-lg"
+          className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:mt-5 sm:text-base md:text-lg"
         >
           Launch your career with Nigeria&apos;s most intensive 2-week coding
           experience. Zero tuition, 100% industry-focused, and designed for

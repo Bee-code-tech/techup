@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/marketing/site-button";
 import { site } from "@/lib/site";
 
 type BootcampSuccessModalProps = {

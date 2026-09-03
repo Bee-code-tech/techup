@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { ContactSuccessModal } from "@/components/sections/contact/ContactSuccessModal";
-import { Button } from "@/components/ui/Button";
-import { Field, Input, Textarea } from "@/components/ui/Field";
-import { Select } from "@/components/ui/Select";
+import { Button } from "@/components/marketing/site-button";
+import { Field, Input, Textarea } from "@/components/marketing/Field";
+import { Select } from "@/components/marketing/Select";
 import { contactSubjects } from "@/lib/contact";
 
 const subjectOptions = contactSubjects.map((value) => ({
@@ -59,7 +59,7 @@ export function ContactForm() {
         <h2 className="font-display text-2xl font-bold text-foreground sm:text-[2rem]">
           Send a Message
         </h2>
-        <p className="mt-2 text-sm text-muted">
+        <p className="mt-2 text-sm text-muted-foreground">
           Fill out the form below and our team will get back to you within 24
           hours.
         </p>

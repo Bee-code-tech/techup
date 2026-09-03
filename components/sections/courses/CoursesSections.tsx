@@ -3,10 +3,10 @@ import { Section } from "@/components/layout/Section";
 import { HeroIntro } from "@/components/motion/HeroIntro";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger } from "@/components/motion/Stagger";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { CourseCard } from "@/components/ui/CourseCard";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { Badge } from "@/components/marketing/Badge";
+import { Button } from "@/components/marketing/site-button";
+import { CourseCard } from "@/components/marketing/CourseCard";
+import { SectionHeading } from "@/components/marketing/SectionHeading";
 import { comingSoonCourses, courses } from "@/lib/site";
 
 export function CoursesHero() {
@@ -24,7 +24,7 @@ export function CoursesHero() {
         </h1>
         <p
           data-hero
-          className="mt-4 max-w-2xl text-sm text-muted sm:text-base md:text-lg"
+          className="mt-4 max-w-2xl text-sm text-muted-foreground sm:text-base md:text-lg"
         >
           Industry-focused training designed to bridge the gap between Nigerian
           talent and global tech opportunities. Master the skills that matter.
@@ -55,7 +55,7 @@ export function CoursesCatalog() {
             <h2 className="font-display text-2xl font-bold text-navy sm:text-3xl md:text-4xl">
               What You&apos;ll Learn
             </h2>
-            <p className="mt-3 max-w-xl text-sm text-muted sm:mt-4 sm:text-base">
+            <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:mt-4 sm:text-base">
               Curriculum shaped with industry partners so every module maps to
               real workplace outcomes.
             </p>
@@ -79,7 +79,7 @@ export function CoursesCatalog() {
                   className="rounded-2xl border border-border bg-white px-4 py-4 sm:px-5"
                 >
                   <h3 className="font-semibold text-navy">{item.title}</h3>
-                  <p className="mt-1 text-sm text-muted">{item.body}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{item.body}</p>
                 </div>
               ))}
             </div>
@@ -114,7 +114,7 @@ export function CoursesCatalog() {
                   >
                     <div className="min-w-0">
                       <p className="font-semibold text-navy">{option.title}</p>
-                      <p className="text-sm text-muted">{option.body}</p>
+                      <p className="text-sm text-muted-foreground">{option.body}</p>
                     </div>
                     <span className="shrink-0 text-orange">{option.mark}</span>
                   </div>

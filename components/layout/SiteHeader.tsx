@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { Container } from "@/components/layout/Container";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/marketing/site-button";
 import { cn } from "@/lib/cn";
 import { gsap, prefersReducedMotion, registerGsap } from "@/lib/gsap";
 import { navLinks, site } from "@/lib/site";
@@ -116,7 +116,7 @@ export function SiteHeader() {
                 data-nav
                 className={cn(
                   "relative text-sm font-medium transition-colors",
-                  active ? "text-orange" : "text-muted hover:text-navy",
+                  active ? "text-orange" : "text-muted-foreground hover:text-navy",
                 )}
               >
                 {link.label}

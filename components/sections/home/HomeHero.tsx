@@ -2,9 +2,9 @@ import Image from "next/image";
 import { Section } from "@/components/layout/Section";
 import { Float } from "@/components/motion/Float";
 import { HeroIntro } from "@/components/motion/HeroIntro";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { MediaBox } from "@/components/ui/MediaBox";
+import { Badge } from "@/components/marketing/Badge";
+import { Button } from "@/components/marketing/site-button";
+import { MediaBox } from "@/components/marketing/MediaBox";
 
 function SuccessStoryIcon() {
   return (
@@ -49,7 +49,7 @@ export function HomeHero() {
           </h1>
           <p
             data-hero
-            className="mt-4 max-w-xl text-sm leading-relaxed text-muted sm:mt-5 sm:text-base md:text-lg"
+            className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:mt-5 sm:text-base md:text-lg"
           >
             Equipping the next generation of African tech talent with
             industry-standard practical skills, world-class mentorship, and a
@@ -88,7 +88,7 @@ export function HomeHero() {
               <p className="text-sm font-semibold text-navy">
                 100+ Students Registered
               </p>
-              <p className="text-xs text-muted">Across Nigeria & Africa</p>
+              <p className="text-xs text-muted-foreground">Across Nigeria & Africa</p>
             </div>
           </div>
         </div>

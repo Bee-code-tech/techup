@@ -1,15 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
-import { Montserrat } from "next/font/google";
+import { Montserrat, Geist } from "next/font/google";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { MetaPixel } from "@/components/analytics/MetaPixel";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { SiteHeader } from "@/components/layout/SiteHeader";
-import { PageTransition } from "@/components/motion/PageTransition";
 import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
 import { absoluteUrl, ogImage } from "@/lib/seo";
 import { site } from "@/lib/site";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -82,16 +82,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${montserrat.variable} h-full antialiased`}>
+    <html lang="en" className={cn("h-full", "antialiased", montserrat.variable, "font-sans", geist.variable)}>
       <body className="flex min-h-full flex-col overflow-x-hidden font-sans">
         <GoogleAnalytics />
         <MetaPixel />
         <OrganizationJsonLd />
-        <SiteHeader />
-        <main className="flex flex-1 flex-col">
-          <PageTransition>{children}</PageTransition>
-        </main>
-        <SiteFooter />
+        {children}
         <Analytics />
       </body>
     </html>

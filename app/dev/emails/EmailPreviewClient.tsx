@@ -26,7 +26,7 @@ export function EmailPreviewClient({
             <h1 className="mt-1 font-display text-2xl font-bold">
               Bootcamp emails
             </h1>
-            <p className="mt-1 text-sm text-muted">
+            <p className="mt-1 text-sm text-muted-foreground">
               Subject: <span className="font-medium text-navy">{subject}</span>
             </p>
           </div>
@@ -71,7 +71,7 @@ export function EmailPreviewClient({
           <div className="border-b border-border px-4 py-3 text-sm font-semibold">
             Plain text version
           </div>
-          <pre className="overflow-auto p-4 text-xs leading-6 whitespace-pre-wrap text-muted">
+          <pre className="overflow-auto p-4 text-xs leading-6 whitespace-pre-wrap text-muted-foreground">
             {text}
           </pre>
         </div>

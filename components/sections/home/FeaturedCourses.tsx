@@ -1,7 +1,7 @@
 import { Section } from "@/components/layout/Section";
 import { Stagger } from "@/components/motion/Stagger";
-import { CourseCard } from "@/components/ui/CourseCard";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { CourseCard } from "@/components/marketing/CourseCard";
+import { SectionHeading } from "@/components/marketing/SectionHeading";
 import { courses } from "@/lib/site";
 
 export function FeaturedCourses() {

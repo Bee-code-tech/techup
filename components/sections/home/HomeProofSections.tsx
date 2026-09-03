@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Section } from "@/components/layout/Section";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger } from "@/components/motion/Stagger";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionHeading } from "@/components/marketing/SectionHeading";
 
 function CalendarIcon() {
   return (
@@ -166,7 +166,7 @@ export function StudentVoices() {
               />
               <div>
                 <h3 className="font-semibold text-navy">{item.name}</h3>
-                <p className="text-sm text-muted">{item.track}</p>
+                <p className="text-sm text-muted-foreground">{item.track}</p>
               </div>
             </div>
             <p className="mt-6 text-sm leading-7 text-slate-600 sm:text-base">

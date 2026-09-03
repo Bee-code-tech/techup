@@ -3,9 +3,9 @@ import { Section } from "@/components/layout/Section";
 import { HeroIntro } from "@/components/motion/HeroIntro";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger } from "@/components/motion/Stagger";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { Badge } from "@/components/marketing/Badge";
+import { Button } from "@/components/marketing/site-button";
+import { SectionHeading } from "@/components/marketing/SectionHeading";
 import { site } from "@/lib/site";
 
 const criteria = [
@@ -171,7 +171,7 @@ export function ScholarshipHero() {
           </h1>
           <p
             data-hero
-            className="mt-4 max-w-xl text-sm leading-relaxed text-muted sm:mt-5 sm:text-base md:text-lg"
+            className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:mt-5 sm:text-base md:text-lg"
           >
             We are removing financial barriers to empower Nigeria&apos;s
             brightest minds. Gain world-class tech education and accelerate your
@@ -228,7 +228,7 @@ export function ScholarshipBody() {
               Empowering Dreams through{" "}
               <span className="sm:block">Tech Skills</span>
             </h2>
-            <p className="mt-5 max-w-2xl text-sm leading-7 text-muted sm:leading-8 sm:text-base">
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-muted-foreground sm:leading-8 sm:text-base">
               The TechUp Academy Scholarship Fund is designed to identify and
               support exceptional talent who lack the financial means to access
               premium tech training. Our goal is to train Nigerians over time,
@@ -239,13 +239,13 @@ export function ScholarshipBody() {
                 <p className="font-display text-3xl font-bold text-navy sm:text-4xl">
                   ₦2M+
                 </p>
-                <p className="mt-2 text-sm text-muted">Fund Committed</p>
+                <p className="mt-2 text-sm text-muted-foreground">Fund Committed</p>
               </div>
               <div className="border-l-4 border-orange pl-4">
                 <p className="font-display text-3xl font-bold text-navy sm:text-4xl">
                   100
                 </p>
-                <p className="mt-2 text-sm text-muted">Scholars Trained</p>
+                <p className="mt-2 text-sm text-muted-foreground">Scholars Trained</p>
               </div>
             </div>
           </Reveal>
@@ -279,7 +279,7 @@ export function ScholarshipBody() {
               <h3 className="mt-5 font-display text-xl font-bold text-navy sm:text-2xl">
                 Full Tuition Coverage
               </h3>
-              <p className="mt-3 text-sm leading-7 text-muted">
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">
                 Complete coverage of course fees so exceptional talent can focus
                 on learning, not finances.
               </p>
@@ -297,7 +297,7 @@ export function ScholarshipBody() {
                   <h3 className="font-display text-xl font-bold text-navy">
                     Modern Tools & Software
                   </h3>
-                  <p className="mt-2 text-sm leading-7 text-muted">
+                  <p className="mt-2 text-sm leading-7 text-muted-foreground">
                     Train with Figma, Adobe Creative Cloud, GitHub Pro, and modern
                     analytics stacks used in real product teams.
                   </p>
@@ -313,7 +313,7 @@ export function ScholarshipBody() {
               <h3 className="mt-5 font-display text-xl font-bold text-navy">
                 1-on-1 Mentorship
               </h3>
-              <p className="mt-3 text-sm leading-7 text-muted">
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">
                 Weekly sessions with industry leads who review your progress and
                 unblock growth.
               </p>
@@ -327,7 +327,7 @@ export function ScholarshipBody() {
               <h3 className="mt-5 font-display text-xl font-bold text-navy">
                 Job Placement
               </h3>
-              <p className="mt-3 text-sm leading-7 text-muted">
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">
                 Direct pathways into internships and full-time roles with partner
                 companies.
               </p>
@@ -350,7 +350,7 @@ export function ScholarshipBody() {
               <p className="text-sm leading-6 italic">
                 &ldquo;The scholarship changed my life.&rdquo;
               </p>
-              <p className="mt-2 text-xs font-semibold text-muted">
+              <p className="mt-2 text-xs font-semibold text-muted-foreground">
                 — Sarah A., 2024 Scholar
               </p>
             </div>
@@ -387,7 +387,7 @@ export function ScholarshipBody() {
             <h2 className="font-display text-2xl font-bold text-navy sm:text-3xl md:text-4xl">
               Selection Process
             </h2>
-            <p className="mt-3 max-w-md text-sm leading-7 text-muted sm:text-base">
+            <p className="mt-3 max-w-md text-sm leading-7 text-muted-foreground sm:text-base">
               Our rigorous selection ensures we find the most deserving
               candidates.
             </p>
@@ -419,7 +419,7 @@ export function ScholarshipBody() {
                   key={item.label}
                   className="flex items-start justify-between gap-3 sm:items-center sm:gap-4"
                 >
-                  <p className="min-w-0 text-sm font-medium text-muted sm:text-base">
+                  <p className="min-w-0 text-sm font-medium text-muted-foreground sm:text-base">
                     {item.label}
                   </p>
                   {item.highlight ? (

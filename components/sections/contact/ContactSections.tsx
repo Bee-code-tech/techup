@@ -3,9 +3,9 @@ import { HeroIntro } from "@/components/motion/HeroIntro";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger } from "@/components/motion/Stagger";
 import { ContactForm } from "@/components/sections/contact/ContactForm";
-import { Button } from "@/components/ui/Button";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { SocialLinks } from "@/components/ui/SocialLinks";
+import { Button } from "@/components/marketing/site-button";
+import { SectionHeading } from "@/components/marketing/SectionHeading";
+import { SocialLinks } from "@/components/marketing/SocialLinks";
 import { site } from "@/lib/site";
 
 export function ContactHero() {
@@ -26,7 +26,7 @@ export function ContactHero() {
         </h1>
         <p
           data-hero
-          className="mx-auto mt-4 max-w-2xl text-sm text-muted sm:text-base md:text-lg"
+          className="mx-auto mt-4 max-w-2xl text-sm text-muted-foreground sm:text-base md:text-lg"
         >
           Have questions about our programs, scholarships, or partnerships?
           We&apos;re here to help you navigate your digital ascent.
@@ -50,7 +50,7 @@ export function ContactBody() {
                 ◐
               </div>
               <h3 className="mt-3 font-semibold text-navy">Chat with Us</h3>
-              <p className="mt-1 text-sm text-muted">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Fastest response time for quick inquiries.
               </p>
               <a
@@ -70,7 +70,7 @@ export function ContactBody() {
                 ✉
               </div>
               <h3 className="mt-3 font-semibold text-navy">Email Us</h3>
-              <p className="mt-1 text-sm text-muted">
+              <p className="mt-1 text-sm text-muted-foreground">
                 For detailed inquiries and support.
               </p>
               <a

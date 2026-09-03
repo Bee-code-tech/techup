@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Section } from "@/components/layout/Section";
 import { Reveal } from "@/components/motion/Reveal";
-import { Button } from "@/components/ui/Button";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { Button } from "@/components/marketing/site-button";
+import { SectionHeading } from "@/components/marketing/SectionHeading";
 import { cn } from "@/lib/cn";
 import { aboutFaqs } from "@/lib/site";
 
@@ -38,7 +38,7 @@ export function AboutFaqCta() {
                     </span>
                     <span
                       className={cn(
-                        "shrink-0 text-muted transition",
+                        "shrink-0 text-muted-foreground transition",
                         isOpen && "rotate-180",
                       )}
                     >
@@ -46,7 +46,7 @@ export function AboutFaqCta() {
                     </span>
                   </button>
                   {isOpen ? (
-                    <p className="border-t border-border px-4 py-4 text-sm leading-relaxed text-muted sm:px-5">
+                    <p className="border-t border-border px-4 py-4 text-sm leading-relaxed text-muted-foreground sm:px-5">
                       {item.a}
                     </p>
                   ) : null}

@@ -22,7 +22,7 @@ export function MediaBox({
   return (
     <div
       className={cn(
-        "relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-dashed border-border bg-surface-blue text-sm font-medium text-muted",
+        "relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-dashed border-border bg-surface-blue text-sm font-medium text-muted-foreground",
         aspectClass[aspect],
         className,
       )}

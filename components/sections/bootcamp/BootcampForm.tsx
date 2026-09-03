@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { BootcampSuccessModal } from "@/components/sections/bootcamp/BootcampSuccessModal";
-import { Button } from "@/components/ui/Button";
-import { Field, Input } from "@/components/ui/Field";
-import { Select } from "@/components/ui/Select";
+import { Button } from "@/components/marketing/site-button";
+import { Field, Input } from "@/components/marketing/Field";
+import { Select } from "@/components/marketing/Select";
 import { bootcampTracks } from "@/lib/bootcamp";
 
 const trackOptions = Object.entries(bootcampTracks).map(([value, label]) => ({
@@ -32,7 +32,18 @@ export function BootcampForm() {
         method: "POST",
         body: formData,
       });
-      const payload = (await response.json()) as { error?: string };
+      const payload = (await response.json()) as {
+        error?: string;
+        code?: string;
+      };
+
+      if (response.status === 409 || payload.code === "duplicate") {
+        setError(
+          payload.error ||
+            "You have already registered for this bootcamp with this email address.",
+        );
+        return;
+      }
 
       if (!response.ok) {
         setError(payload.error || "Something went wrong. Please try again.");
@@ -60,7 +71,7 @@ export function BootcampForm() {
             <h2 className="font-display text-2xl font-bold text-navy sm:text-3xl">
               Reserve Your Spot
             </h2>
-            <p className="mt-2 text-sm text-muted sm:text-base">
+            <p className="mt-2 text-sm text-muted-foreground sm:text-base">
               Fill in your details to join the next free bootcamp cohort.
             </p>
           </div>
@@ -142,7 +153,7 @@ export function BootcampForm() {
           ) : null}
 
           <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-muted sm:max-w-sm">
+            <p className="text-xs text-muted-foreground sm:max-w-sm">
               By clicking, you agree to our Terms of Service and Privacy Policy.
             </p>
             <Button

@@ -2,8 +2,8 @@ import Image from "next/image";
 import { Section } from "@/components/layout/Section";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger } from "@/components/motion/Stagger";
-import { Button } from "@/components/ui/Button";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { Button } from "@/components/marketing/site-button";
+import { SectionHeading } from "@/components/marketing/SectionHeading";
 
 function StudentGraduateIcon() {
   return (
@@ -475,7 +475,7 @@ export function BootcampBody() {
               <h3 className="mt-6 font-display text-2xl font-bold leading-tight text-navy">
                 Community Driven
               </h3>
-              <p className="mt-4 text-sm leading-7 text-muted">
+              <p className="mt-4 text-sm leading-7 text-muted-foreground">
                 Join 120+ alumni working in startups across Lagos, and Africa.
               </p>
             </Reveal>
@@ -501,7 +501,7 @@ export function BootcampBody() {
               <h3 className="font-display text-2xl font-bold text-navy sm:text-3xl">
                 Real Projects. Real Experience.
               </h3>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-muted">
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground">
                 Move beyond &quot;Hello World&quot;. Build banking apps and
                 e-commerce platforms used by thousands of users.
               </p>
@@ -531,7 +531,7 @@ export function BootcampBody() {
                 <h3 className="mt-5 font-display text-xl font-bold text-navy">
                   {item.title}
                 </h3>
-                <p className="mt-3 text-sm leading-7 text-muted">
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">
                   {item.description}
                 </p>
               </article>
@@ -602,7 +602,7 @@ export function BootcampBody() {
               <h3 className="mt-5 font-display text-xl font-bold text-navy">
                 {item.title}
               </h3>
-              <p className="mt-3 text-sm leading-7 text-muted">{item.body}</p>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">{item.body}</p>
             </article>
           ))}
         </Stagger>
@@ -627,7 +627,7 @@ export function BootcampBody() {
                     {item.title}
                   </h3>
                 </div>
-                <p className="mt-2.5 text-sm leading-6 text-muted">{item.body}</p>
+                <p className="mt-2.5 text-sm leading-6 text-muted-foreground">{item.body}</p>
               </Reveal>
             );
 
@@ -694,11 +694,11 @@ export function BootcampBody() {
                 >
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-navy [&::-webkit-details-marker]:hidden">
                     {item.q}
-                    <span className="shrink-0 text-muted transition group-open:rotate-180">
+                    <span className="shrink-0 text-muted-foreground transition group-open:rotate-180">
                       ▾
                     </span>
                   </summary>
-                  <p className="mt-3 border-t border-border pt-3 text-sm leading-relaxed text-muted">
+                  <p className="mt-3 border-t border-border pt-3 text-sm leading-relaxed text-muted-foreground">
                     {item.a}
                   </p>
                 </details>

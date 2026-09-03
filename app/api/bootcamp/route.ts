@@ -1,24 +1,13 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { parseBootcampApplication } from "@/lib/bootcamp";
 import { adminAlertEmail, studentWelcomeEmail } from "@/lib/bootcamp-email";
-import { site } from "@/lib/site";
-
-function resendErrorMessage(error: unknown) {
-  if (!error || typeof error !== "object") return "Unknown email error";
-  if ("message" in error && typeof error.message === "string") {
-    return error.message;
-  }
-  return JSON.stringify(error);
-}
+import { db } from "@/lib/db";
+import { getResendConfig, resendErrorMessage } from "@/lib/resend-client";
 
 export async function POST(request: Request) {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json(
-      { error: "Email is not configured yet. Please try again later." },
-      { status: 500 },
-    );
+  const emailConfig = getResendConfig();
+  if (!emailConfig.ok) {
+    return NextResponse.json({ error: emailConfig.error }, { status: 500 });
   }
 
   const formData = await request.formData();
@@ -31,24 +20,46 @@ export async function POST(request: Request) {
   }
 
   const application = parsed.value;
-  const adminEmail = process.env.ADMIN_EMAIL || site.adminEmail;
-  const from =
-    process.env.RESEND_FROM ||
-    "TechUp Academy <noreply@techupacademyng.com>";
 
-  if (from.includes("@resend.dev")) {
-    return NextResponse.json(
-      {
-        error:
-          "Email sender is still on Resend's test domain. Set RESEND_FROM to an address on your verified domain (e.g. noreply@techupacademyng.com).",
+  try {
+    const existing = await db.bootcampRegistration.findUnique({
+      where: { email: application.email },
+    });
+
+    if (existing) {
+      return NextResponse.json(
+        {
+          error:
+            "You have already registered for this bootcamp with this email address.",
+          code: "duplicate",
+        },
+        { status: 409 },
+      );
+    }
+
+    await db.bootcampRegistration.create({
+      data: {
+        fullName: application.fullName,
+        email: application.email,
+        age: Number(application.age),
+        gender: application.gender,
+        whatsapp: application.whatsapp,
+        education: application.education,
+        laptop: application.laptop,
+        track: application.track,
       },
+    });
+  } catch (error) {
+    console.error("Bootcamp registration save failed", error);
+    return NextResponse.json(
+      { error: "Could not save your registration. Please try again." },
       { status: 500 },
     );
   }
 
   const studentMail = studentWelcomeEmail(application);
   const adminMail = adminAlertEmail(application);
-  const resend = new Resend(apiKey);
+  const { resend, from, adminEmail } = emailConfig;
 
   const [adminResult, studentResult] = await Promise.all([
     resend.emails.send({
@@ -80,7 +91,9 @@ export async function POST(request: Request) {
 
     const parts: string[] = [];
     if (adminResult.error) {
-      parts.push(`Admin (${adminEmail}): ${resendErrorMessage(adminResult.error)}`);
+      parts.push(
+        `Admin (${adminEmail}): ${resendErrorMessage(adminResult.error)}`,
+      );
     }
     if (studentResult.error) {
       parts.push(
@@ -91,7 +104,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "We could not send confirmation emails. Please check your details and try again.",
+          "Your registration was saved, but we could not send confirmation emails. Our team has your details.",
         details: parts,
       },
       { status: 502 },

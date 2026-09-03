@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/marketing/site-button";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
 
@@ -103,12 +103,12 @@ export function CourseCard({
         <h3 className="font-display text-lg font-bold text-navy sm:text-xl">
           {title}
         </h3>
-        <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">
+        <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
           {description}
         </p>
 
         <div className="mt-5 space-y-2.5 border-t border-border pt-4">
-          <div className="flex items-center gap-2 text-sm text-muted">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <ClockIcon />
             <span>
               Duration: <span className="font-medium text-navy">{duration}</span>
@@ -116,10 +116,10 @@ export function CourseCard({
           </div>
           <div className="flex items-center gap-2 text-sm">
             <WalletIcon />
-            <span className="text-muted">Tuition:</span>
+            <span className="text-muted-foreground">Tuition:</span>
             <span className="ml-auto inline-flex items-baseline gap-2.5">
               {originalPrice ? (
-                <span className="text-xs font-medium text-muted/80 line-through decoration-muted">
+                <span className="text-xs font-medium text-muted-foreground/80 line-through decoration-muted">
                   {originalPrice}
                 </span>
               ) : null}

@@ -1,6 +1,6 @@
 import { Section } from "@/components/layout/Section";
 import { Stagger } from "@/components/motion/Stagger";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionHeading } from "@/components/marketing/SectionHeading";
 
 function PracticalLearningIcon() {
   return (
@@ -98,7 +98,7 @@ export function WhyTechUp() {
             <h3 className="mt-4 font-display text-lg font-bold text-navy sm:mt-5 sm:text-xl">
               {feature.title}
             </h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {feature.description}
             </p>
           </article>
