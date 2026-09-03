@@ -7,6 +7,7 @@ type BroadcastBody = {
   subject?: string;
   message?: string;
   recipientIds?: string[];
+  tracks?: string[];
 };
 
 const BATCH_SIZE = 10;
@@ -17,6 +18,9 @@ export async function POST(request: Request) {
   const message = String(body.message ?? "").trim();
   const recipientIds = Array.isArray(body.recipientIds)
     ? body.recipientIds.filter((id) => typeof id === "string" && id.length > 0)
+    : [];
+  const tracks = Array.isArray(body.tracks)
+    ? body.tracks.filter((track) => typeof track === "string" && track.length > 0)
     : [];
 
   if (subject.length < 3) {
@@ -42,9 +46,14 @@ export async function POST(request: Request) {
       ? await db.bootcampRegistration.findMany({
           where: { id: { in: recipientIds } },
         })
-      : await db.bootcampRegistration.findMany({
-          orderBy: { createdAt: "desc" },
-        });
+      : tracks.length > 0
+        ? await db.bootcampRegistration.findMany({
+            where: { track: { in: tracks } },
+            orderBy: { createdAt: "desc" },
+          })
+        : await db.bootcampRegistration.findMany({
+            orderBy: { createdAt: "desc" },
+          });
 
   if (recipients.length === 0) {
     return NextResponse.json(

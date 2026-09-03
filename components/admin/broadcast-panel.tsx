@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { CheckIcon, MegaphoneIcon, UsersIcon } from "lucide-react"
 import toast from "react-hot-toast"
 
 import type { Registration } from "@/components/admin/use-admin-dashboard"
@@ -12,7 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   Field,
   FieldGroup,
@@ -20,33 +20,58 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { cn } from "@/lib/utils"
+
+type Audience = "general" | "track"
 
 export function BroadcastPanel({
   registrations,
 }: {
   registrations: Registration[]
 }) {
-  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [audience, setAudience] = useState<Audience>("general")
+  const [selectedTracks, setSelectedTracks] = useState<string[]>([])
   const [subject, setSubject] = useState("")
   const [message, setMessage] = useState("")
   const [pending, setPending] = useState(false)
 
-  function toggleSelected(id: string) {
-    setSelectedIds((current) =>
-      current.includes(id)
-        ? current.filter((value) => value !== id)
-        : [...current, id],
-    )
-  }
+  const tracks = useMemo(() => {
+    const counts = new Map<string, { label: string; count: number }>()
+    for (const row of registrations) {
+      const current = counts.get(row.track)
+      if (current) {
+        current.count += 1
+      } else {
+        counts.set(row.track, { label: row.trackLabel, count: 1 })
+      }
+    }
+    return Array.from(counts.entries()).map(([track, value]) => ({
+      track,
+      ...value,
+    }))
+  }, [registrations])
 
-  function toggleAll() {
-    const ids = registrations.map((row) => row.id)
-    const allSelected = ids.every((id) => selectedIds.includes(id))
-    setSelectedIds(allSelected ? [] : ids)
+  const recipients = useMemo(() => {
+    if (audience === "general") return registrations
+    return registrations.filter((row) => selectedTracks.includes(row.track))
+  }, [audience, registrations, selectedTracks])
+
+  function toggleTrack(track: string) {
+    setSelectedTracks((current) =>
+      current.includes(track)
+        ? current.filter((value) => value !== track)
+        : [...current, track],
+    )
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+
+    if (audience === "track" && selectedTracks.length === 0) {
+      toast.error("Select at least one track.")
+      return
+    }
+
     setPending(true)
 
     try {
@@ -56,7 +81,7 @@ export function BroadcastPanel({
         body: JSON.stringify({
           subject,
           message,
-          recipientIds: selectedIds.length > 0 ? selectedIds : undefined,
+          tracks: audience === "track" ? selectedTracks : undefined,
         }),
       })
       const payload = (await response.json()) as {
@@ -77,7 +102,8 @@ export function BroadcastPanel({
       )
       setSubject("")
       setMessage("")
-      setSelectedIds([])
+      setSelectedTracks([])
+      setAudience("general")
     } catch {
       toast.error("Network error while sending broadcast.")
     } finally {
@@ -86,19 +112,148 @@ export function BroadcastPanel({
   }
 
   return (
-    <div className="grid gap-4 px-4 lg:grid-cols-[1fr_0.9fr] lg:px-6">
+    <div className="flex flex-col gap-5 px-4 lg:px-6">
       <Card className="py-6 shadow-xs">
         <CardHeader className="gap-1.5">
           <CardTitle className="text-xl font-semibold tracking-tight">
-            Send broadcast
+            Recipients
           </CardTitle>
           <CardDescription className="text-[15px]">
-            Email all students, or only the ones you select.
+            Send to every student, or limit the email to one or more tracks.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setAudience("general")}
+              className={cn(
+                "flex items-start gap-3 rounded-2xl border p-4 text-left transition-colors",
+                audience === "general"
+                  ? "border-navy bg-navy/5 ring-1 ring-navy/20"
+                  : "border-border hover:bg-muted/50",
+              )}
+            >
+              <span
+                className={cn(
+                  "mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl",
+                  audience === "general"
+                    ? "bg-navy text-white"
+                    : "bg-muted text-navy",
+                )}
+              >
+                <MegaphoneIcon className="size-5" />
+              </span>
+              <span>
+                <span className="block text-[15px] font-semibold">
+                  General broadcast
+                </span>
+                <span className="mt-1 block text-sm leading-6 text-muted-foreground">
+                  All {registrations.length} registered student
+                  {registrations.length === 1 ? "" : "s"}
+                </span>
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setAudience("track")}
+              className={cn(
+                "flex items-start gap-3 rounded-2xl border p-4 text-left transition-colors",
+                audience === "track"
+                  ? "border-navy bg-navy/5 ring-1 ring-navy/20"
+                  : "border-border hover:bg-muted/50",
+              )}
+            >
+              <span
+                className={cn(
+                  "mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl",
+                  audience === "track"
+                    ? "bg-navy text-white"
+                    : "bg-muted text-navy",
+                )}
+              >
+                <UsersIcon className="size-5" />
+              </span>
+              <span>
+                <span className="block text-[15px] font-semibold">
+                  By track
+                </span>
+                <span className="mt-1 block text-sm leading-6 text-muted-foreground">
+                  Choose Frontend, Backend, design, or data
+                </span>
+              </span>
+            </button>
+          </div>
+
+          {audience === "track" ? (
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {tracks.map((track) => {
+                const selected = selectedTracks.includes(track.track)
+                return (
+                  <button
+                    key={track.track}
+                    type="button"
+                    onClick={() => toggleTrack(track.track)}
+                    className={cn(
+                      "flex items-center justify-between rounded-2xl border px-4 py-3.5 text-left transition-colors",
+                      selected
+                        ? "border-orange bg-orange-soft ring-1 ring-orange/30"
+                        : "border-border hover:bg-muted/50",
+                    )}
+                  >
+                    <span>
+                      <span className="block text-[15px] font-medium">
+                        {track.label}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {track.count} student{track.count === 1 ? "" : "s"}
+                      </span>
+                    </span>
+                    <span
+                      className={cn(
+                        "flex size-6 items-center justify-center rounded-full border",
+                        selected
+                          ? "border-orange bg-orange text-white"
+                          : "border-input bg-background",
+                      )}
+                    >
+                      {selected ? <CheckIcon className="size-3.5" /> : null}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          ) : null}
+
+          <div className="rounded-2xl bg-muted/60 px-4 py-3 text-[15px]">
+            <span className="font-medium text-navy">{recipients.length}</span>
+            <span className="text-muted-foreground">
+              {" "}
+              student{recipients.length === 1 ? "" : "s"} will receive this
+              email
+              {audience === "track" && selectedTracks.length > 0
+                ? ` from ${selectedTracks.length} track${
+                    selectedTracks.length === 1 ? "" : "s"
+                  }`
+                : ""}
+              .
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="py-6 shadow-xs">
+        <CardHeader className="gap-1.5">
+          <CardTitle className="text-xl font-semibold tracking-tight">
+            Message
+          </CardTitle>
+          <CardDescription className="text-[15px]">
+            Write the email that will go out to the selected audience.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
-            <FieldGroup>
+            <FieldGroup className="gap-5">
               <Field>
                 <FieldLabel htmlFor="subject" className="text-[15px]">
                   Subject
@@ -108,6 +263,7 @@ export function BroadcastPanel({
                   value={subject}
                   onChange={(event) => setSubject(event.target.value)}
                   required
+                  placeholder="Bootcamp update"
                   className="h-11 px-3.5 text-[15px] md:text-[15px]"
                 />
               </Field>
@@ -122,56 +278,23 @@ export function BroadcastPanel({
                   required
                   minLength={10}
                   rows={8}
-                  className="px-3.5 py-3 text-[15px] md:text-[15px]"
+                  placeholder="Share the announcement students should receive."
+                  className="min-h-40 px-3.5 py-3 text-[15px] md:text-[15px]"
                 />
               </Field>
-              <p className="text-[15px] text-muted-foreground">
-                {selectedIds.length > 0
-                  ? `${selectedIds.length} selected student(s) will receive this email.`
-                  : `All ${registrations.length} registered student(s) will receive this email.`}
-              </p>
-              <Button type="submit" className="h-11 text-[15px]" disabled={pending}>
-                {pending ? "Sending..." : "Send broadcast"}
+              <Button
+                type="submit"
+                className="h-11 w-full text-[15px] sm:w-auto"
+                disabled={pending || recipients.length === 0}
+              >
+                {pending
+                  ? "Sending..."
+                  : `Send to ${recipients.length} student${
+                      recipients.length === 1 ? "" : "s"
+                    }`}
               </Button>
             </FieldGroup>
           </form>
-        </CardContent>
-      </Card>
-
-      <Card className="py-6 shadow-xs">
-        <CardHeader className="flex-row items-center justify-between space-y-0">
-          <div>
-            <CardTitle className="text-xl font-semibold tracking-tight">
-              Select recipients
-            </CardTitle>
-            <CardDescription className="text-[15px]">
-              Leave empty to email everyone
-            </CardDescription>
-          </div>
-          <Button type="button" variant="ghost" size="sm" onClick={toggleAll}>
-            Toggle all
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="max-h-[32rem] space-y-2 overflow-y-auto">
-            {registrations.map((row) => (
-              <label
-                key={row.id}
-                className="flex cursor-pointer items-start gap-3 rounded-lg border px-3 py-3 transition-colors hover:bg-muted/60"
-              >
-                <Checkbox
-                  checked={selectedIds.includes(row.id)}
-                  onCheckedChange={() => toggleSelected(row.id)}
-                />
-                <span>
-                  <span className="block text-[15px] font-medium">{row.fullName}</span>
-                  <span className="block text-sm text-muted-foreground">
-                    {row.email}
-                  </span>
-                </span>
-              </label>
-            ))}
-          </div>
         </CardContent>
       </Card>
     </div>
