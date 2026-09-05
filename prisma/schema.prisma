@@ -39,8 +39,9 @@ model Broadcast {
 }
 
 model SiteSettings {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
-  key               String   @unique
-  whatsappGroupUrl  String
-  updatedAt         DateTime @updatedAt
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  key                String   @unique
+  whatsappGroupUrl   String?
+  whatsappGroupUrls  Json?
+  updatedAt          DateTime @updatedAt
 }

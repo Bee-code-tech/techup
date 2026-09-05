@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import toast from "react-hot-toast"
 
@@ -11,6 +11,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { bootcampTracks } from "@/lib/bootcamp"
+
+type TrackOption = { id: string; label: string }
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -25,12 +28,27 @@ function WhatsAppIcon({ className }: { className?: string }) {
   )
 }
 
+function emptyUrls(): Record<string, string> {
+  return Object.fromEntries(
+    Object.keys(bootcampTracks).map((track) => [track, ""]),
+  )
+}
+
 export function WhatsappGroupNav() {
   const [open, setOpen] = useState(false)
-  const [url, setUrl] = useState("")
-  const [savedUrl, setSavedUrl] = useState("")
+  const [urls, setUrls] = useState<Record<string, string>>(emptyUrls)
+  const [savedUrls, setSavedUrls] = useState<Record<string, string>>(emptyUrls)
+  const [tracks, setTracks] = useState<TrackOption[]>(
+    Object.entries(bootcampTracks).map(([id, label]) => ({ id, label })),
+  )
   const [loading, setLoading] = useState(false)
   const [pending, setPending] = useState(false)
+
+  const isDirty = useMemo(
+    () =>
+      tracks.some((track) => (urls[track.id] || "") !== (savedUrls[track.id] || "")),
+    [savedUrls, tracks, urls],
+  )
 
   useEffect(() => {
     if (!open) return
@@ -38,11 +56,23 @@ export function WhatsappGroupNav() {
     setLoading(true)
     void fetch("/api/admin/settings")
       .then((response) => response.json())
-      .then((payload: { whatsappGroupUrl?: string }) => {
-        const value = payload.whatsappGroupUrl || ""
-        setUrl(value)
-        setSavedUrl(value)
-      })
+      .then(
+        (payload: {
+          whatsappGroupUrls?: Record<string, string>
+          tracks?: TrackOption[]
+        }) => {
+          if (payload.tracks?.length) setTracks(payload.tracks)
+
+          const next = emptyUrls()
+          for (const [track, url] of Object.entries(
+            payload.whatsappGroupUrls || {},
+          )) {
+            if (track in next) next[track] = url
+          }
+          setUrls(next)
+          setSavedUrls(next)
+        },
+      )
       .finally(() => setLoading(false))
   }, [open])
 
@@ -71,22 +101,27 @@ export function WhatsappGroupNav() {
       const response = await fetch("/api/admin/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ whatsappGroupUrl: url }),
+        body: JSON.stringify({ whatsappGroupUrls: urls }),
       })
       const payload = (await response.json()) as {
         error?: string
-        whatsappGroupUrl?: string
+        whatsappGroupUrls?: Record<string, string>
       }
 
       if (!response.ok) {
-        toast.error(payload.error || "Could not save the WhatsApp link.")
+        toast.error(payload.error || "Could not save the WhatsApp links.")
         return
       }
 
-      const next = payload.whatsappGroupUrl || url.trim()
-      setUrl(next)
-      setSavedUrl(next)
-      toast.success("WhatsApp group link updated.")
+      const next = emptyUrls()
+      for (const [track, url] of Object.entries(
+        payload.whatsappGroupUrls || urls,
+      )) {
+        if (track in next) next[track] = url
+      }
+      setUrls(next)
+      setSavedUrls(next)
+      toast.success("WhatsApp group links updated.")
       setOpen(false)
     } catch {
       toast.error("Network error. Please try again.")
@@ -101,7 +136,7 @@ export function WhatsappGroupNav() {
         <SidebarMenuItem>
           <SidebarMenuButton
             size="lg"
-            tooltip="WhatsApp group"
+            tooltip="WhatsApp groups"
             className="bg-[#25D366] text-white hover:bg-[#1ebe57] hover:text-white active:bg-[#1aa34c] active:text-white data-active:bg-[#25D366] data-active:text-white"
             onClick={() => setOpen(true)}
           >
@@ -109,9 +144,9 @@ export function WhatsappGroupNav() {
               <WhatsAppIcon className="size-4" />
             </span>
             <span className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">WhatsApp group</span>
+              <span className="truncate font-medium">WhatsApp groups</span>
               <span className="truncate text-xs text-white/80">
-                Update invite link
+                Links by track
               </span>
             </span>
           </SidebarMenuButton>
@@ -131,9 +166,9 @@ export function WhatsappGroupNav() {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="whatsapp-group-title"
-                className="relative z-10 w-full max-w-md overflow-hidden rounded-2xl border bg-background shadow-lg"
+                className="relative z-10 flex max-h-[min(90vh,720px)] w-full max-w-lg flex-col overflow-hidden rounded-2xl border bg-background shadow-lg"
               >
-                <div className="border-b px-5 py-4">
+                <div className="shrink-0 border-b px-5 py-4">
                   <div className="flex items-center gap-3">
                     <span className="flex size-10 items-center justify-center rounded-xl bg-[#25D366] text-white">
                       <WhatsAppIcon className="size-5" />
@@ -143,29 +178,41 @@ export function WhatsappGroupNav() {
                         id="whatsapp-group-title"
                         className="text-base font-semibold tracking-tight"
                       >
-                        WhatsApp group
+                        WhatsApp groups by track
                       </h2>
                       <p className="text-sm text-muted-foreground">
-                        Used in the success modal and confirmation email.
+                        Students see the link for the track they registered for.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <form onSubmit={handleSave} className="space-y-4 px-5 py-5">
-                  <label className="block space-y-2">
-                    <span className="text-sm font-medium">Invite link</span>
-                    <Input
-                      value={url}
-                      onChange={(event) => setUrl(event.target.value)}
-                      placeholder="https://chat.whatsapp.com/..."
-                      disabled={loading}
-                      autoFocus
-                      className="h-11 px-3.5 text-[15px] md:text-[15px]"
-                    />
-                  </label>
+                <form
+                  onSubmit={handleSave}
+                  className="flex min-h-0 flex-1 flex-col"
+                >
+                  <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-5">
+                    {tracks.map((track, index) => (
+                      <label key={track.id} className="block space-y-2">
+                        <span className="text-sm font-medium">{track.label}</span>
+                        <Input
+                          value={urls[track.id] || ""}
+                          onChange={(event) =>
+                            setUrls((current) => ({
+                              ...current,
+                              [track.id]: event.target.value,
+                            }))
+                          }
+                          placeholder="https://chat.whatsapp.com/..."
+                          disabled={loading}
+                          autoFocus={index === 0}
+                          className="h-11 px-3.5 text-[15px] md:text-[15px]"
+                        />
+                      </label>
+                    ))}
+                  </div>
 
-                  <div className="flex items-center justify-end gap-2 pt-1">
+                  <div className="flex shrink-0 items-center justify-end gap-2 border-t px-5 py-4">
                     <Button
                       type="button"
                       variant="ghost"
@@ -177,11 +224,9 @@ export function WhatsappGroupNav() {
                     <Button
                       type="submit"
                       className="h-10 bg-[#25D366] px-4 text-white hover:bg-[#1ebe57]"
-                      disabled={
-                        loading || pending || url.trim() === savedUrl
-                      }
+                      disabled={loading || pending || !isDirty}
                     >
-                      {pending ? "Saving..." : "Save link"}
+                      {pending ? "Saving..." : "Save links"}
                     </Button>
                   </div>
                 </form>

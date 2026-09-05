@@ -20,6 +20,7 @@ export function BootcampForm() {
   const [whatsappGroupUrl, setWhatsappGroupUrl] = useState(
     site.whatsappGroupUrl as string,
   );
+  const [trackLabel, setTrackLabel] = useState(bootcampTracks.frontend);
   const [modalOpen, setModalOpen] = useState(false);
   const [formKey, setFormKey] = useState(0);
 
@@ -40,6 +41,7 @@ export function BootcampForm() {
         error?: string;
         code?: string;
         whatsappGroupUrl?: string;
+        trackLabel?: string;
       };
 
       if (response.status === 409 || payload.code === "duplicate") {
@@ -58,6 +60,12 @@ export function BootcampForm() {
       setSuccessName(String(formData.get("fullName") ?? ""));
       if (payload.whatsappGroupUrl) {
         setWhatsappGroupUrl(payload.whatsappGroupUrl);
+      }
+      if (payload.trackLabel) {
+        setTrackLabel(payload.trackLabel);
+      } else {
+        const track = String(formData.get("track") ?? "");
+        setTrackLabel(bootcampTracks[track] || bootcampTracks.frontend);
       }
       setModalOpen(true);
       setFormKey((value) => value + 1);
@@ -178,6 +186,7 @@ export function BootcampForm() {
       <BootcampSuccessModal
         open={modalOpen}
         name={successName}
+        trackLabel={trackLabel}
         whatsappGroupUrl={whatsappGroupUrl}
         onClose={() => setModalOpen(false)}
       />

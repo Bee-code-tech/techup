@@ -70,6 +70,7 @@ export function studentWelcomeEmail(
 ) {
   const name = firstName(application.fullName);
   const track = bootcampTracks[application.track];
+  const whatsappCta = `Join ${track} WhatsApp Group`;
 
   const text = [
     `Hi ${application.fullName.split(" ")[0] || application.fullName},`,
@@ -80,7 +81,7 @@ export function studentWelcomeEmail(
     "Cohort: Free Bootcamp - October 2026",
     "",
     "Next step:",
-    `Join the WhatsApp group for onboarding and session updates: ${whatsappGroupUrl}`,
+    `Join the ${track} WhatsApp group for onboarding and session updates: ${whatsappGroupUrl}`,
     "",
     "If you have any questions, reply to this email.",
     "",
@@ -99,11 +100,11 @@ export function studentWelcomeEmail(
       What to do next
     </p>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 8px;">
-      ${nextStep("1", "Join the WhatsApp group", "Onboarding notes and session links are shared there first.")}
+      ${nextStep("1", `Join the ${track} WhatsApp group`, "Onboarding notes and session links for your track are shared there first.")}
       ${nextStep("2", "Keep this confirmation", "Save this email for your registration details.")}
       ${nextStep("3", "Reply if you need help", "Our team will respond if anything is unclear.")}
     </table>
-    ${emailPrimaryButton(whatsappGroupUrl, "Join WhatsApp Group")}
+    ${emailPrimaryButton(whatsappGroupUrl, whatsappCta)}
     <p style="margin:0;font-size:13px;line-height:1.7;color:${muted};">
       Questions? Reply to this email and the TechUp team will assist you.
     </p>

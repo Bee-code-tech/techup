@@ -8,6 +8,7 @@ import { Button } from "@/components/marketing/site-button";
 type BootcampSuccessModalProps = {
   open: boolean;
   name: string;
+  trackLabel: string;
   whatsappGroupUrl: string;
   onClose: () => void;
 };
@@ -47,6 +48,7 @@ function fireConfetti() {
 export function BootcampSuccessModal({
   open,
   name,
+  trackLabel,
   whatsappGroupUrl,
   onClose,
 }: BootcampSuccessModalProps) {
@@ -115,8 +117,8 @@ export function BootcampSuccessModal({
             You&apos;re in, {firstName}!
           </h2>
           <p className="mx-auto mt-3 max-w-sm text-center text-sm leading-6 text-white/80">
-            A confirmation email is on its way. Join the WhatsApp group for
-            onboarding updates and session links.
+            A confirmation email is on its way. Join the {trackLabel} WhatsApp
+            group for onboarding updates and session links.
           </p>
         </div>
 
@@ -127,7 +129,7 @@ export function BootcampSuccessModal({
             size="lg"
             className="w-full rounded-xl"
           >
-            Join WhatsApp Group
+            Join {trackLabel} WhatsApp
           </Button>
           <Button
             type="button"

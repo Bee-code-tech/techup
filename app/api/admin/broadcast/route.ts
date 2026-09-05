@@ -1,3 +1,4 @@
+import type { BootcampRegistration } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { broadcastEmail } from "@/lib/broadcast-email";
 import { db } from "@/lib/db";
@@ -52,19 +53,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: emailConfig.error }, { status: 500 });
   }
 
-  const recipients =
-    recipientIds.length > 0
-      ? await db.bootcampRegistration.findMany({
-          where: { id: { in: recipientIds } },
-        })
-      : tracks.length > 0
-        ? await db.bootcampRegistration.findMany({
-            where: { track: { in: tracks } },
-            orderBy: { createdAt: "desc" },
-          })
-        : await db.bootcampRegistration.findMany({
-            orderBy: { createdAt: "desc" },
-          });
+  let recipients: BootcampRegistration[];
+  if (recipientIds.length > 0) {
+    recipients = await db.bootcampRegistration.findMany({
+      where: { id: { in: recipientIds } },
+    });
+  } else if (tracks.length > 0) {
+    recipients = await db.bootcampRegistration.findMany({
+      where: { track: { in: tracks } },
+      orderBy: { createdAt: "desc" },
+    });
+  } else {
+    recipients = await db.bootcampRegistration.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+  }
 
   if (recipients.length === 0) {
     return NextResponse.json(

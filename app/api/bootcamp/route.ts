@@ -3,7 +3,7 @@ import { parseBootcampApplication } from "@/lib/bootcamp";
 import { adminAlertEmail, studentWelcomeEmail } from "@/lib/bootcamp-email";
 import { db } from "@/lib/db";
 import { getResendConfig, resendErrorMessage } from "@/lib/resend-client";
-import { getWhatsappGroupUrl } from "@/lib/site-settings";
+import { getWhatsappGroupUrlForTrack } from "@/lib/site-settings";
 
 export async function POST(request: Request) {
   const emailConfig = getResendConfig();
@@ -58,7 +58,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const whatsappGroupUrl = await getWhatsappGroupUrl();
+  const { whatsappGroupUrl, trackLabel } = await getWhatsappGroupUrlForTrack(
+    application.track,
+  );
   const studentMail = studentWelcomeEmail(application, whatsappGroupUrl);
   const adminMail = adminAlertEmail(application);
   const { resend, from, adminEmail } = emailConfig;
@@ -113,5 +115,5 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json({ ok: true, whatsappGroupUrl });
+  return NextResponse.json({ ok: true, whatsappGroupUrl, trackLabel });
 }

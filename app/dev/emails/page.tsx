@@ -4,7 +4,7 @@ import {
   adminAlertEmail,
   studentWelcomeEmail,
 } from "@/lib/bootcamp-email";
-import { getWhatsappGroupUrl } from "@/lib/site-settings";
+import { getWhatsappGroupUrlForTrack } from "@/lib/site-settings";
 import { EmailPreviewClient } from "./EmailPreviewClient";
 
 export const metadata = {
@@ -40,7 +40,9 @@ export default async function EmailPreviewPage({ searchParams }: PageProps) {
 
   const params = await searchParams;
   const type = params.type === "admin" ? "admin" : "student";
-  const whatsappGroupUrl = await getWhatsappGroupUrl();
+  const { whatsappGroupUrl } = await getWhatsappGroupUrlForTrack(
+    sampleApplication.track,
+  );
   const student = studentWelcomeEmail(sampleApplication, whatsappGroupUrl);
   const admin = adminAlertEmail(sampleApplication);
   const current = type === "admin" ? admin : student;
