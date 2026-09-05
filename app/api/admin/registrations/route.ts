@@ -25,13 +25,7 @@ export async function GET() {
       db.bootcampRegistration.count(),
       db.broadcast.findMany({
         orderBy: { createdAt: "desc" },
-        take: 20,
-        select: {
-          id: true,
-          subject: true,
-          recipientCount: true,
-          createdAt: true,
-        },
+        take: 100,
       }),
     ]);
 
@@ -71,6 +65,40 @@ export async function GET() {
     const today = countsByDay.get(todayKey) ?? 0;
     const yesterday = countsByDay.get(yesterdayKey) ?? 0;
 
+    const campaignKeys = Array.from(
+      new Set(
+        broadcasts
+          .map((row) => row.campaignKey)
+          .filter((key): key is string => Boolean(key)),
+      ),
+    );
+
+    const deliveryRows =
+      campaignKeys.length > 0
+        ? await db.broadcastDelivery.findMany({
+            where: {
+              campaignKey: { in: campaignKeys },
+              status: "sent",
+            },
+            select: { campaignKey: true, email: true },
+          })
+        : [];
+
+    const sentByCampaign = new Map<string, Set<string>>();
+    for (const row of deliveryRows) {
+      const set = sentByCampaign.get(row.campaignKey) ?? new Set<string>();
+      set.add(row.email.toLowerCase());
+      sentByCampaign.set(row.campaignKey, set);
+    }
+
+    const registrationEmailsByTrack = new Map<string, string[]>();
+    const allEmails = registrations.map((row) => row.email.toLowerCase());
+    for (const row of registrations) {
+      const list = registrationEmailsByTrack.get(row.track) ?? [];
+      list.push(row.email.toLowerCase());
+      registrationEmailsByTrack.set(row.track, list);
+    }
+
     return NextResponse.json({
       stats: {
         total,
@@ -86,12 +114,40 @@ export async function GET() {
         count,
       })),
       trackBreakdown,
-      broadcasts: broadcasts.map((row) => ({
-        id: row.id,
-        subject: row.subject,
-        recipientCount: row.recipientCount,
-        createdAt: row.createdAt.toISOString(),
-      })),
+      broadcasts: broadcasts.map((row) => {
+        const tracks = Array.isArray(row.tracks) ? row.tracks : [];
+        const audienceEmails =
+          tracks.length > 0
+            ? tracks.flatMap(
+                (track) => registrationEmailsByTrack.get(track) ?? [],
+              )
+            : allEmails;
+        const uniqueAudience = Array.from(new Set(audienceEmails));
+        const sentSet = row.campaignKey
+          ? (sentByCampaign.get(row.campaignKey) ?? new Set<string>())
+          : new Set<string>();
+        const alreadyReceived = uniqueAudience.filter((email) =>
+          sentSet.has(email),
+        ).length;
+        const remaining = Math.max(0, uniqueAudience.length - alreadyReceived);
+
+        return {
+          id: row.id,
+          campaignKey: row.campaignKey || "",
+          subject: row.subject,
+          heading: row.heading || "",
+          body: row.body,
+          ctaLabel: row.ctaLabel || "",
+          ctaUrl: row.ctaUrl || "",
+          tracks,
+          recipientCount: row.recipientCount,
+          skippedCount: row.skippedCount ?? 0,
+          alreadyReceived,
+          remaining,
+          audienceSize: uniqueAudience.length,
+          createdAt: row.createdAt.toISOString(),
+        };
+      }),
       registrations: registrations.map((row) => ({
         id: row.id,
         fullName: row.fullName,

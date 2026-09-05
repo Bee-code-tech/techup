@@ -18,8 +18,18 @@ export type Registration = {
 
 export type BroadcastRecord = {
   id: string
+  campaignKey: string
   subject: string
+  heading: string
+  body: string
+  ctaLabel: string
+  ctaUrl: string
+  tracks: string[]
   recipientCount: number
+  skippedCount: number
+  alreadyReceived: number
+  remaining: number
+  audienceSize: number
   createdAt: string
 }
 

@@ -32,10 +32,33 @@ model BootcampRegistration {
 
 model Broadcast {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  /// Optional for legacy rows created before campaign tracking.
+  campaignKey    String?
   subject        String
+  heading        String?  @default("")
   body           String
+  ctaLabel       String?  @default("")
+  ctaUrl         String?  @default("")
+  tracks         String[] @default([])
   recipientCount Int
+  skippedCount   Int?     @default(0)
   createdAt      DateTime @default(now())
+
+  @@index([campaignKey])
+}
+
+model BroadcastDelivery {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  broadcastId    String   @db.ObjectId
+  campaignKey    String
+  registrationId String   @db.ObjectId
+  email          String
+  status         String
+  createdAt      DateTime @default(now())
+
+  @@unique([campaignKey, email])
+  @@index([campaignKey])
+  @@index([broadcastId])
 }
 
 model SiteSettings {
