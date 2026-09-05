@@ -7,22 +7,22 @@ import { DashboardShell } from "@/components/admin/dashboard-shell"
 export function AdminOverviewPage() {
   return (
     <DashboardShell title="Dashboard">
-      {({ data }) => {
-        const week = data!.daily.reduce((sum, day) => sum + day.count, 0)
-        return (
-          <div className="flex flex-col gap-6 py-6 md:py-8">
-            <SectionCards
-              total={data!.stats.total}
-              today={data!.stats.today}
-              tracks={data!.stats.tracks}
-              week={week}
-            />
-            <div className="px-4 lg:px-6">
-              <ChartAreaInteractive data={data!.daily} />
-            </div>
+      {({ data }) => (
+        <div className="flex flex-col gap-6 py-6 md:py-8">
+          <SectionCards
+            total={data!.stats.total}
+            today={data!.stats.today}
+            yesterday={data!.stats.yesterday}
+            week={data!.stats.week}
+            month={data!.stats.month}
+            tracks={data!.stats.tracks}
+            topTrack={data!.stats.topTrack}
+          />
+          <div className="px-4 lg:px-6">
+            <ChartAreaInteractive registrations={data!.registrations} />
           </div>
-        )
-      }}
+        </div>
+      )}
     </DashboardShell>
   )
 }

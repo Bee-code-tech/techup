@@ -1,7 +1,12 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import { ChevronDownIcon, SearchIcon } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  SearchIcon,
+} from "lucide-react"
 
 import type { Registration } from "@/components/admin/use-admin-dashboard"
 import { Badge } from "@/components/ui/badge"
@@ -15,6 +20,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   Table,
   TableBody,
   TableCell,
@@ -22,6 +34,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50] as const
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-NG", {
@@ -52,6 +66,8 @@ export function StudentsTable({
 }) {
   const [query, setQuery] = useState("")
   const [trackFilter, setTrackFilter] = useState("all")
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(10)
 
   const tracks = useMemo(
     () =>
@@ -77,6 +93,24 @@ export function StudentsTable({
     })
   }, [query, registrations, trackFilter])
 
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
+
+  useEffect(() => {
+    setPage(1)
+  }, [query, trackFilter, pageSize])
+
+  useEffect(() => {
+    if (page > pageCount) setPage(pageCount)
+  }, [page, pageCount])
+
+  const pageRows = useMemo(() => {
+    const start = (page - 1) * pageSize
+    return filtered.slice(start, start + pageSize)
+  }, [filtered, page, pageSize])
+
+  const rangeStart = filtered.length === 0 ? 0 : (page - 1) * pageSize + 1
+  const rangeEnd = Math.min(page * pageSize, filtered.length)
+
   const trackLabel =
     trackFilter === "all"
       ? "All tracks"
@@ -91,7 +125,8 @@ export function StudentsTable({
             Registered students
           </h2>
           <p className="text-[15px] text-muted-foreground">
-            {filtered.length} of {registrations.length} shown
+            {filtered.length} of {registrations.length} match · showing{" "}
+            {rangeStart}-{rangeEnd}
           </p>
         </div>
       </div>
@@ -167,7 +202,7 @@ export function StudentsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.length === 0 ? (
+            {pageRows.length === 0 ? (
               <TableRow className="hover:bg-transparent">
                 <TableCell
                   colSpan={6}
@@ -177,12 +212,13 @@ export function StudentsTable({
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((row, index) => {
+              pageRows.map((row, index) => {
                 const href = whatsappHref(row.whatsapp)
+                const serial = (page - 1) * pageSize + index + 1
                 return (
                   <TableRow key={row.id} className="hover:bg-muted/40">
                     <TableCell className="px-4 py-4 font-medium tabular-nums text-muted-foreground">
-                      {String(index + 1).padStart(2, "0")}
+                      {String(serial).padStart(2, "0")}
                     </TableCell>
                     <TableCell className="px-4 py-4">
                       <div className="flex items-center gap-3">
@@ -233,6 +269,71 @@ export function StudentsTable({
             )}
           </TableBody>
         </Table>
+
+        <div className="flex flex-col gap-3 border-t px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Rows per page</span>
+            <Select
+              value={String(pageSize)}
+              onValueChange={(value) => {
+                if (value == null) return
+                setPageSize(Number(value) as (typeof PAGE_SIZE_OPTIONS)[number])
+              }}
+              items={Object.fromEntries(
+                PAGE_SIZE_OPTIONS.map((size) => [String(size), String(size)]),
+              )}
+            >
+              <SelectTrigger
+                size="sm"
+                className="h-8 w-[4.5rem] rounded-lg"
+                aria-label="Rows per page"
+              >
+                <SelectValue>
+                  {(value) => (value != null ? String(value) : "10")}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent align="start">
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <SelectItem key={size} value={String(size)}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 sm:justify-end">
+            <p className="text-sm tabular-nums text-muted-foreground">
+              Page {page} of {pageCount}
+            </p>
+            <div className="flex items-center gap-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-8 px-2.5"
+                disabled={page <= 1}
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+              >
+                <ChevronLeftIcon className="size-4" />
+                <span className="sr-only sm:not-sr-only sm:ml-1">Prev</span>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-8 px-2.5"
+                disabled={page >= pageCount}
+                onClick={() =>
+                  setPage((current) => Math.min(pageCount, current + 1))
+                }
+              >
+                <span className="sr-only sm:not-sr-only sm:mr-1">Next</span>
+                <ChevronRightIcon className="size-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

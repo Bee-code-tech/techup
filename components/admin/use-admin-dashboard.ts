@@ -24,7 +24,15 @@ export type BroadcastRecord = {
 }
 
 export type DashboardData = {
-  stats: { total: number; today: number; tracks: number }
+  stats: {
+    total: number
+    today: number
+    yesterday: number
+    week: number
+    month: number
+    tracks: number
+    topTrack: { track: string; label: string; count: number } | null
+  }
   daily: Array<{ date: string; count: number }>
   trackBreakdown: Array<{ track: string; label: string; count: number }>
   broadcasts: BroadcastRecord[]
