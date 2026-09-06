@@ -9,12 +9,17 @@ type SelectOption = {
 };
 
 type SelectProps = {
-  name: string;
+  name?: string;
   options: SelectOption[];
+  value?: string;
   defaultValue?: string;
+  onValueChange?: (value: string) => void;
   placeholder?: string;
   className?: string;
+  contentClassName?: string;
   required?: boolean;
+  id?: string;
+  disabled?: boolean;
 };
 
 function ChevronDownIcon() {
@@ -64,18 +69,27 @@ function CheckIcon() {
 export function Select({
   name,
   options,
+  value,
   defaultValue,
+  onValueChange,
   placeholder = "Select an option",
   className,
+  contentClassName,
   required,
+  id,
+  disabled,
 }: SelectProps) {
   return (
     <SelectPrimitive.Root
       name={name}
+      value={value}
       defaultValue={defaultValue}
+      onValueChange={onValueChange}
       required={required}
+      disabled={disabled}
     >
       <SelectPrimitive.Trigger
+        id={id}
         className={cn(
           "flex h-11 w-full items-center justify-between gap-2 rounded-md border border-border bg-white px-3 text-left text-sm text-foreground shadow-xs outline-none transition",
           "hover:bg-surface-blue/40",
@@ -94,7 +108,10 @@ export function Select({
         <SelectPrimitive.Content
           position="popper"
           sideOffset={6}
-          className="z-50 origin-top overflow-hidden rounded-md border border-border bg-white text-foreground shadow-[0_8px_30px_rgba(0,32,111,0.12)] data-[state=open]:animate-[select-in_140ms_ease-out]"
+          className={cn(
+            "z-[300] origin-top overflow-hidden rounded-md border border-border bg-white text-foreground shadow-[0_8px_30px_rgba(0,32,111,0.12)] data-[state=open]:animate-[select-in_140ms_ease-out]",
+            contentClassName,
+          )}
         >
           <SelectPrimitive.Viewport
             className="min-w-[var(--radix-select-trigger-width)] p-1"

@@ -124,6 +124,69 @@ export function studentWelcomeEmail(
   };
 }
 
+export function studentTrackChangeEmail(options: {
+  application: BootcampApplication;
+  previousTrack: string;
+  whatsappGroupUrl: string;
+}) {
+  const { application, previousTrack, whatsappGroupUrl } = options;
+  const name = firstName(application.fullName);
+  const previousLabel = bootcampTracks[previousTrack] ?? previousTrack;
+  const nextLabel = bootcampTracks[application.track] ?? application.track;
+  const whatsappCta = `Join ${nextLabel} WhatsApp Group`;
+
+  const text = [
+    `Hi ${name},`,
+    "",
+    "Your TechUp Academy bootcamp track has been updated by our team.",
+    "",
+    `Previous track: ${previousLabel}`,
+    `New track: ${nextLabel}`,
+    "",
+    "Next step:",
+    `Join the ${nextLabel} WhatsApp group for onboarding and class updates: ${whatsappGroupUrl}`,
+    "",
+    "If you did not expect this change, reply to this email and we will help.",
+    "",
+    "TechUp Academy",
+    site.email,
+    site.url,
+  ].join("\n");
+
+  const body = `
+    ${infoCard([
+      ["Previous track", previousLabel],
+      ["New track", nextLabel],
+      ["Status", "Updated"],
+    ])}
+    <p style="margin:0 0 14px;font-size:16px;font-weight:700;color:${navy};">
+      What to do next
+    </p>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 8px;">
+      ${nextStep("1", `Join the ${nextLabel} WhatsApp group`, "Your new track’s onboarding notes and session links are shared there first.")}
+      ${nextStep("2", "Leave the old track group if needed", "Stay in the group that matches your new track so you do not miss updates.")}
+      ${nextStep("3", "Reply if this looks wrong", "Our team can help if this change was unexpected.")}
+    </table>
+    ${emailPrimaryButton(whatsappGroupUrl, whatsappCta)}
+    <p style="margin:0;font-size:13px;line-height:1.7;color:${muted};">
+      Questions? Reply to this email and the TechUp team will assist you.
+    </p>
+  `;
+
+  return {
+    subject: `Your TechUp track is now ${nextLabel}`,
+    text,
+    html: emailShell({
+      title: "Bootcamp track updated",
+      eyebrow: "Track updated",
+      heading: `You’re moving to ${nextLabel}`,
+      subheading:
+        "Your registration details have been updated. Join your new track WhatsApp group below.",
+      body,
+    }),
+  };
+}
+
 export function adminAlertEmail(application: BootcampApplication) {
   const track = bootcampTracks[application.track];
   const laptop = laptopLabels[application.laptop] ?? application.laptop;

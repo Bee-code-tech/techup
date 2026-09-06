@@ -9,6 +9,10 @@ import {
 } from "lucide-react"
 
 import type { Registration } from "@/components/admin/use-admin-dashboard"
+import {
+  StudentActionButton,
+  StudentEditModal,
+} from "@/components/admin/student-edit-modal"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -61,13 +65,16 @@ function whatsappHref(value: string) {
 
 export function StudentsTable({
   registrations,
+  onUpdated,
 }: {
   registrations: Registration[]
+  onUpdated?: () => void
 }) {
   const [query, setQuery] = useState("")
   const [trackFilter, setTrackFilter] = useState("all")
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(10)
+  const [selected, setSelected] = useState<Registration | null>(null)
 
   const tracks = useMemo(
     () =>
@@ -199,13 +206,16 @@ export function StudentsTable({
               <TableHead className="h-12 px-4 text-[13px] font-semibold tracking-wide text-muted-foreground uppercase">
                 Registered
               </TableHead>
+              <TableHead className="h-12 w-24 px-4 text-right text-[13px] font-semibold tracking-wide text-muted-foreground uppercase">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pageRows.length === 0 ? (
               <TableRow className="hover:bg-transparent">
                 <TableCell
-                  colSpan={6}
+                  colSpan={7}
                   className="h-28 text-center text-[15px] text-muted-foreground"
                 >
                   No registrations match your filters.
@@ -262,6 +272,9 @@ export function StudentsTable({
                     </TableCell>
                     <TableCell className="px-4 py-4 text-[15px] whitespace-nowrap text-muted-foreground">
                       {formatDate(row.createdAt)}
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-right">
+                      <StudentActionButton onClick={() => setSelected(row)} />
                     </TableCell>
                   </TableRow>
                 )
@@ -335,6 +348,13 @@ export function StudentsTable({
           </div>
         </div>
       </div>
+
+      <StudentEditModal
+        student={selected}
+        open={selected != null}
+        onClose={() => setSelected(null)}
+        onSaved={onUpdated}
+      />
     </div>
   )
 }
