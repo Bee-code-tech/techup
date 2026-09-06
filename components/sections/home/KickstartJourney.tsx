@@ -13,7 +13,7 @@ const paths = [
     badge: "BOOTCAMP",
     badgeTone: "orange" as const,
     cta: "Register Now",
-    href: "/bootcamp",
+    href: "/auth?mode=register",
     solid: false,
     image: "/journey.png",
   },

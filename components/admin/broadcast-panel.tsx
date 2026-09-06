@@ -27,7 +27,7 @@ type AudienceIntel = {
 }
 
 const fieldClass =
-  "h-11 rounded-xl border-black/8 bg-[#f7f8fb] px-3.5 text-[15px] shadow-none focus-visible:bg-white md:text-[15px]"
+  "h-11 rounded-xl border-black/[0.06] bg-[#f4f6fa] px-3.5 text-[15px] shadow-none transition-[border-color,background-color,box-shadow] duration-150 ease-[var(--ease-out)] focus-visible:border-[#00206F]/30 focus-visible:bg-white focus-visible:ring-3 focus-visible:ring-[#00206F]/10 md:text-[15px]"
 
 export function BroadcastPanel({
   registrations,
@@ -269,7 +269,7 @@ export function BroadcastPanel({
     <div className="grid items-start gap-6 px-4 xl:grid-cols-[minmax(0,1fr)_28rem] xl:gap-8 lg:px-6">
       <form
         onSubmit={handleSubmit}
-        className="flex min-w-0 flex-col overflow-hidden rounded-[28px] border border-black/5 bg-card shadow-[0_18px_50px_-36px_rgba(0,32,111,0.35)]"
+        className="flex min-w-0 flex-col overflow-hidden rounded-[24px] border border-black/[0.05] bg-card shadow-[0_18px_50px_-36px_rgba(0,32,111,0.32)]"
       >
         <div className="relative overflow-hidden border-b border-black/5 bg-[#00206F] px-5 py-6 text-white sm:px-6">
           <div
@@ -377,10 +377,10 @@ export function BroadcastPanel({
                   type="button"
                   onClick={() => setAudience(value)}
                   className={cn(
-                    "rounded-2xl border px-3.5 py-3 text-left transition-colors",
+                    "admin-press rounded-2xl border px-3.5 py-3 text-left",
                     audience === value
                       ? "border-[#00206F] bg-[#00206F] text-white"
-                      : "border-black/5 bg-[#f7f8fb] text-foreground hover:bg-muted/50",
+                      : "border-black/[0.06] bg-[#f4f6fa] text-foreground",
                   )}
                 >
                   <span className="block text-sm font-medium">{label}</span>
@@ -570,7 +570,7 @@ export function BroadcastPanel({
           </p>
           <Button
             type="submit"
-            className="h-11 min-w-36 rounded-xl bg-[#00206F] px-5 text-sm text-white hover:bg-[#001752] active:scale-[0.98]"
+            className="admin-press h-11 min-w-36 rounded-xl bg-[#00206F] px-5 text-sm text-white shadow-[0_10px_24px_-16px_rgba(0,32,111,0.65)] hover:bg-[#001752]"
             disabled={pending || sendCount === 0 || recipients.length === 0}
           >
             {pending

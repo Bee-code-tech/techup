@@ -48,6 +48,13 @@
   --sidebar-accent-foreground: #00206f;
   --sidebar-border: #e4e9f2;
   --sidebar-ring: #00206f;
+
+  /* Motion — strong custom curves (Emil) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Slightly softer for toast cohesion */
+  --ease-toast: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @theme inline {
@@ -180,9 +187,175 @@ body {
   }
 }
 
+@keyframes toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* Transitions (not keyframes) so rapid toasts interrupt cleanly */
+.toast-glass {
+  opacity: 0;
+  transform: translate3d(12px, 0, 0) scale(0.96);
+  transition:
+    opacity 340ms var(--ease-toast),
+    transform 340ms var(--ease-toast);
+  will-change: transform, opacity;
+}
+
+.toast-glass[data-visible="true"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.toast-glass[data-visible="false"] {
+  opacity: 0;
+  transform: translate3d(10px, 0, 0) scale(0.97);
+  transition-duration: 180ms;
+  transition-timing-function: var(--ease-out);
+}
+
+.toast-progress-bar {
+  animation-name: toast-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.toast-glass:hover .toast-progress-bar {
+  animation-play-state: paused;
+}
+
+/* Admin surfaces */
+.admin-panel {
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--navy) 6%, transparent);
+  background: white;
+  box-shadow: 0 18px 48px -36px rgba(0, 32, 111, 0.32);
+}
+
+.admin-press {
+  transition:
+    transform 150ms var(--ease-out),
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease,
+    opacity 150ms ease;
+}
+
+.admin-press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.admin-stagger > * {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: admin-fade-up 280ms var(--ease-out) forwards;
+}
+
+.admin-stagger > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.admin-stagger > *:nth-child(2) {
+  animation-delay: 40ms;
+}
+.admin-stagger > *:nth-child(3) {
+  animation-delay: 80ms;
+}
+.admin-stagger > *:nth-child(4) {
+  animation-delay: 120ms;
+}
+.admin-stagger > *:nth-child(5) {
+  animation-delay: 160ms;
+}
+.admin-stagger > *:nth-child(6) {
+  animation-delay: 200ms;
+}
+
+@keyframes admin-fade-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .admin-card-hover:hover {
+    border-color: color-mix(in srgb, var(--navy) 14%, transparent);
+    box-shadow: 0 22px 50px -34px rgba(0, 32, 111, 0.4);
+    transform: translateY(-1px);
+  }
+}
+
+/* Student learn — progress fill settles once on mount */
+.learn-progress-fill {
+  transform-origin: left center;
+  transition: width 420ms var(--ease-out);
+}
+
+/* Dashboard: slightly tighter type on phones; desktop unchanged */
+@media (max-width: 767px) {
+  .dashboard-shell :where(.text-\[15px\]) {
+    font-size: 0.875rem;
+    line-height: 1.4rem;
+  }
+
+  .dashboard-shell :where(.text-3xl) {
+    font-size: 1.5rem;
+    line-height: 1.75rem;
+  }
+
+  .dashboard-shell :where(.text-2xl) {
+    font-size: 1.35rem;
+    line-height: 1.6rem;
+  }
+
+  .dashboard-shell :where(.text-\[1\.05rem\]) {
+    font-size: 0.95rem;
+    line-height: 1.3rem;
+  }
+
+  .dashboard-shell :where(.text-\[1\.75rem\]) {
+    font-size: 1.35rem;
+    line-height: 1.55rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .toast-glass {
+    transition: opacity 160ms ease;
+    transform: none;
+  }
+
+  .toast-glass[data-visible="false"] {
+    transform: none;
+  }
+
+  .toast-progress-bar {
+    animation: none;
+    transform: scaleX(0.35);
+  }
+
+  .admin-stagger > * {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .admin-card-hover:hover {
+    transform: none;
+  }
+
+  .learn-progress-fill {
+    transition: none;
   }
 }
 

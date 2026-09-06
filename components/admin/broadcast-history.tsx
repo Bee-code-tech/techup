@@ -126,7 +126,7 @@ export function BroadcastHistory({
   }
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-black/5 bg-card shadow-[0_18px_50px_-36px_rgba(0,32,111,0.35)]">
+    <div className="admin-panel overflow-hidden">
       <div className="flex flex-col gap-3 border-b border-black/5 bg-linear-to-r from-[#00206F]/4 to-transparent px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6">
         <div>
           <p className="text-[11px] font-semibold tracking-[0.16em] text-[#00206F] uppercase">

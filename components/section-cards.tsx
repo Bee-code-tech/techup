@@ -57,13 +57,17 @@ function percentOf(part: number, whole: number) {
 
 export function StatCards({ cards }: { cards: StatCardItem[] }) {
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+    <div className="admin-stagger grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       {cards.map((card) => {
         const Icon = card.icon
         return (
           <Card
             key={card.label}
-            className="@container/card overflow-hidden border-black/5 py-0 shadow-[0_14px_40px_-30px_rgba(0,32,111,0.35)]"
+            className={cn(
+              "admin-card-hover @container/card overflow-hidden border-black/[0.05] py-0",
+              "shadow-[0_14px_40px_-30px_rgba(0,32,111,0.32)]",
+              "transition-[transform,box-shadow,border-color] duration-200 ease-[var(--ease-out)]",
+            )}
           >
             <CardHeader className="gap-3 px-5 py-5">
               <div className="flex items-start justify-between gap-3">
@@ -76,9 +80,9 @@ export function StatCards({ cards }: { cards: StatCardItem[] }) {
                       card.accent === "navy" && "bg-[#00206F]/8 text-[#00206F]",
                     )}
                   >
-                    <Icon className="size-4" />
+                    <Icon className="size-4" strokeWidth={2.25} />
                   </span>
-                  <CardDescription className="text-[13px] font-medium tracking-wide text-muted-foreground uppercase">
+                  <CardDescription className="text-[12px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
                     {card.label}
                   </CardDescription>
                 </div>
@@ -93,10 +97,10 @@ export function StatCards({ cards }: { cards: StatCardItem[] }) {
                   </span>
                 ) : null}
               </div>
-              <CardTitle className="text-3xl font-semibold tabular-nums tracking-tight text-[#001752] @[250px]/card:text-4xl">
+              <CardTitle className="text-3xl font-semibold tabular-nums tracking-tight text-[#001752] @[250px]/card:text-[2.35rem]">
                 {card.value.toLocaleString("en-NG")}
               </CardTitle>
-              <div className="space-y-1.5 pt-1">
+              <div className="space-y-1 pt-0.5">
                 {card.details.map((line) => (
                   <p
                     key={line}

@@ -125,13 +125,13 @@ export function StudentsTable({
         "All tracks")
 
   return (
-    <div className="flex flex-col gap-4 px-4 lg:px-6">
+    <div className="flex flex-col gap-5 px-4 lg:px-6">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold tracking-tight">
+          <h2 className="text-[1.35rem] font-semibold tracking-tight text-[#001752]">
             Registered students
           </h2>
-          <p className="text-[15px] text-muted-foreground">
+          <p className="mt-1 text-[14.5px] text-muted-foreground">
             {filtered.length} of {registrations.length} match · showing{" "}
             {rangeStart}-{rangeEnd}
           </p>
@@ -145,7 +145,7 @@ export function StudentsTable({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search name, email, WhatsApp, or track"
-            className="h-11 px-3.5 pl-10 text-[15px] md:text-[15px]"
+            className="h-11 rounded-xl border-black/[0.06] bg-[#f4f6fa] px-3.5 pl-10 text-[15px] shadow-none transition-[border-color,background-color,box-shadow] duration-150 ease-[var(--ease-out)] focus-visible:border-[#00206F]/30 focus-visible:bg-white focus-visible:ring-3 focus-visible:ring-[#00206F]/10 md:text-[15px]"
           />
         </div>
         <DropdownMenu>
@@ -153,7 +153,7 @@ export function StudentsTable({
             render={
               <Button
                 variant="outline"
-                className="h-11 w-full justify-between px-3.5 text-[15px] font-normal sm:w-56"
+                className="admin-press h-11 w-full justify-between rounded-xl border-black/[0.06] bg-[#f4f6fa] px-3.5 text-[15px] font-normal shadow-none hover:bg-white sm:w-56"
               />
             }
           >
@@ -184,29 +184,29 @@ export function StudentsTable({
         </DropdownMenu>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border bg-card shadow-xs">
+      <div className="admin-panel overflow-hidden">
         <Table>
-          <TableHeader className="bg-muted/70">
+          <TableHeader className="bg-[#f4f6fa]/90">
             <TableRow className="hover:bg-transparent">
-              <TableHead className="h-12 w-16 px-4 text-[13px] font-semibold tracking-wide text-muted-foreground uppercase">
+              <TableHead className="h-12 w-16 px-4 text-[12px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
                 S/N
               </TableHead>
-              <TableHead className="h-12 px-4 text-[13px] font-semibold tracking-wide text-muted-foreground uppercase">
+              <TableHead className="h-12 px-4 text-[12px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
                 Student
               </TableHead>
-              <TableHead className="h-12 px-4 text-[13px] font-semibold tracking-wide text-muted-foreground uppercase">
+              <TableHead className="h-12 px-4 text-[12px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
                 Track
               </TableHead>
-              <TableHead className="h-12 px-4 text-[13px] font-semibold tracking-wide text-muted-foreground uppercase">
+              <TableHead className="h-12 px-4 text-[12px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
                 WhatsApp
               </TableHead>
-              <TableHead className="h-12 px-4 text-[13px] font-semibold tracking-wide text-muted-foreground uppercase">
+              <TableHead className="h-12 px-4 text-[12px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
                 Education
               </TableHead>
-              <TableHead className="h-12 px-4 text-[13px] font-semibold tracking-wide text-muted-foreground uppercase">
+              <TableHead className="h-12 px-4 text-[12px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
                 Registered
               </TableHead>
-              <TableHead className="h-12 w-24 px-4 text-right text-[13px] font-semibold tracking-wide text-muted-foreground uppercase">
+              <TableHead className="h-12 w-24 px-4 text-right text-[12px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
                 Actions
               </TableHead>
             </TableRow>
@@ -226,17 +226,20 @@ export function StudentsTable({
                 const href = whatsappHref(row.whatsapp)
                 const serial = (page - 1) * pageSize + index + 1
                 return (
-                  <TableRow key={row.id} className="hover:bg-muted/40">
-                    <TableCell className="px-4 py-4 font-medium tabular-nums text-muted-foreground">
+                  <TableRow
+                    key={row.id}
+                    className="transition-colors duration-150 ease-[var(--ease-out)] hover:bg-[#f7f9fc]"
+                  >
+                    <TableCell className="px-4 py-3.5 font-medium tabular-nums text-muted-foreground">
                       {String(serial).padStart(2, "0")}
                     </TableCell>
-                    <TableCell className="px-4 py-4">
+                    <TableCell className="px-4 py-3.5">
                       <div className="flex items-center gap-3">
-                        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-navy text-xs font-semibold text-white">
+                        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#00206F]/[0.08] text-xs font-semibold text-[#00206F]">
                           {initials(row.fullName)}
                         </span>
                         <span>
-                          <span className="block text-[15px] font-medium">
+                          <span className="block text-[15px] font-medium text-[#001752]">
                             {row.fullName}
                           </span>
                           <span className="block text-sm text-muted-foreground">
@@ -245,21 +248,21 @@ export function StudentsTable({
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="px-4 py-4">
+                    <TableCell className="px-4 py-3.5">
                       <Badge
                         variant="secondary"
-                        className="h-auto rounded-full px-2.5 py-1 text-xs font-medium whitespace-normal"
+                        className="h-auto rounded-lg px-2.5 py-1 text-xs font-medium whitespace-normal"
                       >
                         {row.trackLabel}
                       </Badge>
                     </TableCell>
-                    <TableCell className="px-4 py-4 text-[15px]">
+                    <TableCell className="px-4 py-3.5 text-[15px]">
                       {href ? (
                         <a
                           href={href}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-navy underline-offset-4 hover:underline"
+                          className="text-navy underline-offset-4 transition-colors duration-150 hover:underline"
                         >
                           {row.whatsapp}
                         </a>
@@ -267,13 +270,13 @@ export function StudentsTable({
                         row.whatsapp
                       )}
                     </TableCell>
-                    <TableCell className="max-w-48 px-4 py-4 text-[15px] whitespace-normal text-muted-foreground">
+                    <TableCell className="max-w-48 px-4 py-3.5 text-[15px] whitespace-normal text-muted-foreground">
                       {row.education}
                     </TableCell>
-                    <TableCell className="px-4 py-4 text-[15px] whitespace-nowrap text-muted-foreground">
+                    <TableCell className="px-4 py-3.5 text-[15px] whitespace-nowrap text-muted-foreground">
                       {formatDate(row.createdAt)}
                     </TableCell>
-                    <TableCell className="px-4 py-4 text-right">
+                    <TableCell className="px-4 py-3.5 text-right">
                       <StudentActionButton onClick={() => setSelected(row)} />
                     </TableCell>
                   </TableRow>
@@ -283,7 +286,7 @@ export function StudentsTable({
           </TableBody>
         </Table>
 
-        <div className="flex flex-col gap-3 border-t px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-t border-black/[0.05] bg-[#fafbfd] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>Rows per page</span>
             <Select
@@ -324,7 +327,7 @@ export function StudentsTable({
                 type="button"
                 variant="outline"
                 size="sm"
-                className="h-8 px-2.5"
+                className="h-8 rounded-lg px-2.5"
                 disabled={page <= 1}
                 onClick={() => setPage((current) => Math.max(1, current - 1))}
               >
@@ -335,7 +338,7 @@ export function StudentsTable({
                 type="button"
                 variant="outline"
                 size="sm"
-                className="h-8 px-2.5"
+                className="h-8 rounded-lg px-2.5"
                 disabled={page >= pageCount}
                 onClick={() =>
                   setPage((current) => Math.min(pageCount, current + 1))

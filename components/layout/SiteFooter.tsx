@@ -13,7 +13,7 @@ const columns = [
   {
     title: "Programs",
     links: [
-      { href: "/bootcamp", label: "Free Bootcamp" },
+      { href: "/auth?mode=register", label: "Free Bootcamp" },
       { href: "/scholarship", label: "Scholarships" },
       { href: "/courses", label: "Advanced Courses" },
       { href: "/about", label: "Mentorship Only" },

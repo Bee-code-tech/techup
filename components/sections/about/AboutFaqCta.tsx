@@ -66,7 +66,7 @@ export function AboutFaqCta() {
               career.
             </p>
             <Button
-              href="/bootcamp"
+              href="/auth?mode=register"
               variant="orange"
               size="lg"
               className="mt-6 w-full sm:mt-8 sm:w-auto"

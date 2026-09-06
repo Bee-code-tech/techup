@@ -8,15 +8,215 @@ datasource db {
   url      = env("MONGODB_URI")
 }
 
+/// Roles: admin | tutor | student
 model User {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  email        String   @unique
-  passwordHash String
-  role         String   @default("admin")
-  createdAt    DateTime @default(now())
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  name               String
+  email              String   @unique
+  passwordHash       String
+  role               String   @default("student")
+  /// Student profile (null for admin/tutor unless filled)
+  age                Int?
+  gender             String?
+  whatsapp           String?
+  education          String?
+  laptop             String?
+  track              String?
+  /// free | paid — controls paid-module + live eligibility
+  accessTier         String   @default("free")
+  mustChangePassword Boolean  @default(false)
+  bio                String?
+  avatarUrl          String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime? @updatedAt
+
+  tutorTracks        TutorTrack[]
+  coursesCreated     Course[]           @relation("CourseTutor")
+  moduleProgress     ModuleProgress[]
+  assignments        AssignmentSubmission[]
+  liveSessions       LiveSession[]
+  payments           Payment[]
+  moduleUnlocks      ModuleUnlock[]
+  passwordResets     PasswordResetToken[]
 }
 
+/// Exactly one tutor assigned per track; a tutor may own many tracks.
+model TutorTrack {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  tutorId   String   @db.ObjectId
+  track     String
+  createdAt DateTime @default(now())
+
+  tutor User @relation(fields: [tutorId], references: [id])
+
+  @@unique([track])
+  @@index([tutorId])
+}
+
+model Course {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  track       String
+  title       String
+  description String   @default("")
+  order       Int      @default(0)
+  tutorId     String   @db.ObjectId
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tutor   User     @relation("CourseTutor", fields: [tutorId], references: [id])
+  modules Module[]
+
+  @@index([track])
+  @@index([tutorId])
+}
+
+model Module {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  courseId      String   @db.ObjectId
+  title         String
+  description   String   @default("")
+  /// Cloudinary secure URL
+  videoUrl      String?
+  videoPublicId String?
+  /// [{ name, url, publicId, format }]
+  materials     Json?
+  /// free | paid
+  access        String   @default("free")
+  order         Int      @default(0)
+  passMark      Int      @default(70)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  course      Course                 @relation(fields: [courseId], references: [id])
+  questions   QuizQuestion[]
+  progress    ModuleProgress[]
+  assignments AssignmentSubmission[]
+  unlocks     ModuleUnlock[]
+
+  @@index([courseId])
+}
+
+model QuizQuestion {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  moduleId     String   @db.ObjectId
+  prompt       String
+  options      String[]
+  correctIndex Int
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  module Module @relation(fields: [moduleId], references: [id])
+
+  @@index([moduleId])
+}
+
+model ModuleProgress {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String    @db.ObjectId
+  moduleId        String    @db.ObjectId
+  videoCompleted  Boolean   @default(false)
+  quizPassed      Boolean   @default(false)
+  quizScore       Int?
+  quizAttempts    Int       @default(0)
+  completedAt     DateTime?
+  updatedAt       DateTime  @updatedAt
+  createdAt       DateTime  @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  module Module @relation(fields: [moduleId], references: [id])
+
+  @@unique([userId, moduleId])
+  @@index([userId])
+  @@index([moduleId])
+}
+
+model AssignmentSubmission {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  moduleId      String   @db.ObjectId
+  userId        String   @db.ObjectId
+  explanation   String
+  screenshotUrl String
+  /// pending | reviewed
+  status        String   @default("pending")
+  tutorNote     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  module Module @relation(fields: [moduleId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([moduleId])
+  @@index([userId])
+}
+
+model LiveSession {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  track     String
+  tutorId   String    @db.ObjectId
+  title     String    @default("Live class")
+  /// zoom | meet
+  platform  String
+  joinUrl   String
+  /// free | paid | both
+  audience  String    @default("both")
+  isActive  Boolean   @default(true)
+  endedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  tutor User @relation(fields: [tutorId], references: [id])
+
+  @@index([track, isActive])
+  @@index([tutorId])
+}
+
+model Payment {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String   @db.ObjectId
+  moduleId          String?  @db.ObjectId
+  amount            Int
+  currency          String   @default("NGN")
+  paystackReference String   @unique
+  /// pending | success | failed
+  status            String   @default("pending")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model ModuleUnlock {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  moduleId  String   @db.ObjectId
+  paymentId String?  @db.ObjectId
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  module Module @relation(fields: [moduleId], references: [id])
+
+  @@unique([userId, moduleId])
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+/// Legacy CRM list — kept in sync for broadcasts during transition.
 model BootcampRegistration {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   fullName  String
@@ -62,9 +262,9 @@ model BroadcastDelivery {
 }
 
 model SiteSettings {
-  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
-  key                String   @unique
-  whatsappGroupUrl   String?
-  whatsappGroupUrls  Json?
-  updatedAt          DateTime @updatedAt
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  key               String   @unique
+  whatsappGroupUrl  String?
+  whatsappGroupUrls Json?
+  updatedAt         DateTime @updatedAt
 }

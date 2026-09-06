@@ -36,21 +36,21 @@ export function AppSidebar({
   const navMain = [
     {
       title: "Dashboard",
-      url: "/admin",
+      url: "/dashboard",
       icon: <LayoutDashboardIcon />,
-      isActive: pathname === "/admin",
+      isActive: pathname === "/dashboard",
     },
     {
       title: "Students",
-      url: "/admin/students",
+      url: "/dashboard/students",
       icon: <UsersIcon />,
-      isActive: pathname.startsWith("/admin/students"),
+      isActive: pathname.startsWith("/dashboard/students"),
     },
     {
       title: "Broadcast",
-      url: "/admin/broadcast",
+      url: "/dashboard/broadcast",
       icon: <MailIcon />,
-      isActive: pathname.startsWith("/admin/broadcast"),
+      isActive: pathname.startsWith("/dashboard/broadcast"),
     },
   ]
 
@@ -62,7 +62,7 @@ export function AppSidebar({
             <SidebarMenuButton
               size="lg"
               className="gap-3 px-2"
-              render={<Link href="/admin" />}
+              render={<Link href="/dashboard" />}
             >
               <BrandLogo size={36} />
               <span className="text-base font-semibold">TechUp Admin</span>

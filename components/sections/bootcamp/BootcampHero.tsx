@@ -1,5 +1,4 @@
 import { Section } from "@/components/layout/Section";
-import { BootcampForm } from "@/components/sections/bootcamp/BootcampForm";
 import { HeroIntro } from "@/components/motion/HeroIntro";
 import { Badge } from "@/components/marketing/Badge";
 import { Button } from "@/components/marketing/site-button";
@@ -25,16 +24,20 @@ export function BootcampHero() {
           experience. Zero tuition, 100% industry-focused, and designed for
           high-energy talent ready to scale.
         </p>
-        <div data-hero className="mt-7 sm:mt-8">
-          <Button href="#reserve" size="lg" className="w-full sm:w-auto">
-            Reserve Your Spot
+        <div data-hero className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row">
+          <Button href="/auth?mode=register" size="lg" className="w-full sm:w-auto">
+            Join Free Bootcamp
+          </Button>
+          <Button
+            href="/auth"
+            size="lg"
+            variant="secondary"
+            className="w-full sm:w-auto"
+          >
+            Already registered? Log in
           </Button>
         </div>
       </HeroIntro>
-
-      <div id="reserve" className="mt-10 scroll-mt-24 sm:mt-12 md:mt-14">
-        <BootcampForm />
-      </div>
     </Section>
   );
 }

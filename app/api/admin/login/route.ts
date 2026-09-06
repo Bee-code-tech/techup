@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { verifyPassword } from "@/lib/auth/password";
 import { db } from "@/lib/db";
-import { setSessionCookie } from "@/lib/admin-session";
+import { dashboardHomeForRole } from "@/lib/roles";
+import { setSessionCookie } from "@/lib/session";
 
 type LoginBody = {
   email?: string;
   password?: string;
 };
 
+/** @deprecated Prefer POST /api/auth/login */
 export async function POST(request: Request) {
   const body = (await request.json()) as LoginBody;
   const email = String(body.email ?? "").trim().toLowerCase();
@@ -37,17 +39,11 @@ export async function POST(request: Request) {
       );
     }
 
-    if (user.role !== "admin") {
-      return NextResponse.json(
-        { error: "You do not have permission to access the admin dashboard." },
-        { status: 403 },
-      );
-    }
-
     await setSessionCookie(user.id, user.role);
 
     return NextResponse.json({
       ok: true,
+      redirectTo: dashboardHomeForRole(user.role),
       user: {
         id: user.id,
         name: user.name,
@@ -56,7 +52,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Admin login failed", error);
+    console.error("Login failed", error);
     return NextResponse.json(
       { error: "Login failed. Check database connection." },
       { status: 500 },

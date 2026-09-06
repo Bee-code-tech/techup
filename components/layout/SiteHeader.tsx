@@ -17,7 +17,9 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const ctaHref =
-    pathname === "/scholarship" ? site.scholarshipFormUrl : "/bootcamp";
+    pathname === "/scholarship"
+      ? site.scholarshipFormUrl
+      : "/auth?mode=register";
   const ctaLabel =
     pathname === "/scholarship"
       ? "Apply for Scholarship"

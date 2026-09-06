@@ -718,7 +718,7 @@ export function BootcampBody() {
                 digital skills.
               </p>
               <Button
-                href="#reserve"
+                href="/auth?mode=register"
                 variant="orange"
                 size="lg"
                 className="mt-8 w-full sm:w-auto"

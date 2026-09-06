@@ -66,12 +66,6 @@ type WeekOption = {
   label: string
 }
 
-function dateKeyInLagos(iso: string) {
-  return new Date(iso).toLocaleDateString("en-CA", {
-    timeZone: "Africa/Lagos",
-  })
-}
-
 function daysInMonth(year: number, monthIndex: number) {
   return new Date(year, monthIndex + 1, 0).getDate()
 }
@@ -113,19 +107,13 @@ function currentPartsInLagos(date = new Date()) {
 }
 
 function buildWeekDaySeries(
-  registrations: Array<{ createdAt: string }>,
+  dayCounts: Array<{ date: string; count: number }>,
   year: number,
   monthIndex: number,
   week: number,
 ): DayPoint[] {
   const prefix = `${year}-${String(monthIndex + 1).padStart(2, "0")}`
-  const totals = new Map<string, number>()
-
-  for (const row of registrations) {
-    const key = dateKeyInLagos(row.createdAt)
-    if (!key.startsWith(prefix)) continue
-    totals.set(key, (totals.get(key) ?? 0) + 1)
-  }
+  const totals = new Map(dayCounts.map((row) => [row.date, row.count]))
 
   const startDay = (week - 1) * 7 + 1
   const endDay = Math.min(week * 7, daysInMonth(year, monthIndex))
@@ -140,9 +128,9 @@ function buildWeekDaySeries(
 }
 
 export function ChartAreaInteractive({
-  registrations,
+  dayCounts,
 }: {
-  registrations: Array<{ createdAt: string }>
+  dayCounts: Array<{ date: string; count: number }>
 }) {
   const now = useMemo(() => new Date(), [])
   const initial = useMemo(() => currentPartsInLagos(now), [now])
@@ -152,13 +140,12 @@ export function ChartAreaInteractive({
 
   const years = useMemo(() => {
     const set = new Set<number>([now.getFullYear()])
-    for (const row of registrations) {
-      const key = dateKeyInLagos(row.createdAt)
-      const y = Number(key.slice(0, 4))
+    for (const row of dayCounts) {
+      const y = Number(row.date.slice(0, 4))
       if (!Number.isNaN(y)) set.add(y)
     }
     return Array.from(set).sort((a, b) => b - a)
-  }, [now, registrations])
+  }, [dayCounts, now])
 
   const weekOptions = useMemo(
     () => buildWeekOptions(year, month),
@@ -171,12 +158,12 @@ export function ChartAreaInteractive({
   const data = useMemo(
     () =>
       buildWeekDaySeries(
-        registrations,
+        dayCounts,
         year,
         month,
         selectedWeek?.week ?? 1,
       ),
-    [month, registrations, selectedWeek?.week, year],
+    [dayCounts, month, selectedWeek?.week, year],
   )
 
   const summary = useMemo(() => {

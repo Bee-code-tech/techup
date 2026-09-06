@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { cn } from "@/lib/utils"
 
 export function NavMain({
   items,
@@ -22,15 +23,19 @@ export function NavMain({
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupContent className="flex flex-col gap-2">
-        <SidebarMenu className="gap-2">
+      <SidebarGroupContent className="flex flex-col gap-1.5">
+        <SidebarMenu className="gap-1">
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 tooltip={item.title}
                 isActive={item.isActive}
                 size="lg"
-                className="gap-3 px-3 text-[15px] [&_svg]:size-5"
+                className={cn(
+                  "admin-press gap-3 px-3 text-[14.5px] [&_svg]:size-[1.15rem]",
+                  item.isActive &&
+                    "bg-[#00206F]/[0.07] font-semibold text-[#00206F] shadow-none",
+                )}
                 render={<Link href={item.url} />}
               >
                 {item.icon}

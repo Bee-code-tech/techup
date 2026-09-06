@@ -102,7 +102,7 @@ export function ContactBody() {
         />
         <Reveal className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:justify-center">
           <Button
-            href="/bootcamp"
+            href="/auth?mode=register"
             variant="ghost"
             className="w-full rounded-xl sm:w-auto"
           >

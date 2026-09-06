@@ -3,6 +3,7 @@
 import {
   Avatar,
   AvatarFallback,
+  AvatarImage,
 } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -19,7 +20,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { EllipsisVerticalIcon, LogOutIcon } from "lucide-react"
+import { clearAdminDashboardCache } from "@/components/admin/use-admin-dashboard"
+import { clearSessionCache } from "@/components/dashboard/use-session"
+import { clearStudentLearnCache } from "@/components/dashboard/use-student-learn"
+import { EllipsisVerticalIcon, LogOutIcon, SettingsIcon } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 function initials(name: string) {
   return name
@@ -40,10 +45,14 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const router = useRouter()
 
   async function handleLogout() {
-    await fetch("/api/admin/logout", { method: "POST" })
-    window.location.href = "/admin/login"
+    await fetch("/api/auth/logout", { method: "POST" })
+    clearSessionCache()
+    clearAdminDashboardCache()
+    clearStudentLearnCache()
+    window.location.href = "/auth"
   }
 
   return (
@@ -56,6 +65,9 @@ export function NavUser({
             }
           >
             <Avatar className="size-8 rounded-lg">
+              {user.avatar ? (
+                <AvatarImage src={user.avatar} alt={user.name} />
+              ) : null}
               <AvatarFallback className="rounded-lg bg-secondary text-navy">
                 {initials(user.name)}
               </AvatarFallback>
@@ -77,7 +89,10 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar className="size-8">
+                  <Avatar className="size-8 rounded-lg">
+                    {user.avatar ? (
+                      <AvatarImage src={user.avatar} alt={user.name} />
+                    ) : null}
                     <AvatarFallback className="rounded-lg bg-secondary text-navy">
                       {initials(user.name)}
                     </AvatarFallback>
@@ -92,6 +107,10 @@ export function NavUser({
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
+              <SettingsIcon />
+              Settings
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleLogout}>
               <LogOutIcon />
               Log out

@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 const fieldClass =
-  "h-11 w-full rounded-xl border border-black/8 bg-[#f7f8fb] px-3.5 text-[15px] text-[#001752] shadow-none outline-none transition-colors focus-visible:border-[#00206F]/35 focus-visible:bg-white focus-visible:ring-3 focus-visible:ring-[#00206F]/12 md:text-[15px]"
+  "h-11 w-full rounded-xl border border-black/8 bg-[#f7f8fb] px-3.5 text-[15px] text-[#001752] shadow-none outline-none transition-[border-color,background-color,box-shadow] duration-150 ease-[var(--ease-out)] focus-visible:border-[#00206F]/35 focus-visible:bg-white focus-visible:ring-3 focus-visible:ring-[#00206F]/12 md:text-[15px]"
 
 const genderOptions = [
   { value: "Female", label: "Female" },
@@ -245,10 +245,10 @@ export function StudentEditModal({
         aria-modal="true"
         aria-labelledby={`${formId}-title`}
         className={cn(
-          "relative z-10 flex max-h-[min(92vh,860px)] w-full max-w-2xl origin-center flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#f7f8fb] shadow-[0_28px_80px_-28px_rgba(0,32,111,0.55)] transition-[opacity,transform] duration-200 ease-out",
+          "relative z-10 flex max-h-[min(92vh,860px)] w-full max-w-2xl origin-center flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#f7f8fb] shadow-[0_28px_80px_-28px_rgba(0,32,111,0.55)] transition-[opacity,transform] duration-200 ease-[var(--ease-out)]",
           visible
             ? "translate-y-0 scale-100 opacity-100"
-            : "translate-y-3 scale-[0.97] opacity-0",
+            : "translate-y-2 scale-[0.96] opacity-0",
         )}
         onMouseDown={(event) => event.stopPropagation()}
       >
@@ -489,7 +489,7 @@ export function StudentEditModal({
               </Button>
               <Button
                 type="submit"
-                className="h-10 rounded-xl bg-[#00206F] px-5 text-white hover:bg-[#001752] active:scale-[0.98]"
+                className="admin-press h-10 rounded-xl bg-[#00206F] px-5 text-white hover:bg-[#001752]"
                 disabled={pending || !dirty}
               >
                 {pending ? "Saving..." : "Save changes"}
@@ -513,7 +513,7 @@ export function StudentActionButton({
       type="button"
       variant="outline"
       size="sm"
-      className="h-8 rounded-lg px-2.5 text-xs"
+      className="h-8 rounded-lg border-black/[0.08] px-2.5 text-xs"
       onClick={onClick}
     >
       <PencilIcon className="size-3.5" />

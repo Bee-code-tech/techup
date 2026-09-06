@@ -1,12 +1,13 @@
 "use client"
 
 import { AppSidebar } from "@/components/app-sidebar"
-import { SiteHeader } from "@/components/site-header"
 import { useAdminDashboard } from "@/components/admin/use-admin-dashboard"
 import { Button } from "@/components/ui/button"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { SiteHeader } from "@/components/site-header"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
+/** @deprecated Prefer DashboardShell — kept for transitional imports. */
 export function DashboardShell({
   title,
   children,

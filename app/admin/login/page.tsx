@@ -1,13 +1,11 @@
-import { Suspense } from "react"
-import { AuthShell } from "@/components/admin/auth-shell"
-import { LoginForm } from "@/components/login-form"
+import { redirect } from "next/navigation"
 
-export default function AdminLoginPage() {
-  return (
-    <AuthShell title="Sign in to manage the academy.">
-      <Suspense fallback={<div className="h-64" />}>
-        <LoginForm />
-      </Suspense>
-    </AuthShell>
-  )
+type Props = {
+  searchParams: Promise<{ next?: string }>
+}
+
+export default async function AdminLoginRedirect({ searchParams }: Props) {
+  const params = await searchParams
+  const next = params.next ? `?next=${encodeURIComponent(params.next)}` : ""
+  redirect(`/auth${next}`)
 }

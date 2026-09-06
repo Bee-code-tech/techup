@@ -192,7 +192,7 @@ export function WhatsappGroupNav() {
                 type="button"
                 aria-label="Close dialog"
                 className={cn(
-                  "absolute inset-0 z-0 bg-[#001028]/55 backdrop-blur-[6px] transition-opacity duration-200 ease-out",
+                  "absolute inset-0 z-0 bg-[#001028]/55 backdrop-blur-[6px] transition-opacity duration-200 ease-[var(--ease-out)]",
                   visible ? "opacity-100" : "opacity-0",
                 )}
                 onClick={() => setOpen(false)}
@@ -202,10 +202,10 @@ export function WhatsappGroupNav() {
                 aria-modal="true"
                 aria-labelledby="whatsapp-group-title"
                 className={cn(
-                  "relative z-10 flex max-h-[min(92vh,760px)] w-full max-w-xl origin-center flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#f7f8fb] shadow-[0_28px_80px_-28px_rgba(0,32,111,0.55)] transition-[opacity,transform] duration-200 ease-out",
+                  "relative z-10 flex max-h-[min(92vh,760px)] w-full max-w-xl origin-center flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#f7f8fb] shadow-[0_28px_80px_-28px_rgba(0,32,111,0.55)] transition-[opacity,transform] duration-200 ease-[var(--ease-out)]",
                   visible
                     ? "translate-y-0 scale-100 opacity-100"
-                    : "translate-y-3 scale-[0.97] opacity-0",
+                    : "translate-y-2 scale-[0.96] opacity-0",
                 )}
               >
                 <div className="relative shrink-0 overflow-hidden bg-[#00206F] px-5 pb-5 pt-5 text-white sm:px-6 sm:pb-6 sm:pt-6">
@@ -244,7 +244,7 @@ export function WhatsappGroupNav() {
                       type="button"
                       aria-label="Close"
                       onClick={() => setOpen(false)}
-                      className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/15 hover:text-white active:scale-[0.97]"
+                      className="admin-press flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/80 hover:bg-white/15 hover:text-white"
                     >
                       <XIcon className="size-4" />
                     </button>
@@ -332,7 +332,7 @@ export function WhatsappGroupNav() {
                                 placeholder="https://chat.whatsapp.com/..."
                                 disabled={loading}
                                 autoFocus={index === 0}
-                                className="h-11 rounded-xl border-black/8 bg-[#f7f8fb] pr-3.5 pl-10 text-[14px] shadow-none focus-visible:bg-white md:text-[14px]"
+                                className="h-11 rounded-xl border-black/[0.06] bg-[#f4f6fa] pr-3.5 pl-10 text-[14px] shadow-none transition-[border-color,background-color,box-shadow] duration-150 ease-[var(--ease-out)] focus-visible:border-[#00206F]/30 focus-visible:bg-white focus-visible:ring-3 focus-visible:ring-[#00206F]/10 md:text-[14px]"
                               />
                             </div>
                           </label>
