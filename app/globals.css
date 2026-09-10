@@ -197,24 +197,24 @@ body {
 }
 
 /* Transitions (not keyframes) so rapid toasts interrupt cleanly */
-.toast-glass {
+.toast-card {
   opacity: 0;
-  transform: translate3d(12px, 0, 0) scale(0.96);
+  transform: translate3d(0, -8px, 0);
   transition:
-    opacity 340ms var(--ease-toast),
-    transform 340ms var(--ease-toast);
+    opacity 220ms var(--ease-toast),
+    transform 220ms var(--ease-toast);
   will-change: transform, opacity;
 }
 
-.toast-glass[data-visible="true"] {
+.toast-card[data-visible="true"] {
   opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1);
+  transform: translate3d(0, 0, 0);
 }
 
-.toast-glass[data-visible="false"] {
+.toast-card[data-visible="false"] {
   opacity: 0;
-  transform: translate3d(10px, 0, 0) scale(0.97);
-  transition-duration: 180ms;
+  transform: translate3d(0, -6px, 0);
+  transition-duration: 140ms;
   transition-timing-function: var(--ease-out);
 }
 
@@ -222,10 +222,6 @@ body {
   animation-name: toast-progress;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
-}
-
-.toast-glass:hover .toast-progress-bar {
-  animation-play-state: paused;
 }
 
 /* Admin surfaces */
@@ -330,12 +326,12 @@ body {
     scroll-behavior: auto;
   }
 
-  .toast-glass {
+  .toast-card {
     transition: opacity 160ms ease;
     transform: none;
   }
 
-  .toast-glass[data-visible="false"] {
+  .toast-card[data-visible="false"] {
     transform: none;
   }
 

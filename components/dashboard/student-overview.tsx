@@ -10,6 +10,7 @@ import {
   BookOpenIcon,
   CheckCircle2Icon,
   CircleDashedIcon,
+  FlameIcon,
   LayersIcon,
   LockIcon,
   MailIcon,
@@ -92,7 +93,12 @@ export function StudentOverview() {
     (track ? bootcampTracks[track] : null) ||
     "your track"
   const courses = data?.courses ?? []
-  const tutor = data?.tutor
+  const tutors =
+    data?.tutors && data.tutors.length > 0
+      ? data.tutors
+      : data?.tutor
+        ? [data.tutor]
+        : []
   const awaiting = loading && !data
 
   const summary = useMemo(() => {
@@ -164,7 +170,7 @@ export function StudentOverview() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
+            <div className="rounded-xl border border-white/10 bg-white/8 p-4">
               <div className="flex items-end justify-between gap-3">
                 <div>
                   <p className="text-[11px] font-medium text-white/60">
@@ -181,11 +187,15 @@ export function StudentOverview() {
                     </p>
                   )}
                 </div>
-                <p className="text-sm text-white/65">
-                  {awaiting
-                    ? "—"
-                    : `${summary.completed}/${summary.total} modules`}
-                </p>
+                <div className="text-right">
+                  <p className="inline-flex items-center gap-1 text-sm font-semibold text-[#FB7801]">
+                    <FlameIcon className="size-3.5" />
+                    {awaiting ? "—" : `${data?.currentStreak ?? 0} day`}
+                  </p>
+                  <p className="mt-0.5 text-xs text-white/55">
+                    Best {awaiting ? "—" : data?.longestStreak ?? 0}
+                  </p>
+                </div>
               </div>
               <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/12">
                 <div
@@ -352,7 +362,7 @@ export function StudentOverview() {
         <aside className="space-y-5">
           <section className="admin-panel p-5 sm:p-6">
             <p className="text-[11px] font-semibold tracking-[0.14em] text-[#00206F]/65 uppercase">
-              Your tutor
+              {tutors.length === 1 ? "Your tutor" : "Your tutors"}
             </p>
             {awaiting ? (
               <div className="mt-4 space-y-3">
@@ -360,42 +370,46 @@ export function StudentOverview() {
                 <Skeleton className="h-4 w-36 rounded-md" />
                 <Skeleton className="h-4 w-full rounded-md" />
               </div>
-            ) : tutor ? (
-              <div className="mt-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#00206F] text-sm font-semibold text-white">
-                    {tutor.avatarUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={tutor.avatarUrl}
-                        alt=""
-                        className="size-full object-cover"
-                      />
-                    ) : (
-                      tutorInitials(tutor.name)
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="truncate text-base font-semibold text-[#001752]">
-                      {tutor.name}
-                    </h3>
-                    <p className="mt-1 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
-                      {tutor.bio ||
-                        `Track instructor for ${trackLabel}. Reach out if you get stuck.`}
-                    </p>
-                  </div>
-                </div>
-                <a
-                  href={`mailto:${tutor.email}`}
-                  className="admin-press mt-4 inline-flex h-10 items-center gap-2 rounded-xl border border-black/8 bg-[#f7f8fb] px-3 text-sm font-medium text-[#001752] transition-[background-color] duration-150 hover:bg-white"
-                >
-                  <MailIcon className="size-4 text-[#00206F]" aria-hidden />
-                  Email tutor
-                </a>
-              </div>
+            ) : tutors.length > 0 ? (
+              <ul className="mt-4 space-y-4">
+                {tutors.map((person) => (
+                  <li key={person.id}>
+                    <div className="flex items-start gap-3">
+                      <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#00206F] text-sm font-semibold text-white">
+                        {person.avatarUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={person.avatarUrl}
+                            alt=""
+                            className="size-full object-cover"
+                          />
+                        ) : (
+                          tutorInitials(person.name)
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="truncate text-base font-semibold text-[#001752]">
+                          {person.name}
+                        </h3>
+                        <p className="mt-1 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                          {person.bio ||
+                            `Track instructor for ${trackLabel}. Reach out if you get stuck.`}
+                        </p>
+                      </div>
+                    </div>
+                    <a
+                      href={`mailto:${person.email}`}
+                      className="admin-press mt-3 inline-flex h-10 items-center gap-2 rounded-xl border border-black/8 bg-[#f7f8fb] px-3 text-sm font-medium text-[#001752] transition-[background-color] duration-150 hover:bg-white"
+                    >
+                      <MailIcon className="size-4 text-[#00206F]" aria-hidden />
+                      Email {person.name.split(" ")[0] || "tutor"}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             ) : (
               <p className="mt-3 text-sm text-muted-foreground">
-                No tutor assigned to this track yet.
+                No tutors assigned to this track yet.
               </p>
             )}
           </section>

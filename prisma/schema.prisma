@@ -27,20 +27,27 @@ model User {
   mustChangePassword Boolean  @default(false)
   bio                String?
   avatarUrl          String?
+  /// Learning streak (calendar days with activity)
+  currentStreak      Int      @default(0)
+  longestStreak      Int      @default(0)
+  /// YYYY-MM-DD of last streak-qualifying activity (UTC)
+  lastActivityDate   String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime? @updatedAt
 
   tutorTracks        TutorTrack[]
   coursesCreated     Course[]           @relation("CourseTutor")
   moduleProgress     ModuleProgress[]
-  assignments        AssignmentSubmission[]
+  assignmentsCreated Assignment[]       @relation("AssignmentTutor")
+  submissions        AssignmentSubmission[]
   liveSessions       LiveSession[]
   payments           Payment[]
   moduleUnlocks      ModuleUnlock[]
   passwordResets     PasswordResetToken[]
+  notifications      Notification[]
 }
 
-/// Exactly one tutor assigned per track; a tutor may own many tracks.
+/// A tutor may be assigned to many tracks; a track may have many tutors.
 model TutorTrack {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   tutorId   String   @db.ObjectId
@@ -49,8 +56,9 @@ model TutorTrack {
 
   tutor User @relation(fields: [tutorId], references: [id])
 
-  @@unique([track])
+  @@unique([tutorId, track])
   @@index([tutorId])
+  @@index([track])
 }
 
 model Course {
@@ -58,14 +66,18 @@ model Course {
   track       String
   title       String
   description String   @default("")
+  /// Tigris (or CDN) cover image URL
+  coverUrl    String?
+  coverKey    String?
   order       Int      @default(0)
   tutorId     String   @db.ObjectId
-  published   Boolean  @default(true)
+  published   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   tutor   User     @relation("CourseTutor", fields: [tutorId], references: [id])
   modules Module[]
+  assignments Assignment[]
 
   @@index([track])
   @@index([tutorId])
@@ -76,10 +88,11 @@ model Module {
   courseId      String   @db.ObjectId
   title         String
   description   String   @default("")
-  /// Cloudinary secure URL
+  /// Tigris secure/public URL
   videoUrl      String?
+  /// Object key in Tigris (legacy name: videoPublicId)
   videoPublicId String?
-  /// [{ name, url, publicId, format }]
+  /// [{ name, url, key, format }]
   materials     Json?
   /// free | paid
   access        String   @default("free")
@@ -91,20 +104,25 @@ model Module {
   course      Course                 @relation(fields: [courseId], references: [id])
   questions   QuizQuestion[]
   progress    ModuleProgress[]
-  assignments AssignmentSubmission[]
   unlocks     ModuleUnlock[]
 
   @@index([courseId])
 }
 
 model QuizQuestion {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  moduleId     String   @db.ObjectId
-  prompt       String
-  options      String[]
-  correctIndex Int
-  order        Int      @default(0)
-  createdAt    DateTime @default(now())
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  moduleId        String   @db.ObjectId
+  /// Question text (optional if promptImageUrl is set)
+  prompt          String   @default("")
+  promptImageUrl  String?
+  promptImageKey  String?
+  /// Option labels (may be empty when optionImageUrls[i] is set)
+  options         String[]
+  /// Parallel to options — public image URL or "" when none
+  optionImageUrls String[] @default([])
+  correctIndex    Int
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
 
   module Module @relation(fields: [moduleId], references: [id])
 
@@ -131,44 +149,97 @@ model ModuleProgress {
   @@index([moduleId])
 }
 
+model Assignment {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  /// course | track | module
+  scope       String
+  title       String
+  description String    @default("")
+  track       String
+  courseId    String?   @db.ObjectId
+  moduleId    String?   @db.ObjectId
+  tutorId     String    @db.ObjectId
+  /// When the assignment window opens (optional)
+  opensAt     DateTime?
+  dueAt       DateTime?
+  maxScore    Int       @default(100)
+  published   Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tutor       User                   @relation("AssignmentTutor", fields: [tutorId], references: [id])
+  course      Course?                @relation(fields: [courseId], references: [id])
+  submissions AssignmentSubmission[]
+
+  @@index([tutorId])
+  @@index([track])
+  @@index([courseId])
+  @@index([published])
+}
+
 model AssignmentSubmission {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  moduleId      String   @db.ObjectId
-  userId        String   @db.ObjectId
-  explanation   String
-  screenshotUrl String
-  /// pending | reviewed
-  status        String   @default("pending")
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  assignmentId  String    @db.ObjectId
+  userId        String    @db.ObjectId
+  explanation   String    @default("")
+  attachmentUrl String?
+  attachmentKey String?
+  /// pending | graded
+  status        String    @default("pending")
+  score         Int?
   tutorNote     String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  reviewedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  module Module @relation(fields: [moduleId], references: [id])
-  user   User   @relation(fields: [userId], references: [id])
+  assignment Assignment @relation(fields: [assignmentId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
 
-  @@index([moduleId])
+  @@unique([assignmentId, userId])
+  @@index([assignmentId])
   @@index([userId])
+  @@index([status])
+}
+
+model Notification {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  /// assignment | grade | live | payment | course | system | alert
+  type      String
+  title     String
+  body      String    @default("")
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
 }
 
 model LiveSession {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  track     String
-  tutorId   String    @db.ObjectId
-  title     String    @default("Live class")
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  track       String
+  tutorId     String    @db.ObjectId
+  title       String    @default("Live class")
   /// zoom | meet
-  platform  String
-  joinUrl   String
+  platform    String
+  joinUrl     String
   /// free | paid | both
-  audience  String    @default("both")
-  isActive  Boolean   @default(true)
-  endedAt   DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  audience    String    @default("both")
+  /// When the class is scheduled to start
+  scheduledAt DateTime  @default(now())
+  isActive    Boolean   @default(true)
+  endedAt     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   tutor User @relation(fields: [tutorId], references: [id])
 
   @@index([track, isActive])
   @@index([tutorId])
+  @@index([scheduledAt])
 }
 
 model Payment {

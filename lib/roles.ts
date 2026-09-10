@@ -21,6 +21,8 @@ export const ROLE_ROUTE_RULES: Array<{
   { prefix: "/dashboard/settings", roles: ["admin", "tutor", "student"] },
   { prefix: "/dashboard/courses/manage", roles: ["tutor", "admin"] },
   { prefix: "/dashboard/assignments/review", roles: ["tutor", "admin"] },
+  { prefix: "/dashboard/assignments", roles: ["student", "tutor", "admin"] },
+  { prefix: "/dashboard/leaderboard", roles: ["student"] },
   { prefix: "/dashboard/learn", roles: ["student"] },
   { prefix: "/dashboard/live/manage", roles: ["tutor", "admin"] },
   // /dashboard/live redirects students to overview (live callout lives there)

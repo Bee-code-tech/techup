@@ -6,7 +6,7 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 /** Bump when models are added so hot-reload drops stale clients. */
-const PRISMA_SCHEMA_VERSION = 2;
+const PRISMA_SCHEMA_VERSION = 5;
 
 function createClient() {
   return new PrismaClient({
@@ -17,9 +17,7 @@ function createClient() {
 function getClient(): PrismaClient {
   if (
     globalForPrisma.prismaSchemaVersion !== PRISMA_SCHEMA_VERSION ||
-    !globalForPrisma.prisma ||
-    typeof (globalForPrisma.prisma as { passwordResetToken?: unknown })
-      .passwordResetToken === "undefined"
+    !globalForPrisma.prisma
   ) {
     if (globalForPrisma.prisma) {
       void globalForPrisma.prisma.$disconnect().catch(() => undefined);

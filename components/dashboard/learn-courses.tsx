@@ -24,6 +24,7 @@ export type LearnCourse = {
   id: string
   title: string
   description: string
+  coverUrl?: string | null
   modules: LearnModule[]
 }
 
@@ -35,7 +36,12 @@ const TRACK_COVERS: Record<string, string> = {
   data: "/course-data.jpg",
 }
 
-function courseCover(track: string | null, index: number) {
+function courseCover(
+  course: LearnCourse,
+  track: string | null,
+  index: number,
+) {
+  if (course.coverUrl) return course.coverUrl
   if (track && TRACK_COVERS[track]) return TRACK_COVERS[track]
   const covers = Object.values(TRACK_COVERS)
   return covers[index % covers.length]
@@ -105,7 +111,7 @@ export function LearnCoursesGrid({
     <div className="admin-stagger grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
       {courses.map((course, courseIndex) => {
         const stats = courseStats(course)
-        const cover = courseCover(track, courseIndex)
+        const cover = courseCover(course, track, courseIndex)
         const href = courseHref(course)
 
         return (

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isNextResponse, requireTutorOrAdmin } from "@/lib/api-auth";
 import { db } from "@/lib/db";
+import { validateQuizQuestion, type QuizQuestionInput } from "@/lib/quiz";
 
 type RouteContext = { params: Promise<{ courseId: string }> };
 
@@ -49,11 +50,7 @@ type CreateBody = {
   videoUrl?: string;
   videoPublicId?: string;
   materials?: unknown;
-  questions?: Array<{
-    prompt: string;
-    options: string[];
-    correctIndex: number;
-  }>;
+  questions?: QuizQuestionInput[];
 };
 
 export async function POST(request: Request, context: RouteContext) {
@@ -81,22 +78,13 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   const questions = Array.isArray(body.questions) ? body.questions : [];
+  const normalized = [];
   for (const question of questions) {
-    if (!question.prompt?.trim() || !Array.isArray(question.options) || question.options.length < 2) {
-      return NextResponse.json(
-        { error: "Each quiz question needs a prompt and at least 2 options." },
-        { status: 400 },
-      );
+    const validated = validateQuizQuestion(question);
+    if (!validated.ok) {
+      return NextResponse.json({ error: validated.error }, { status: 400 });
     }
-    if (
-      question.correctIndex < 0 ||
-      question.correctIndex >= question.options.length
-    ) {
-      return NextResponse.json(
-        { error: "Quiz correct answer index is invalid." },
-        { status: 400 },
-      );
-    }
+    normalized.push(validated.question);
   }
 
   const moduleRow = await db.module.create({
@@ -111,9 +99,12 @@ export async function POST(request: Request, context: RouteContext) {
       videoPublicId: body.videoPublicId ? String(body.videoPublicId) : null,
       materials: body.materials ?? undefined,
       questions: {
-        create: questions.map((question, index) => ({
-          prompt: question.prompt.trim(),
-          options: question.options.map(String),
+        create: normalized.map((question, index) => ({
+          prompt: question.prompt,
+          promptImageUrl: question.promptImageUrl,
+          promptImageKey: question.promptImageKey,
+          options: question.options,
+          optionImageUrls: question.optionImageUrls,
           correctIndex: question.correctIndex,
           order: index,
         })),

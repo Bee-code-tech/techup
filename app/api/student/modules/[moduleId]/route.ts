@@ -128,7 +128,9 @@ export async function GET(_request: Request, context: RouteContext) {
       questions: moduleRow.questions.map((question) => ({
         id: question.id,
         prompt: question.prompt,
+        promptImageUrl: question.promptImageUrl,
         options: question.options,
+        optionImageUrls: question.optionImageUrls || [],
         order: question.order,
         // correctIndex omitted until after pass / submit response
       })),

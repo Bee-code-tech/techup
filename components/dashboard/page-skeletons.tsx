@@ -9,11 +9,12 @@ import {
 import { cn } from "@/lib/utils"
 
 export function SidebarNavSkeleton({ count = 4 }: { count?: number }) {
+  const widths = ["72%", "64%", "80%", "58%", "76%", "68%"]
   return (
     <SidebarMenu className="gap-1 px-2">
       {Array.from({ length: count }).map((_, i) => (
         <SidebarMenuItem key={i}>
-          <SidebarMenuSkeleton showIcon />
+          <SidebarMenuSkeleton showIcon width={widths[i % widths.length]} />
         </SidebarMenuItem>
       ))}
     </SidebarMenu>
@@ -215,6 +216,56 @@ export function TutorListSkeleton({ rows = 3 }: { rows?: number }) {
           </div>
         </div>
       ))}
+    </div>
+  )
+}
+
+/** Matches tutor My courses card grid (cover + badges + title). */
+export function TutorCoursesSkeleton({
+  count = 6,
+  compact,
+}: {
+  count?: number
+  compact?: boolean
+}) {
+  return (
+    <div
+      className={cn(!compact && "px-4 py-6 lg:px-6 md:py-8")}
+      aria-busy
+      aria-label="Loading courses"
+    >
+      {!compact ? (
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-40 rounded-lg" />
+            <Skeleton className="h-4 w-64 max-w-full rounded-md" />
+          </div>
+          <Skeleton className="h-10 w-32 rounded-xl" />
+        </div>
+      ) : null}
+      <div
+        className={cn(
+          "grid gap-4 sm:grid-cols-2 xl:grid-cols-3",
+          !compact && "mt-6",
+        )}
+      >
+        {Array.from({ length: count }).map((_, i) => (
+          <div
+            key={i}
+            className="overflow-hidden rounded-xl border border-black/10 bg-white"
+          >
+            <Skeleton className="aspect-video w-full rounded-none" />
+            <div className="space-y-3 p-4">
+              <div className="flex gap-1.5">
+                <Skeleton className="h-5 w-16 rounded-md" />
+                <Skeleton className="h-5 w-14 rounded-md" />
+              </div>
+              <Skeleton className="h-5 w-[80%] max-w-[14rem] rounded-md" />
+              <Skeleton className="h-3 w-20 rounded-md" />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

@@ -69,11 +69,6 @@ export function TutorsTable({
       ? tracks
       : Object.entries(bootcampTracks).map(([id, label]) => ({ id, label }))
 
-  const takenTracks = useMemo(
-    () => new Set(tutors.flatMap((tutor) => tutor.tracks)),
-    [tutors],
-  )
-
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase()
     if (!normalized) return tutors
@@ -269,7 +264,6 @@ export function TutorsTable({
         open={inviteOpen}
         onClose={() => setInviteOpen(false)}
         trackOptions={trackOptions}
-        takenTracks={takenTracks}
         onInvited={onChanged}
       />
 
@@ -278,7 +272,6 @@ export function TutorsTable({
         open={editTutor != null}
         onClose={() => setEditTutor(null)}
         trackOptions={trackOptions}
-        takenTracks={takenTracks}
         onSaved={onChanged}
       />
     </div>
@@ -289,13 +282,11 @@ function InviteTutorModal({
   open,
   onClose,
   trackOptions,
-  takenTracks,
   onInvited,
 }: {
   open: boolean
   onClose: () => void
   trackOptions: TrackOption[]
-  takenTracks: Set<string>
   onInvited: () => Promise<void>
 }) {
   const formId = useId()
@@ -445,12 +436,10 @@ function InviteTutorModal({
             <div className="flex flex-wrap gap-2">
               {trackOptions.map((track) => {
                 const selected = selectedTracks.includes(track.id)
-                const taken = takenTracks.has(track.id) && !selected
                 return (
                   <button
                     key={track.id}
                     type="button"
-                    disabled={taken}
                     onClick={() =>
                       setSelectedTracks((current) =>
                         current.includes(track.id)
@@ -463,11 +452,9 @@ function InviteTutorModal({
                       selected
                         ? "border-[#00206F] bg-[#00206F] text-white"
                         : "border-black/[0.08] bg-white text-[#001752]",
-                      taken && "cursor-not-allowed opacity-35",
                     )}
                   >
                     {track.label}
-                    {taken ? " · taken" : ""}
                   </button>
                 )
               })}
@@ -503,14 +490,12 @@ function EditTutorTracksModal({
   open,
   onClose,
   trackOptions,
-  takenTracks,
   onSaved,
 }: {
   tutor: TutorRow | null
   open: boolean
   onClose: () => void
   trackOptions: TrackOption[]
-  takenTracks: Set<string>
   onSaved: () => Promise<void>
 }) {
   const formId = useId()
@@ -603,13 +588,10 @@ function EditTutorTracksModal({
           <div className="flex flex-wrap gap-2">
             {trackOptions.map((track) => {
               const selected = selectedTracks.includes(track.id)
-              const taken =
-                takenTracks.has(track.id) && !tutor.tracks.includes(track.id)
               return (
                 <button
                   key={track.id}
                   type="button"
-                  disabled={taken}
                   onClick={() =>
                     setSelectedTracks((current) =>
                       current.includes(track.id)
@@ -622,7 +604,6 @@ function EditTutorTracksModal({
                     selected
                       ? "border-[#00206F] bg-[#00206F] text-white"
                       : "border-black/[0.08] bg-[#f4f6fa] text-[#001752]",
-                    taken && "cursor-not-allowed opacity-35",
                   )}
                 >
                   {track.label}

@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useEffect, useId, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import toast from "react-hot-toast"
@@ -17,13 +18,17 @@ import { cn } from "@/lib/utils"
 export type QuizQuestion = {
   id: string
   prompt: string
+  promptImageUrl?: string | null
   options: string[]
+  optionImageUrls?: string[]
 }
 
 export type QuizReviewItem = {
   questionId: string
   prompt: string
+  promptImageUrl?: string | null
   options: string[]
+  optionImageUrls?: string[]
   selectedIndex: number
   correctIndex: number
   isCorrect: boolean
@@ -37,8 +42,8 @@ type QuizResult = {
 }
 
 function quizDurationSeconds(questionCount: number) {
-  // 45s per question, floor of 90s so short quizzes still feel timed.
-  return Math.max(90, questionCount * 45)
+  // Extra time when questions may include reading images
+  return Math.max(120, questionCount * 60)
 }
 
 function formatClock(totalSeconds: number) {
@@ -46,6 +51,13 @@ function formatClock(totalSeconds: number) {
   const minutes = Math.floor(safe / 60)
   const seconds = safe % 60
   return `${minutes}:${String(seconds).padStart(2, "0")}`
+}
+
+function optionLabel(options: string[], optionImageUrls: string[] | undefined, index: number) {
+  const text = options[index]?.trim()
+  if (text) return text
+  if (optionImageUrls?.[index]) return `Image ${String.fromCharCode(65 + index)}`
+  return `Option ${String.fromCharCode(65 + index)}`
 }
 
 export function ModuleQuizModal({
@@ -189,6 +201,8 @@ export function ModuleQuizModal({
   if (!open || typeof document === "undefined") return null
 
   const question = questions[step]
+  const optionImages = question?.optionImageUrls || []
+  const hasOptionImages = optionImages.some(Boolean)
   const answeredCount = answers.filter((value) => value >= 0).length
   const progressPercent =
     questions.length === 0
@@ -197,7 +211,10 @@ export function ModuleQuizModal({
         ? 100
         : phase === "intro"
           ? 0
-          : Math.round(((step + (answers[step] >= 0 ? 0.35 : 0)) / questions.length) * 100)
+          : Math.round(
+              ((step + (answers[step] >= 0 ? 0.35 : 0)) / questions.length) *
+                100,
+            )
   const timerUrgent = secondsLeft <= 30 && phase === "quiz"
 
   function startQuiz() {
@@ -259,7 +276,10 @@ export function ModuleQuizModal({
         aria-modal="true"
         aria-labelledby={titleId}
         className={cn(
-          "relative z-10 flex max-h-[min(92dvh,860px)] w-full max-w-xl flex-col overflow-hidden rounded-t-2xl border border-white/10 bg-[#f7f8fb] shadow-[0_28px_80px_-28px_rgba(0,32,111,0.55)] transition-[opacity,transform] duration-200 ease-[var(--ease-out)] sm:rounded-2xl",
+          "relative z-10 flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-2xl border border-white/10 bg-[#f7f8fb] shadow-[0_28px_80px_-28px_rgba(0,32,111,0.55)] transition-[opacity,transform] duration-200 ease-[var(--ease-out)] sm:rounded-2xl",
+          hasOptionImages || question?.promptImageUrl
+            ? "max-w-2xl"
+            : "max-w-xl",
           visible
             ? "translate-y-0 scale-100 opacity-100"
             : "translate-y-3 scale-[0.97] opacity-0 sm:translate-y-2",
@@ -325,7 +345,8 @@ export function ModuleQuizModal({
             <div className="space-y-5">
               <div className="rounded-xl border border-black/5 bg-white p-4">
                 <p className="text-sm leading-relaxed text-[#334155]">
-                  Answer one question at a time. You have{" "}
+                  Answer one question at a time. Some questions may include
+                  images. You have{" "}
                   <span className="font-semibold text-[#001752]">
                     {formatClock(totalSeconds)}
                   </span>{" "}
@@ -347,38 +368,94 @@ export function ModuleQuizModal({
                 <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#00206F] text-xs font-semibold text-white">
                   {String(step + 1).padStart(2, "0")}
                 </span>
-                <p className="pt-0.5 text-[1.05rem] font-semibold leading-snug text-[#001752]">
-                  {question.prompt}
-                </p>
+                <div className="min-w-0 flex-1 space-y-3">
+                  {question.prompt.trim() ? (
+                    <p className="pt-0.5 text-[1.05rem] font-semibold leading-snug text-[#001752]">
+                      {question.prompt}
+                    </p>
+                  ) : (
+                    <p className="pt-0.5 text-sm font-medium text-muted-foreground">
+                      Look at the image, then choose an answer.
+                    </p>
+                  )}
+                  {question.promptImageUrl ? (
+                    <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-black/8 bg-white">
+                      <Image
+                        src={question.promptImageUrl}
+                        alt="Question"
+                        fill
+                        className="object-contain p-2"
+                        unoptimized
+                      />
+                    </div>
+                  ) : null}
+                </div>
               </div>
-              <div className="grid gap-2">
+
+              <div
+                className={cn(
+                  "grid gap-2",
+                  hasOptionImages ? "sm:grid-cols-2" : "grid-cols-1",
+                )}
+              >
                 {question.options.map((option, optionIndex) => {
                   const selected = answers[step] === optionIndex
+                  const imageUrl = optionImages[optionIndex]
                   return (
                     <button
                       key={optionIndex}
                       type="button"
                       onClick={() => selectOption(optionIndex)}
                       className={cn(
-                        "admin-press rounded-xl border px-3.5 py-3.5 text-left text-sm leading-snug transition-[background-color,border-color,box-shadow,color] duration-150",
+                        "admin-press rounded-xl border text-left text-sm leading-snug transition-[background-color,border-color,box-shadow,color] duration-150",
+                        imageUrl ? "overflow-hidden p-0" : "px-3.5 py-3.5",
                         selected
                           ? "border-[#00206F]/35 bg-[#eef2f9] text-[#001752] shadow-[0_0_0_3px_rgba(0,32,111,0.08)]"
                           : "border-black/6 bg-white text-[#334155] hover:border-[#00206F]/18",
                       )}
                     >
-                      <span className="flex items-start gap-2.5">
-                        <span
-                          className={cn(
-                            "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold",
-                            selected
-                              ? "border-[#00206F] bg-[#00206F] text-white"
-                              : "border-black/15 text-muted-foreground",
-                          )}
-                        >
-                          {String.fromCharCode(65 + optionIndex)}
+                      {imageUrl ? (
+                        <span className="block">
+                          <span className="relative m-2 block aspect-video overflow-hidden rounded-xl bg-[#f4f6fa]">
+                            <Image
+                              src={imageUrl}
+                              alt={option || `Option ${optionIndex + 1}`}
+                              fill
+                              className="rounded-xl object-contain p-2"
+                              unoptimized
+                            />
+                          </span>
+                          <span className="flex items-start gap-2.5 px-3 py-2.5">
+                            <span
+                              className={cn(
+                                "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold",
+                                selected
+                                  ? "border-[#00206F] bg-[#00206F] text-white"
+                                  : "border-black/15 text-muted-foreground",
+                              )}
+                            >
+                              {String.fromCharCode(65 + optionIndex)}
+                            </span>
+                            <span className="pt-0.5">
+                              {option.trim() || "Select this image"}
+                            </span>
+                          </span>
                         </span>
-                        <span>{option}</span>
-                      </span>
+                      ) : (
+                        <span className="flex items-start gap-2.5">
+                          <span
+                            className={cn(
+                              "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold",
+                              selected
+                                ? "border-[#00206F] bg-[#00206F] text-white"
+                                : "border-black/15 text-muted-foreground",
+                            )}
+                          >
+                            {String.fromCharCode(65 + optionIndex)}
+                          </span>
+                          <span>{option}</span>
+                        </span>
+                      )}
                     </button>
                   )
                 })}
@@ -420,15 +497,27 @@ export function ModuleQuizModal({
                 <p className="text-[11px] font-semibold tracking-[0.14em] text-[#00206F]/65 uppercase">
                   Quick review
                 </p>
-                <ul className="max-h-56 space-y-2 overflow-y-auto pr-1">
+                <ul className="max-h-64 space-y-2 overflow-y-auto pr-1">
                   {result.review.map((item, index) => (
                     <li
                       key={item.questionId}
                       className="rounded-xl border border-black/5 bg-white px-3 py-2.5 text-sm"
                     >
                       <p className="font-medium text-[#001752]">
-                        {index + 1}. {item.prompt}
+                        {index + 1}.{" "}
+                        {item.prompt.trim() || "Image question"}
                       </p>
+                      {item.promptImageUrl ? (
+                        <div className="relative mt-2 aspect-video max-w-[220px] overflow-hidden rounded-lg border border-black/8 bg-[#f4f6fa]">
+                          <Image
+                            src={item.promptImageUrl}
+                            alt=""
+                            fill
+                            className="object-contain p-1"
+                            unoptimized
+                          />
+                        </div>
+                      ) : null}
                       <p
                         className={cn(
                           "mt-1 text-xs",
@@ -438,12 +527,16 @@ export function ModuleQuizModal({
                         )}
                       >
                         {item.isCorrect
-                          ? `Correct · ${item.options[item.correctIndex]}`
+                          ? `Correct · ${optionLabel(item.options, item.optionImageUrls, item.correctIndex)}`
                           : `Your answer: ${
                               item.selectedIndex >= 0
-                                ? item.options[item.selectedIndex]
+                                ? optionLabel(
+                                    item.options,
+                                    item.optionImageUrls,
+                                    item.selectedIndex,
+                                  )
                                 : "Skipped"
-                            } · Correct: ${item.options[item.correctIndex]}`}
+                            } · Correct: ${optionLabel(item.options, item.optionImageUrls, item.correctIndex)}`}
                       </p>
                     </li>
                   ))}

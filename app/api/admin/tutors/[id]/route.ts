@@ -45,18 +45,6 @@ export async function PATCH(request: Request, context: RouteContext) {
     );
   }
 
-  for (const track of tracks) {
-    const taken = await db.tutorTrack.findUnique({ where: { track } });
-    if (taken && taken.tutorId !== id) {
-      return NextResponse.json(
-        {
-          error: `${bootcampTracks[track]} already has another tutor.`,
-        },
-        { status: 409 },
-      );
-    }
-  }
-
   await db.tutorTrack.deleteMany({ where: { tutorId: id } });
   await db.user.update({
     where: { id },

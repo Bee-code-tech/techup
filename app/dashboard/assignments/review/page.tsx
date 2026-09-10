@@ -1,15 +1,25 @@
 "use client"
 
+import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
+
+import { TutorAssignmentsPanel } from "@/components/dashboard/tutor-assignments-panel"
+
+function ReviewInner() {
+  const params = useSearchParams()
+  return <TutorAssignmentsPanel initialId={params.get("id")} />
+}
+
 export default function TutorAssignmentsPage() {
   return (
-    <div className="px-4 py-8 lg:px-6">
-      <h2 className="text-xl font-semibold tracking-tight">
-        Assignment reviews
-      </h2>
-      <p className="mt-2 max-w-xl text-[15px] text-muted-foreground">
-        Student screenshot + explanation submissions for your tracks will appear
-        here for review.
-      </p>
-    </div>
+    <Suspense
+      fallback={
+        <div className="px-4 py-8 text-sm text-muted-foreground lg:px-6">
+          Loading assignments…
+        </div>
+      }
+    >
+      <ReviewInner />
+    </Suspense>
   )
 }

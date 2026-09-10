@@ -17,8 +17,11 @@ export type StudentLearnData = {
   track: string | null
   trackLabel: string
   tutor: LearnTutor | null
+  tutors: LearnTutor[]
   courses: LearnCourse[]
   accessTier?: string
+  currentStreak?: number
+  longestStreak?: number
 }
 
 type CacheEntry = {
@@ -60,9 +63,17 @@ async function fetchStudentLearn(): Promise<StudentLearnData> {
   return {
     track: payload.track || null,
     trackLabel: payload.trackLabel || "",
-    tutor: payload.tutor || null,
+    tutor: payload.tutor || payload.tutors?.[0] || null,
+    tutors:
+      payload.tutors && payload.tutors.length > 0
+        ? payload.tutors
+        : payload.tutor
+          ? [payload.tutor]
+          : [],
     courses: payload.courses || [],
     accessTier: payload.accessTier,
+    currentStreak: payload.currentStreak ?? 0,
+    longestStreak: payload.longestStreak ?? 0,
   }
 }
 

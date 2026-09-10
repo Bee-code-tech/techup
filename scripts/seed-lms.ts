@@ -247,15 +247,10 @@ async function upsertTutor() {
 }
 
 async function assignTutorTrack(tutorId: string) {
-  const existing = await db.tutorTrack.findUnique({ where: { track: TRACK } });
-  if (existing) {
-    if (existing.tutorId !== tutorId) {
-      await db.tutorTrack.delete({ where: { id: existing.id } });
-      await db.tutorTrack.create({ data: { tutorId, track: TRACK } });
-      console.log(`Reassigned ${TRACK} track to demo tutor.`);
-    }
-    return;
-  }
+  const existing = await db.tutorTrack.findFirst({
+    where: { tutorId, track: TRACK },
+  });
+  if (existing) return;
   await db.tutorTrack.create({ data: { tutorId, track: TRACK } });
 }
 
@@ -322,10 +317,19 @@ async function clearPreviousSeedCourses(tutorId: string) {
       where: { moduleId: { in: moduleIds } },
     });
     await db.moduleUnlock.deleteMany({ where: { moduleId: { in: moduleIds } } });
-    await db.assignmentSubmission.deleteMany({
-      where: { moduleId: { in: moduleIds } },
-    });
     await db.module.deleteMany({ where: { id: { in: moduleIds } } });
+  }
+
+  const courseAssignments = await db.assignment.findMany({
+    where: { courseId: { in: courseIds } },
+    select: { id: true },
+  });
+  const assignmentIds = courseAssignments.map((row) => row.id);
+  if (assignmentIds.length > 0) {
+    await db.assignmentSubmission.deleteMany({
+      where: { assignmentId: { in: assignmentIds } },
+    });
+    await db.assignment.deleteMany({ where: { id: { in: assignmentIds } } });
   }
 
   await db.course.deleteMany({ where: { id: { in: courseIds } } });

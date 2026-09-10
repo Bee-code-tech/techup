@@ -1,83 +1,121 @@
-import { NextResponse } from "next/server";
-import { isNextResponse, requireTutorOrAdmin } from "@/lib/api-auth";
-import { bootcampTracks } from "@/lib/bootcamp";
-import { db } from "@/lib/db";
+import { NextResponse } from "next/server"
+import { isNextResponse, requireTutorOrAdmin } from "@/lib/api-auth"
+import { bootcampTracks } from "@/lib/bootcamp"
+import { db } from "@/lib/db"
 
 async function tutorTracks(userId: string, role: string) {
-  if (role === "admin") return Object.keys(bootcampTracks);
+  if (role === "admin") return Object.keys(bootcampTracks)
   const rows = await db.tutorTrack.findMany({
     where: { tutorId: userId },
     select: { track: true },
-  });
-  return rows.map((row) => row.track);
+  })
+  return rows.map((row) => row.track)
+}
+
+function mapSession(session: {
+  id: string
+  track: string
+  title: string
+  platform: string
+  joinUrl: string
+  audience: string
+  isActive: boolean
+  scheduledAt?: Date | null
+  endedAt: Date | null
+  createdAt: Date
+}) {
+  const scheduledAt = session.scheduledAt ?? session.createdAt
+  return {
+    id: session.id,
+    track: session.track,
+    title: session.title,
+    platform: session.platform,
+    joinUrl: session.joinUrl,
+    audience: session.audience,
+    isActive: session.isActive,
+    trackLabel: bootcampTracks[session.track] || session.track,
+    scheduledAt: scheduledAt.toISOString(),
+    createdAt: session.createdAt.toISOString(),
+    endedAt: session.endedAt?.toISOString() ?? null,
+  }
 }
 
 export async function GET() {
-  const auth = await requireTutorOrAdmin();
-  if (isNextResponse(auth)) return auth;
+  const auth = await requireTutorOrAdmin()
+  if (isNextResponse(auth)) return auth
 
-  const tracks = await tutorTracks(auth.userId, auth.role);
+  const tracks = await tutorTracks(auth.userId, auth.role)
   const sessions = await db.liveSession.findMany({
     where:
       auth.role === "admin"
         ? undefined
         : { tutorId: auth.userId, track: { in: tracks } },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ isActive: "desc" }, { scheduledAt: "asc" }, { createdAt: "desc" }],
     take: 50,
-  });
+  })
 
   return NextResponse.json({
     tracks: tracks.map((id) => ({ id, label: bootcampTracks[id] || id })),
-    sessions: sessions.map((session) => ({
-      ...session,
-      trackLabel: bootcampTracks[session.track] || session.track,
-      createdAt: session.createdAt.toISOString(),
-      endedAt: session.endedAt?.toISOString() ?? null,
-    })),
-  });
+    sessions: sessions.map(mapSession),
+  })
 }
 
 type CreateBody = {
-  track?: string;
-  title?: string;
-  platform?: string;
-  joinUrl?: string;
-  audience?: string;
-};
+  track?: string
+  title?: string
+  platform?: string
+  joinUrl?: string
+  audience?: string
+  scheduledAt?: string
+}
 
 export async function POST(request: Request) {
-  const auth = await requireTutorOrAdmin();
-  if (isNextResponse(auth)) return auth;
+  const auth = await requireTutorOrAdmin()
+  if (isNextResponse(auth)) return auth
 
-  const body = (await request.json()) as CreateBody;
-  const track = String(body.track ?? "").trim();
-  const title = String(body.title ?? "Live class").trim() || "Live class";
-  const platform = body.platform === "zoom" ? "zoom" : "meet";
-  const joinUrl = String(body.joinUrl ?? "").trim();
+  const body = (await request.json()) as CreateBody
+  const track = String(body.track ?? "").trim()
+  const title = String(body.title ?? "Live class").trim() || "Live class"
+  const platform = body.platform === "zoom" ? "zoom" : "meet"
+  const joinUrl = String(body.joinUrl ?? "").trim()
   const audience =
     body.audience === "free" || body.audience === "paid"
       ? body.audience
-      : "both";
+      : "both"
 
-  const allowed = await tutorTracks(auth.userId, auth.role);
-  if (!allowed.includes(track)) {
+  const allowed = await tutorTracks(auth.userId, auth.role)
+  if (!track || !allowed.includes(track)) {
     return NextResponse.json(
-      { error: "You are not assigned to this track." },
+      { error: "Pick a track you are assigned to." },
       { status: 403 },
-    );
+    )
   }
   if (!/^https?:\/\//i.test(joinUrl)) {
     return NextResponse.json(
       { error: "Enter a valid Zoom or Google Meet URL." },
       { status: 400 },
-    );
+    )
   }
 
-  // End any other active session on this track for this tutor
-  await db.liveSession.updateMany({
-    where: { tutorId: auth.userId, track, isActive: true },
-    data: { isActive: false, endedAt: new Date() },
-  });
+  const scheduledAt = body.scheduledAt
+    ? new Date(body.scheduledAt)
+    : new Date()
+  if (Number.isNaN(scheduledAt.getTime())) {
+    return NextResponse.json(
+      { error: "Pick a valid date and time." },
+      { status: 400 },
+    )
+  }
+
+  // Treat "now or within 2 minutes" as going live immediately.
+  const goLiveNow = scheduledAt.getTime() <= Date.now() + 2 * 60 * 1000
+
+  if (goLiveNow) {
+    await db.liveSession.updateMany({
+      where: { tutorId: auth.userId, track, isActive: true },
+      data: { isActive: false, endedAt: new Date() },
+    })
+  }
 
   const session = await db.liveSession.create({
     data: {
@@ -87,16 +125,14 @@ export async function POST(request: Request) {
       platform,
       joinUrl,
       audience,
-      isActive: true,
+      scheduledAt,
+      isActive: goLiveNow,
+      endedAt: null,
     },
-  });
+  })
 
   return NextResponse.json({
     ok: true,
-    session: {
-      ...session,
-      trackLabel: bootcampTracks[session.track] || session.track,
-      createdAt: session.createdAt.toISOString(),
-    },
-  });
+    session: mapSession(session),
+  })
 }

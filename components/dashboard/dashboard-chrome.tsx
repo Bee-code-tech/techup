@@ -21,6 +21,7 @@ function titleForPath(pathname: string, role?: string | null) {
   if (pathname.startsWith("/dashboard/courses/manage")) return "My courses"
   if (pathname.startsWith("/dashboard/live/manage")) return "Live class"
   if (pathname.startsWith("/dashboard/assignments")) return "Assignments"
+  if (pathname.startsWith("/dashboard/leaderboard")) return "Leaderboard"
   if (pathname.startsWith("/dashboard/settings")) return "Settings"
   if (pathname.startsWith("/dashboard/learn/course/")) return "Learning"
   if (pathname.startsWith("/dashboard/learn/")) return "Learning"

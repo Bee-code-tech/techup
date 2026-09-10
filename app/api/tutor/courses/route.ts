@@ -53,6 +53,7 @@ export async function GET() {
       trackLabel: bootcampTracks[course.track] || course.track,
       title: course.title,
       description: course.description,
+      coverUrl: course.coverUrl,
       order: course.order,
       published: course.published,
       tutor: course.tutor,
@@ -64,11 +65,13 @@ export async function GET() {
 }
 
 type CreateBody = {
-  track?: string;
-  title?: string;
-  description?: string;
-  order?: number;
-};
+  track?: string
+  title?: string
+  description?: string
+  order?: number
+  coverUrl?: string
+  coverKey?: string
+}
 
 export async function POST(request: Request) {
   const auth = await requireTutorOrAdmin();
@@ -101,8 +104,9 @@ export async function POST(request: Request) {
   const tutorId =
     auth.role === "admin"
       ? (
-          await db.tutorTrack.findUnique({
+          await db.tutorTrack.findFirst({
             where: { track },
+            orderBy: { createdAt: "asc" },
             select: { tutorId: true },
           })
         )?.tutorId || auth.userId
@@ -115,9 +119,11 @@ export async function POST(request: Request) {
       description,
       order: Number.isFinite(order) ? order : 0,
       tutorId,
-      published: true,
+      published: false,
+      coverUrl: body.coverUrl ? String(body.coverUrl) : null,
+      coverKey: body.coverKey ? String(body.coverKey) : null,
     },
-  });
+  })
 
   return NextResponse.json({
     ok: true,
@@ -126,7 +132,10 @@ export async function POST(request: Request) {
       track: course.track,
       title: course.title,
       description: course.description,
+      coverUrl: course.coverUrl,
+      coverKey: course.coverKey,
       order: course.order,
+      published: course.published,
     },
-  });
+  })
 }

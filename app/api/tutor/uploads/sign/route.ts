@@ -1,24 +1,47 @@
-import { NextResponse } from "next/server";
-import { isNextResponse, requireTutorOrAdmin } from "@/lib/api-auth";
-import { createUploadSignature } from "@/lib/cloudinary";
+import { NextResponse } from "next/server"
+import { isNextResponse, requireTutorOrAdmin } from "@/lib/api-auth"
+import { createPresignedUpload } from "@/lib/tigris"
 
+/** @deprecated Prefer POST /api/uploads/sign — kept as alias for older clients. */
 export async function POST(request: Request) {
-  const auth = await requireTutorOrAdmin();
-  if (isNextResponse(auth)) return auth;
+  const auth = await requireTutorOrAdmin()
+  if (isNextResponse(auth)) return auth
 
   const body = (await request.json().catch(() => ({}))) as {
-    resourceType?: "image" | "video" | "raw" | "auto";
-    folder?: string;
-  };
-
-  const signed = createUploadSignature({
-    resourceType: body.resourceType || "auto",
-    folder: body.folder || "techup/modules",
-  });
-
-  if (!signed.ok) {
-    return NextResponse.json({ error: signed.error }, { status: 500 });
+    resourceType?: string
+    folder?: string
+    filename?: string
+    contentType?: string
+    size?: number
   }
 
-  return NextResponse.json(signed);
+  const folder =
+    body.folder?.includes("cover")
+      ? "covers"
+      : body.resourceType === "video"
+        ? "videos"
+        : body.resourceType === "image"
+          ? "covers"
+          : "materials"
+
+  const signed = await createPresignedUpload({
+    userId: auth.userId,
+    folder,
+    filename: body.filename || "upload.bin",
+    contentType: body.contentType || "application/octet-stream",
+    size: body.size,
+  })
+
+  if (!signed.ok) {
+    return NextResponse.json({ error: signed.error }, { status: 500 })
+  }
+
+  return NextResponse.json({
+    uploadUrl: signed.uploadUrl,
+    key: signed.key,
+    publicUrl: signed.publicUrl,
+    contentType: signed.contentType,
+    // Back-compat shape hints
+    folder: signed.key,
+  })
 }

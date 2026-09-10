@@ -13,6 +13,8 @@ export async function GET() {
       track: true,
       accessTier: true,
       name: true,
+      currentStreak: true,
+      longestStreak: true,
     },
   });
 
@@ -21,11 +23,14 @@ export async function GET() {
       track: null,
       courses: [],
       tutor: null,
+      tutors: [],
       unlocks: [],
+      currentStreak: user?.currentStreak ?? 0,
+      longestStreak: user?.longestStreak ?? 0,
     });
   }
 
-  const [courses, tutorTrack, unlocks, progress] = await Promise.all([
+  const [courses, tutorTracks, unlocks, progress] = await Promise.all([
     db.course.findMany({
       where: { track: user.track, published: true },
       orderBy: [{ order: "asc" }, { createdAt: "asc" }],
@@ -43,12 +48,19 @@ export async function GET() {
           },
         },
         tutor: {
-          select: { id: true, name: true, bio: true, avatarUrl: true, email: true },
+          select: {
+            id: true,
+            name: true,
+            bio: true,
+            avatarUrl: true,
+            email: true,
+          },
         },
       },
     }),
-    db.tutorTrack.findUnique({
+    db.tutorTrack.findMany({
       where: { track: user.track },
+      orderBy: { createdAt: "asc" },
       include: {
         tutor: {
           select: {
@@ -76,15 +88,29 @@ export async function GET() {
   );
   const unlocked = new Set(unlocks.map((row) => row.moduleId));
 
+  const tutors = tutorTracks.map((row) => row.tutor);
+  const fallbackTutor = courses[0]?.tutor
+    ? {
+        ...courses[0].tutor,
+        whatsapp: null as string | null,
+      }
+    : null;
+  const resolvedTutors =
+    tutors.length > 0 ? tutors : fallbackTutor ? [fallbackTutor] : [];
+
   return NextResponse.json({
     track: user.track,
     trackLabel: bootcampTracks[user.track] || user.track,
     accessTier: user.accessTier,
-    tutor: tutorTrack?.tutor || courses[0]?.tutor || null,
+    currentStreak: user.currentStreak,
+    longestStreak: user.longestStreak,
+    tutor: resolvedTutors[0] || null,
+    tutors: resolvedTutors,
     courses: courses.map((course) => ({
       id: course.id,
       title: course.title,
       description: course.description,
+      coverUrl: course.coverUrl,
       order: course.order,
       modules: course.modules.map((moduleRow, index) => {
         const prior = course.modules.slice(0, index);

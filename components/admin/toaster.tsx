@@ -17,111 +17,59 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const DEFAULT_DURATION = 4000
+const DEFAULT_DURATION = 3500
 
-const accentByType: Record<ToastType, string> = {
-  success: "bg-[var(--success)]",
-  error: "bg-red-500",
-  loading: "bg-[var(--orange)]",
-  blank: "bg-[var(--navy)]",
-  custom: "bg-[var(--navy)]",
-}
-
-const iconWrapByType: Record<ToastType, string> = {
-  success:
-    "bg-[color-mix(in_srgb,var(--success)_14%,white)] text-[var(--success)]",
-  error: "bg-red-500/12 text-red-600",
-  loading:
-    "bg-[color-mix(in_srgb,var(--orange)_16%,white)] text-[var(--orange)]",
-  blank: "bg-[color-mix(in_srgb,var(--navy)_10%,white)] text-[var(--navy)]",
-  custom: "bg-[color-mix(in_srgb,var(--navy)_10%,white)] text-[var(--navy)]",
+const iconClassByType: Record<ToastType, string> = {
+  success: "text-emerald-600",
+  error: "text-red-600",
+  loading: "text-[#FB7801]",
+  blank: "text-[#00206F]",
+  custom: "text-[#00206F]",
 }
 
 function ToastIcon({ type }: { type: ToastType }) {
-  const className = "size-[17px] shrink-0"
+  const className = cn("size-4 shrink-0", iconClassByType[type])
   switch (type) {
     case "success":
-      return <CheckCircle2 className={className} strokeWidth={2.25} />
+      return <CheckCircle2 className={className} strokeWidth={2} />
     case "error":
-      return <AlertCircle className={className} strokeWidth={2.25} />
+      return <AlertCircle className={className} strokeWidth={2} />
     case "loading":
-      return (
-        <Loader2 className={cn(className, "animate-spin")} strokeWidth={2.25} />
-      )
+      return <Loader2 className={cn(className, "animate-spin")} strokeWidth={2} />
     default:
-      return <Info className={className} strokeWidth={2.25} />
+      return <Info className={className} strokeWidth={2} />
   }
 }
 
-function GlassToast({
+function AppToast({
   t,
   message,
 }: {
   t: Toast
   message: ReactNode
 }) {
-  const duration =
-    typeof t.duration === "number" && Number.isFinite(t.duration)
-      ? t.duration
-      : null
-  const showProgress = duration !== null && t.type !== "loading"
-
   return (
     <div
-      className={cn(
-        "toast-glass group relative w-[min(92vw,360px)] overflow-hidden rounded-lg",
-        "border border-white/60 bg-white/62 shadow-[0_20px_50px_-20px_rgba(0,32,111,0.42)]",
-        "backdrop-blur-2xl backdrop-saturate-150",
-        "ring-1 ring-[color-mix(in_srgb,var(--navy)_7%,transparent)]",
-      )}
+      className="toast-card flex w-max max-w-[min(92vw,380px)] items-center gap-2.5 rounded-lg border border-[#e6eaf2] bg-white py-2.5 pr-2 pl-3 shadow-[0_8px_30px_rgba(0,32,111,0.08)]"
       data-visible={t.visible}
       data-toast-type={t.type}
+      role="status"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/75 via-white/20 to-[color-mix(in_srgb,var(--navy)_5%,transparent)]"
-      />
+      <ToastIcon type={t.type} />
 
-      <div className="relative flex items-start gap-3 px-3.5 py-3.5 pr-2.5">
-        <span
-          className={cn(
-            "mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md",
-            iconWrapByType[t.type],
-          )}
-        >
-          <ToastIcon type={t.type} />
-        </span>
-
-        <div className="min-w-0 flex-1 pt-0.5 text-[13.5px] font-medium leading-snug tracking-[-0.01em] text-[var(--navy-deep)] [&_*]:!m-0 [&_*]:!justify-start [&_*]:!p-0 [&_*]:!text-[13.5px] [&_*]:!font-medium [&_*]:!leading-snug [&_*]:!text-[var(--navy-deep)]">
-          {message}
-        </div>
-
-        {t.type !== "loading" ? (
-          <button
-            type="button"
-            aria-label="Dismiss notification"
-            onClick={() => toast.dismiss(t.id)}
-            className={cn(
-              "admin-press mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg",
-              "text-[var(--muted-foreground)]",
-              "hover:bg-[color-mix(in_srgb,var(--navy)_7%,white)] hover:text-[var(--navy)]",
-            )}
-          >
-            <X className="size-3.5" strokeWidth={2.25} />
-          </button>
-        ) : null}
+      <div className="min-w-0 flex-1 text-[13px] font-medium leading-snug text-[#001752] [&_*]:!m-0 [&_*]:!justify-start [&_*]:!p-0 [&_*]:!text-[13px] [&_*]:!font-medium [&_*]:!leading-snug [&_*]:!text-[#001752]">
+        {message}
       </div>
 
-      {showProgress ? (
-        <div className="toast-progress-track absolute inset-x-0 bottom-0 h-[2.5px] overflow-hidden bg-[color-mix(in_srgb,var(--navy)_7%,transparent)]">
-          <div
-            className={cn(
-              "toast-progress-bar h-full origin-left rounded-full",
-              accentByType[t.type],
-            )}
-            style={{ animationDuration: `${duration}ms` }}
-          />
-        </div>
+      {t.type !== "loading" ? (
+        <button
+          type="button"
+          aria-label="Dismiss"
+          onClick={() => toast.dismiss(t.id)}
+          className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#8b93a7] transition-colors hover:bg-[#f4f6fa] hover:text-[#001752]"
+        >
+          <X className="size-3.5" strokeWidth={2} />
+        </button>
       ) : null}
     </div>
   )
@@ -130,12 +78,11 @@ function GlassToast({
 export function AppToaster() {
   return (
     <Toaster
-      position="top-right"
-      gutter={10}
+      position="top-center"
+      gutter={8}
       reverseOrder={false}
       containerStyle={{
-        top: 18,
-        right: 18,
+        top: 16,
         zIndex: 9999,
       }}
       toastOptions={{
@@ -159,7 +106,7 @@ export function AppToaster() {
             margin: 0,
           }}
         >
-          {({ message }) => <GlassToast t={t} message={message} />}
+          {({ message }) => <AppToast t={t} message={message} />}
         </ToastBar>
       )}
     </Toaster>

@@ -9,24 +9,19 @@ import {
   CircleIcon,
   Clock3Icon,
   CreditCardIcon,
-  ExternalLinkIcon,
-  FileTextIcon,
   LockIcon,
   PlayCircleIcon,
 } from "lucide-react"
 
 import {
   ModuleQuizModal,
+  type QuizQuestion,
 } from "@/components/dashboard/module-quiz-modal"
+import { MaterialCard } from "@/components/dashboard/courses/material-card"
 import { LearningPanelSkeleton } from "@/components/dashboard/page-skeletons"
 import { Button } from "@/components/ui/button"
+import { type MaterialItem } from "@/lib/materials"
 import { cn } from "@/lib/utils"
-
-type Question = {
-  id: string
-  prompt: string
-  options: string[]
-}
 
 type ModulePayload = {
   id: string
@@ -37,14 +32,10 @@ type ModulePayload = {
   passMark: number
   courseId: string
   courseTitle: string
-  questions: Question[]
+  questions: QuizQuestion[]
 }
 
-type Material = {
-  name?: string
-  url?: string
-  format?: string
-}
+type Material = MaterialItem
 
 function parseMaterials(materials: unknown): Material[] {
   if (!Array.isArray(materials)) return []
@@ -57,7 +48,7 @@ function parseMaterials(materials: unknown): Material[] {
 }
 
 function quizDurationLabel(questionCount: number) {
-  const total = Math.max(90, questionCount * 45)
+  const total = Math.max(120, questionCount * 60)
   const minutes = Math.floor(total / 60)
   const seconds = total % 60
   return `${minutes}:${String(seconds).padStart(2, "0")}`
@@ -300,33 +291,10 @@ export function ModuleLearningPanel({
                 No materials attached yet.
               </p>
             ) : (
-              <ul className="mt-3 space-y-2">
+              <ul className="mt-3 space-y-2.5">
                 {materials.map((item, index) => (
                   <li key={`${item.url}-${index}`}>
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="admin-press flex items-center gap-3 rounded-xl border border-black/5 bg-[#f7f8fb] px-3 py-2.5 text-sm transition-[background-color,border-color] duration-150 hover:border-[#00206F]/15 hover:bg-white"
-                    >
-                      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white text-[#00206F] shadow-sm">
-                        <FileTextIcon className="size-4" aria-hidden />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate font-medium text-[#001752]">
-                          {item.name || `Material ${index + 1}`}
-                        </span>
-                        {item.format ? (
-                          <span className="text-xs text-muted-foreground uppercase">
-                            {item.format}
-                          </span>
-                        ) : null}
-                      </span>
-                      <ExternalLinkIcon
-                        className="size-3.5 shrink-0 text-muted-foreground"
-                        aria-hidden
-                      />
-                    </a>
+                    <MaterialCard item={item} />
                   </li>
                 ))}
               </ul>

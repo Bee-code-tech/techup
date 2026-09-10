@@ -91,18 +91,6 @@ export async function POST(request: Request) {
     );
   }
 
-  for (const track of tracks) {
-    const taken = await db.tutorTrack.findUnique({ where: { track } });
-    if (taken) {
-      return NextResponse.json(
-        {
-          error: `${bootcampTracks[track]} already has a tutor assigned.`,
-        },
-        { status: 409 },
-      );
-    }
-  }
-
   const tempPassword = generateTempPassword();
   const passwordHash = await hashPassword(tempPassword);
 

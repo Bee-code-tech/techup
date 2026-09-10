@@ -33,7 +33,12 @@ function LearnContent() {
 
   const track = data?.track ?? null
   const trackLabel = data?.trackLabel ?? ""
-  const tutor = data?.tutor ?? null
+  const tutors =
+    data?.tutors && data.tutors.length > 0
+      ? data.tutors
+      : data?.tutor
+        ? [data.tutor]
+        : []
   const courses = data?.courses ?? []
   const awaitingData = loading && !data
 
@@ -132,37 +137,50 @@ function LearnContent() {
           {awaitingData ? (
             <div className="rounded-xl border border-black/5 bg-[#f7f8fb] p-3 sm:p-4">
               <p className="text-[11px] font-semibold tracking-[0.14em] text-[#00206F]/65 uppercase">
-                Your tutor
+                Your tutors
               </p>
               <Skeleton className="mt-2 h-5 w-40 rounded-md" />
               <Skeleton className="mt-3 h-4 w-full rounded-md" />
             </div>
-          ) : tutor ? (
+          ) : tutors.length > 0 ? (
             <div className="rounded-xl border border-black/5 bg-[#f7f8fb] p-3 sm:p-4">
               <p className="text-[11px] font-semibold tracking-[0.14em] text-[#00206F]/65 uppercase">
-                Your tutor
+                {tutors.length === 1 ? "Your tutor" : "Your tutors"}
               </p>
-              <div className="mt-2 flex items-start gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#00206F] text-sm font-semibold text-white sm:size-11">
-                  {tutor.name
-                    .split(" ")
-                    .slice(0, 2)
-                    .map((part) => part[0])
-                    .join("")
-                    .toUpperCase()}
-                </div>
-                <div className="min-w-0">
-                  <h3 className="truncate text-sm font-semibold text-[#001752] sm:text-base">
-                    {tutor.name}
-                  </h3>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground sm:text-sm">
-                    {tutor.bio || `Track instructor for ${trackLabel}`}
-                  </p>
-                  <p className="mt-1.5 truncate text-xs font-medium text-[#00206F] sm:mt-2">
-                    {tutor.email}
-                  </p>
-                </div>
-              </div>
+              <ul className="mt-2 space-y-3">
+                {tutors.map((tutor) => (
+                  <li key={tutor.id} className="flex items-start gap-3">
+                    <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#00206F] text-sm font-semibold text-white sm:size-11">
+                      {tutor.avatarUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={tutor.avatarUrl}
+                          alt=""
+                          className="size-full object-cover"
+                        />
+                      ) : (
+                        tutor.name
+                          .split(" ")
+                          .slice(0, 2)
+                          .map((part) => part[0])
+                          .join("")
+                          .toUpperCase()
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="truncate text-sm font-semibold text-[#001752] sm:text-base">
+                        {tutor.name}
+                      </h3>
+                      <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground sm:text-sm">
+                        {tutor.bio || `Track instructor for ${trackLabel}`}
+                      </p>
+                      <p className="mt-1.5 truncate text-xs font-medium text-[#00206F] sm:mt-2">
+                        {tutor.email}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           ) : null}
         </div>

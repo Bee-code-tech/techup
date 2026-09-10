@@ -24,8 +24,12 @@ export function TutorsStatCards({
   loading?: boolean
 }) {
   const cards = useMemo(() => {
-    const assigned = new Set(tutors.flatMap((tutor) => tutor.tracks)).size
-    const open = Math.max(0, trackCount - assigned)
+    const assignments = tutors.reduce(
+      (sum, tutor) => sum + tutor.tracks.length,
+      0,
+    )
+    const covered = new Set(tutors.flatMap((tutor) => tutor.tracks)).size
+    const open = Math.max(0, trackCount - covered)
 
     const items: StatCardItem[] = [
       {
@@ -37,39 +41,39 @@ export function TutorsStatCards({
           tutors.length === 1
             ? "1 instructor on the team"
             : `${tutors.length} instructors on the team`,
-          "One tutor per track",
+          "Multiple tutors per track allowed",
         ],
       },
       {
-        label: "Tracks covered",
-        value: assigned,
+        label: "Track assignments",
+        value: assignments,
         icon: LayersIcon,
         accent: "orange",
         details: [
-          `${assigned} of ${trackCount} tracks staffed`,
-          open === 0 ? "All tracks assigned" : `${open} still open`,
+          `${assignments} tutor–track link${assignments === 1 ? "" : "s"}`,
+          `${covered} of ${trackCount} tracks covered`,
         ],
       },
       {
-        label: "Open tracks",
+        label: "Uncovered tracks",
         value: open,
         icon: UserPlusIcon,
         accent: "green",
         details: [
           open === 0
-            ? "No open tracks right now"
-            : "Available for a new invite",
-          "Locked once assigned",
+            ? "Every track has at least one tutor"
+            : `${open} track${open === 1 ? "" : "s"} still need a tutor`,
+          "Invite or edit from the table",
         ],
       },
       {
-        label: "Faculty seats",
+        label: "Bootcamp tracks",
         value: trackCount,
         icon: ShieldCheckIcon,
         accent: "navy",
         details: [
           `${trackCount} bootcamp tracks total`,
-          "Invite from the table below",
+          "Share tracks across faculty",
         ],
       },
     ]

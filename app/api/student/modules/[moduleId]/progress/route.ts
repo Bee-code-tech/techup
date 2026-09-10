@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isNextResponse, requireStudent } from "@/lib/api-auth";
 import { db } from "@/lib/db";
+import { recordLearningActivity } from "@/lib/streak";
 
 type RouteContext = { params: Promise<{ moduleId: string }> };
 
@@ -42,7 +43,8 @@ export async function POST(request: Request, context: RouteContext) {
       },
       update: { videoCompleted: true },
     });
-    return NextResponse.json({ ok: true, progress });
+    const streak = await recordLearningActivity(auth.userId);
+    return NextResponse.json({ ok: true, progress, streak });
   }
 
   if (body.action === "submit-quiz") {
@@ -62,7 +64,9 @@ export async function POST(request: Request, context: RouteContext) {
       return {
         questionId: question.id,
         prompt: question.prompt,
+        promptImageUrl: question.promptImageUrl,
         options: question.options,
+        optionImageUrls: question.optionImageUrls || [],
         selectedIndex: selected,
         correctIndex: question.correctIndex,
         isCorrect,
@@ -101,6 +105,8 @@ export async function POST(request: Request, context: RouteContext) {
       },
     });
 
+    const streak = await recordLearningActivity(auth.userId);
+
     return NextResponse.json({
       ok: true,
       score,
@@ -108,6 +114,7 @@ export async function POST(request: Request, context: RouteContext) {
       passMark: moduleRow.passMark,
       review,
       progress,
+      streak,
     });
   }
 

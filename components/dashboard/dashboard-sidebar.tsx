@@ -22,14 +22,15 @@ import {
 import type { Role } from "@/lib/roles"
 import {
   BookOpenIcon,
+  ClipboardCheckIcon,
+  ClipboardListIcon,
   GraduationCapIcon,
   LayoutDashboardIcon,
   MailIcon,
-  RadioIcon,
   SettingsIcon,
+  TrophyIcon,
   UserCogIcon,
   UsersIcon,
-  ClipboardCheckIcon,
 } from "lucide-react"
 
 type DashUser = {
@@ -94,12 +95,6 @@ function navForRole(role: Role | string, pathname: string) {
         isActive: pathname.startsWith("/dashboard/courses/manage"),
       },
       {
-        title: "Live class",
-        url: "/dashboard/live/manage",
-        icon: <RadioIcon />,
-        isActive: pathname.startsWith("/dashboard/live/manage"),
-      },
-      {
         title: "Assignments",
         url: "/dashboard/assignments/review",
         icon: <ClipboardCheckIcon />,
@@ -121,6 +116,20 @@ function navForRole(role: Role | string, pathname: string) {
       url: "/dashboard/learn",
       icon: <GraduationCapIcon />,
       isActive: pathname.startsWith("/dashboard/learn"),
+    },
+    {
+      title: "Assignments",
+      url: "/dashboard/assignments",
+      icon: <ClipboardListIcon />,
+      isActive:
+        pathname.startsWith("/dashboard/assignments") &&
+        !pathname.startsWith("/dashboard/assignments/review"),
+    },
+    {
+      title: "Leaderboard",
+      url: "/dashboard/leaderboard",
+      icon: <TrophyIcon />,
+      isActive: pathname.startsWith("/dashboard/leaderboard"),
     },
     settingsItem(pathname),
   ]
