@@ -1,12 +1,12 @@
 {
   "crons": [
     {
-      "path": "/api/jobs/cohort-enforcement",
-      "schedule": "0 8 * * *"
+      "path": "/api/jobs/payment-reconcile",
+      "schedule": "0 7 * * *"
     },
     {
-      "path": "/api/jobs/payment-reconcile",
-      "schedule": "*/15 * * * *"
+      "path": "/api/jobs/cohort-enforcement",
+      "schedule": "0 8 * * *"
     }
   ]
 }
