@@ -1,17 +1,11 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { use, useCallback, useEffect, useRef, useState } from "react"
 import toast from "react-hot-toast"
-import {
-  ArrowLeftIcon,
-  FileTextIcon,
-  PlusIcon,
-  Trash2Icon,
-  VideoIcon,
-} from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -233,7 +227,7 @@ export default function ModuleEditPage({
         href={`/dashboard/courses/manage/${courseId}/edit`}
         className="mb-5 inline-flex items-center gap-2 text-sm text-muted-foreground hover:opacity-80"
       >
-        <ArrowLeftIcon className="size-4" />
+        <SolarIcon name="alt-arrow-left" className="size-4" />
         Back to {courseTitle}
       </Link>
 
@@ -265,7 +259,7 @@ export default function ModuleEditPage({
               router.push(`/dashboard/courses/manage/${courseId}/edit`)
             }}
           >
-            <Trash2Icon className="size-4" />
+            <SolarIcon name="trash-bin-trash" className="size-4" />
             Delete
           </Button>
           <Button
@@ -335,7 +329,7 @@ export default function ModuleEditPage({
 
         <section className="space-y-4 rounded-xl border border-black/10 p-5">
           <h2 className="flex items-center gap-2 text-sm font-semibold text-[#001752]">
-            <VideoIcon className="size-4" /> Lesson video
+            <SolarIcon name="videocamera" className="size-4" /> Lesson video
           </h2>
           {moduleRow.videoUrl ? (
             <video
@@ -399,7 +393,7 @@ export default function ModuleEditPage({
 
         <section className="space-y-4 rounded-xl border border-black/10 p-5">
           <h2 className="flex items-center gap-2 text-sm font-semibold text-[#001752]">
-            <FileTextIcon className="size-4" /> Materials
+            <SolarIcon name="document-text" className="size-4" /> Materials
           </h2>
           {(moduleRow.materials || []).length === 0 ? (
             <div className="rounded-xl border border-dashed border-black/10 bg-[#fafafa] px-4 py-8 text-center text-sm text-muted-foreground">
@@ -448,7 +442,7 @@ export default function ModuleEditPage({
               onClick={() => materialInputRef.current?.click()}
               className="h-10 w-full rounded-lg border-black/10"
             >
-              <PlusIcon className="size-4" /> Add material
+              <SolarIcon name="add-circle" className="size-4" /> Add material
             </Button>
           )}
         </section>

@@ -6,7 +6,7 @@ import { Stagger } from "@/components/motion/Stagger";
 import { Badge } from "@/components/marketing/Badge";
 import { Button } from "@/components/marketing/site-button";
 import { SectionHeading } from "@/components/marketing/SectionHeading";
-import { site } from "@/lib/site";
+import { ScholarshipApplyButton } from "@/components/scholarship/scholarship-apply-button";
 
 const criteria = [
   {
@@ -181,15 +181,12 @@ export function ScholarshipHero() {
             data-hero
             className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap"
           >
-            <Button
-              href={site.scholarshipFormUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <ScholarshipApplyButton
               size="lg"
               className="w-full sm:w-auto"
             >
               Apply Now
-            </Button>
+            </ScholarshipApplyButton>
             <Button
               href="#eligibility"
               variant="ghost"
@@ -438,13 +435,9 @@ export function ScholarshipBody() {
         </div>
 
         <div className="mt-10 sm:mt-12">
-          <Button
-            href={site.scholarshipFormUrl}
-            size="lg"
-            className="w-full sm:w-auto"
-          >
+          <ScholarshipApplyButton size="lg" className="w-full sm:w-auto">
             Apply Now
-          </Button>
+          </ScholarshipApplyButton>
         </div>
       </Section>
     </>

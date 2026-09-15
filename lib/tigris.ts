@@ -12,6 +12,7 @@ export type UploadFolder =
   | "materials"
   | "avatars"
   | "quiz"
+  | "chat"
 
 const FOLDER_RULES: Record<
   UploadFolder,
@@ -74,6 +75,37 @@ const FOLDER_RULES: Record<
     maxBytes: 8 * 1024 * 1024,
     mimePrefixes: ["image/"],
     path: "modules/quiz",
+  },
+  chat: {
+    maxBytes: 25 * 1024 * 1024,
+    mimePrefixes: [
+      "image/",
+      "audio/",
+      "video/",
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "text/",
+    ],
+    extensions: [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".gif",
+      ".webp",
+      ".pdf",
+      ".doc",
+      ".docx",
+      ".txt",
+      ".webm",
+      ".mp3",
+      ".mp4",
+      ".m4a",
+      ".ogg",
+      ".wav",
+      ".mov",
+    ],
+    path: "chat",
   },
 }
 

@@ -1,10 +1,10 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useEffect, useId, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import toast from "react-hot-toast"
-import { ArrowLeftRightIcon, XIcon } from "lucide-react"
-
 import {
   LearnCoursesGrid,
   LearnCoursesSkeleton,
@@ -73,7 +73,8 @@ function LearnContent() {
             onClick={() => setChangeOpen(true)}
             className="admin-press h-9 shrink-0 gap-1.5 rounded-xl border-black/8 bg-white px-2.5 text-xs font-semibold text-[#001752] hover:bg-[#f7f8fb] sm:h-10 sm:gap-2 sm:px-3 sm:text-sm"
           >
-            <ArrowLeftRightIcon
+            <SolarIcon
+              name="round-transfer-horizontal"
               className="size-3.5 text-[#FB7801] sm:size-4"
               aria-hidden
             />
@@ -331,7 +332,7 @@ function ChangeTrackModal({
             onClick={onClose}
             className="admin-press flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-black/4 hover:text-[#001752]"
           >
-            <XIcon className="size-4" />
+            <SolarIcon name="close-circle" className="size-4" />
           </button>
         </div>
 

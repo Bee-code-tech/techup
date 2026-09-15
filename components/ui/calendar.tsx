@@ -1,5 +1,7 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import * as React from "react"
 import {
   DayPicker,
@@ -7,12 +9,6 @@ import {
   type DayButton,
   type Locale,
 } from "react-day-picker"
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "lucide-react"
-
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -146,28 +142,25 @@ function Calendar({
             {...rootProps}
           />
         ),
-        Chevron: ({ className: chevronClassName, orientation, ...chevronProps }) => {
+        Chevron: ({ className: chevronClassName, orientation }) => {
           if (orientation === "left") {
             return (
-              <ChevronLeftIcon
-                className={cn("size-4", chevronClassName)}
-                {...chevronProps}
-              />
+              <SolarIcon
+                name="alt-arrow-left"
+                className={cn("size-4", chevronClassName)} />
             )
           }
           if (orientation === "right") {
             return (
-              <ChevronRightIcon
-                className={cn("size-4", chevronClassName)}
-                {...chevronProps}
-              />
+              <SolarIcon
+                name="alt-arrow-right"
+                className={cn("size-4", chevronClassName)} />
             )
           }
           return (
-            <ChevronDownIcon
-              className={cn("size-4", chevronClassName)}
-              {...chevronProps}
-            />
+            <SolarIcon
+              name="alt-arrow-down"
+              className={cn("size-4", chevronClassName)} />
           )
         },
         DayButton: ({ ...dayProps }) => (

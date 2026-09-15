@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import { SolarIcon } from "@/components/icons/solar-icon";
 import { Section } from "@/components/layout/Section";
 import { HeroIntro } from "@/components/motion/HeroIntro";
 import { Reveal } from "@/components/motion/Reveal";
@@ -242,7 +242,7 @@ export function AboutBody() {
                   className="mt-5"
                   aria-label={`${expert.name} on LinkedIn`}
                 >
-                  <ArrowTopRightOnSquareIcon className="size-4" aria-hidden />
+                  <SolarIcon name="arrow-right-up" className="size-4" />
                   LinkedIn
                 </Button>
               </article>

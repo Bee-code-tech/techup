@@ -1,9 +1,9 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, Sparkles } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 
 export type LearnModule = {
@@ -96,7 +96,7 @@ export function LearnCoursesGrid({
   if (courses.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-black/10 bg-white/70 px-5 py-14 text-center">
-        <Sparkles className="mx-auto size-6 text-[#FB7801]" aria-hidden />
+        <SolarIcon name="stars" className="mx-auto size-6 text-[#FB7801]" aria-hidden />
         <p className="mt-3 text-sm font-medium text-[#001752]">
           No published courses yet
         </p>
@@ -191,10 +191,9 @@ export function LearnCoursesGrid({
                     : stats.status === "complete"
                       ? "Review course"
                       : "Continue"}
-                  <ArrowRight
+                  <SolarIcon name="alt-arrow-right"
                     className="size-4 transition-transform duration-150 ease-[var(--ease-out)] group-hover:translate-x-0.5"
-                    aria-hidden
-                  />
+                    aria-hidden />
                 </span>
               </div>
             </div>

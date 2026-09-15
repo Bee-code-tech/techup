@@ -3,9 +3,18 @@ import { isNextResponse, requireStudent } from "@/lib/api-auth"
 import { bootcampTracks } from "@/lib/bootcamp"
 import { db } from "@/lib/db"
 
-export async function GET() {
+export async function GET(request: Request) {
   const auth = await requireStudent()
   if (isNextResponse(auth)) return auth
+
+  const { searchParams } = new URL(request.url)
+  const rawPage = Number(searchParams.get("page") || 1)
+  const rawPageSize = Number(searchParams.get("pageSize") || 20)
+  const page = Number.isFinite(rawPage) && rawPage > 0 ? Math.floor(rawPage) : 1
+  const pageSize =
+    Number.isFinite(rawPageSize) && rawPageSize > 0
+      ? Math.min(50, Math.floor(rawPageSize))
+      : 20
 
   const me = await db.user.findUnique({
     where: { id: auth.userId },
@@ -19,8 +28,12 @@ export async function GET() {
   if (!me?.track) {
     return NextResponse.json({
       track: null,
+      trackLabel: null,
       entries: [],
       me: null,
+      page: 1,
+      pageCount: 1,
+      total: 0,
     })
   }
 
@@ -79,7 +92,7 @@ export async function GET() {
     assignmentByUser.set(row.userId, current)
   }
 
-  const entries = students
+  const ranked = students
     .map((student) => {
       const quiz = quizByUser.get(student.id) || { count: 0, scoreSum: 0 }
       const asg = assignmentByUser.get(student.id) || {
@@ -113,10 +126,19 @@ export async function GET() {
     .sort((a, b) => b.points - a.points)
     .map((entry, index) => ({ ...entry, rank: index + 1 }))
 
+  const total = ranked.length
+  const pageCount = Math.max(1, Math.ceil(total / pageSize))
+  const safePage = Math.min(page, pageCount)
+  const start = (safePage - 1) * pageSize
+  const entries = ranked.slice(start, start + pageSize)
+
   return NextResponse.json({
     track: me.track,
     trackLabel: bootcampTracks[me.track] || me.track,
     entries,
-    me: entries.find((entry) => entry.isMe) || null,
+    me: ranked.find((entry) => entry.isMe) || null,
+    page: safePage,
+    pageCount,
+    total,
   })
 }

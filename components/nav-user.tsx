@@ -1,5 +1,7 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import {
   Avatar,
   AvatarFallback,
@@ -23,7 +25,6 @@ import {
 import { clearAdminDashboardCache } from "@/components/admin/use-admin-dashboard"
 import { clearSessionCache } from "@/components/dashboard/use-session"
 import { clearStudentLearnCache } from "@/components/dashboard/use-student-learn"
-import { EllipsisVerticalIcon, LogOutIcon, SettingsIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 function initials(name: string) {
@@ -78,7 +79,7 @@ export function NavUser({
                 {user.email}
               </span>
             </div>
-            <EllipsisVerticalIcon className="ml-auto size-4" />
+            <SolarIcon name="menu-dots" className="ml-auto size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="min-w-56"
@@ -108,11 +109,11 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
-              <SettingsIcon />
+              <SolarIcon name="settings" />
               Settings
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleLogout}>
-              <LogOutIcon />
+              <SolarIcon name="logout-2" />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

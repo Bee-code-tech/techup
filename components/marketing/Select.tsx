@@ -1,6 +1,7 @@
 "use client";
 
 import * as SelectPrimitive from "@radix-ui/react-select";
+import { SolarIcon } from "@/components/icons/solar-icon";
 import { cn } from "@/lib/cn";
 
 type SelectOption = {
@@ -21,50 +22,6 @@ type SelectProps = {
   id?: string;
   disabled?: boolean;
 };
-
-function ChevronDownIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-      className="size-4 shrink-0 text-muted-foreground"
-    >
-      <path
-        d="M6 9L12 15L18 9"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-      className="size-4 text-navy"
-    >
-      <path
-        d="M5 12L10 17L19 8"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 export function Select({
   name,
@@ -101,7 +58,10 @@ export function Select({
       >
         <SelectPrimitive.Value placeholder={placeholder} />
         <SelectPrimitive.Icon>
-          <ChevronDownIcon />
+          <SolarIcon
+            name="alt-arrow-down"
+            className="size-4 shrink-0 text-muted-foreground"
+          />
         </SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>
       <SelectPrimitive.Portal>
@@ -113,23 +73,23 @@ export function Select({
             contentClassName,
           )}
         >
-          <SelectPrimitive.Viewport
-            className="min-w-[var(--radix-select-trigger-width)] p-1"
-          >
+          <SelectPrimitive.Viewport className="p-1">
             {options.map((option) => (
               <SelectPrimitive.Item
                 key={option.value}
                 value={option.value}
-                className="relative flex w-full cursor-pointer items-center rounded-sm py-2 pr-3 pl-8 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:bg-surface-blue data-highlighted:text-navy"
+                className={cn(
+                  "relative flex cursor-pointer items-center rounded-sm py-2 pr-8 pl-3 text-sm outline-none select-none",
+                  "data-[highlighted]:bg-surface-blue/60 data-[highlighted]:text-navy",
+                  "data-[state=checked]:font-medium data-[state=checked]:text-navy",
+                )}
               >
-                <span className="absolute left-2 flex size-4 items-center justify-center">
-                  <SelectPrimitive.ItemIndicator>
-                    <CheckIcon />
-                  </SelectPrimitive.ItemIndicator>
-                </span>
                 <SelectPrimitive.ItemText>
                   {option.label}
                 </SelectPrimitive.ItemText>
+                <SelectPrimitive.ItemIndicator className="absolute right-2 flex items-center">
+                  <SolarIcon name="check-read" className="size-4 text-navy" />
+                </SelectPrimitive.ItemIndicator>
               </SelectPrimitive.Item>
             ))}
           </SelectPrimitive.Viewport>

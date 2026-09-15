@@ -1,10 +1,10 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useEffect, useId, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import toast from "react-hot-toast"
-import { PlusIcon, SearchIcon, XIcon } from "lucide-react"
-
 import { adminFieldClass, adminPrimaryBtnClass } from "@/components/admin/admin-ui"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -114,13 +114,13 @@ export function TutorsTable({
           className={cn(adminPrimaryBtnClass, "h-10 shrink-0 px-4")}
           onClick={() => setInviteOpen(true)}
         >
-          <PlusIcon className="size-4" />
+          <SolarIcon name="add-circle" className="size-4" />
           Invite tutor
         </Button>
       </div>
 
       <div className="relative max-w-md">
-        <SearchIcon className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
+        <SolarIcon name="magnifer" className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -394,7 +394,7 @@ function InviteTutorModal({
             onClick={onClose}
             className="admin-press flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-black/[0.04] hover:text-[#001752]"
           >
-            <XIcon className="size-4" />
+            <SolarIcon name="close-circle" className="size-4" />
           </button>
         </div>
 
@@ -581,7 +581,7 @@ function EditTutorTracksModal({
             onClick={onClose}
             className="admin-press flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-black/[0.04]"
           >
-            <XIcon className="size-4" />
+            <SolarIcon name="close-circle" className="size-4" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4 px-5 py-5">

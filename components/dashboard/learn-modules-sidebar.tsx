@@ -1,17 +1,14 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { useMemo } from "react"
-import {
-  ArrowLeftIcon,
-  CheckCircle2Icon,
-  LockIcon,
-  PlayCircleIcon,
-} from "lucide-react"
-
+import { useMemo, useState } from "react"
 import { BrandLogo } from "@/components/admin/brand-logo"
+import { CohortCheckoutModal } from "@/components/dashboard/cohort-checkout-modal"
 import type { LearnModule } from "@/components/dashboard/learn-courses"
+import { useCohortCheckout } from "@/components/dashboard/use-cohort-checkout"
 import { useStudentLearn } from "@/components/dashboard/use-student-learn"
 import { NavUser } from "@/components/nav-user"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -60,6 +57,8 @@ export function LearnModulesSidebar({
   const activeModuleId = params.moduleId
 
   const { data, loading, error } = useStudentLearn()
+  const checkout = useCohortCheckout({ track: data?.track ?? null })
+  const [openingCheckout, setOpeningCheckout] = useState(false)
 
   const course = useMemo(
     () => data?.courses.find((row) => row.id === courseId) ?? null,
@@ -72,8 +71,23 @@ export function LearnModulesSidebar({
   const percent = total === 0 ? 0 : Math.round((completed / total) * 100)
   const awaitingData = loading && !data
 
+  async function openPaidCheckout() {
+    setOpeningCheckout(true)
+    try {
+      await checkout.openCheckout()
+    } finally {
+      setOpeningCheckout(false)
+    }
+  }
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
+      <CohortCheckoutModal
+        open={checkout.checkoutOpen}
+        onClose={checkout.closeCheckout}
+        cohort={checkout.activeCohort}
+        defaultTrack={data?.track ?? null}
+      />
       <SidebarHeader className="gap-3 border-b border-sidebar-border pb-3">
         <SidebarMenu>
           <SidebarMenuItem>
@@ -85,7 +99,7 @@ export function LearnModulesSidebar({
               <BrandLogo size={36} />
               <span className="flex min-w-0 flex-col items-start gap-0.5">
                 <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                  <ArrowLeftIcon className="size-3" aria-hidden />
+                  <SolarIcon name="alt-arrow-left" className="size-3" aria-hidden />
                   My learning
                 </span>
                 <span className="truncate text-sm font-semibold text-[#001752]">
@@ -133,6 +147,33 @@ export function LearnModulesSidebar({
               const href = `/dashboard/learn/course/${courseId}/${moduleRow.id}`
 
               if (meta.locked) {
+                const isPaid = moduleRow.lockedReason === "paid"
+
+                if (isPaid) {
+                  return (
+                    <button
+                      key={moduleRow.id}
+                      type="button"
+                      disabled={openingCheckout}
+                      onClick={() => void openPaidCheckout()}
+                      className="admin-press flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left transition-[background-color,opacity] duration-150 hover:bg-[#fff8f1] disabled:opacity-60"
+                    >
+                      <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#fff1e6] text-[11px] font-semibold text-[#9a4d00]">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="line-clamp-2 text-sm font-medium text-[#001752]">
+                          {moduleRow.title}
+                        </span>
+                        <span className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-medium text-[#FB7801]">
+                          <SolarIcon name="card" className="size-3" aria-hidden />
+                          {openingCheckout ? "Loading…" : "Unlock paid access"}
+                        </span>
+                      </span>
+                    </button>
+                  )
+                }
+
                 return (
                   <div
                     key={moduleRow.id}
@@ -147,7 +188,7 @@ export function LearnModulesSidebar({
                         {moduleRow.title}
                       </span>
                       <span className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                        <LockIcon className="size-3" aria-hidden />
+                        <SolarIcon name="lock-keyhole" className="size-3" aria-hidden />
                         {meta.hint}
                       </span>
                     </span>
@@ -187,9 +228,9 @@ export function LearnModulesSidebar({
                       )}
                     >
                       {moduleRow.progress?.quizPassed ? (
-                        <CheckCircle2Icon className="size-3" aria-hidden />
+                        <SolarIcon name="check-circle" className="size-3" aria-hidden />
                       ) : (
-                        <PlayCircleIcon className="size-3" aria-hidden />
+                        <SolarIcon name="play-circle" className="size-3" aria-hidden />
                       )}
                       {meta.hint}
                       {moduleRow.access === "paid" ? " · Paid" : ""}

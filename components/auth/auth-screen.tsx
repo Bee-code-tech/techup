@@ -1,37 +1,29 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import {
-  CheckIcon,
-  EyeIcon,
-  EyeOffIcon,
-  GraduationCapIcon,
-  UserRoundIcon,
-  UsersIcon,
-  type LucideIcon,
-} from "lucide-react"
-
 import { BrandLogo } from "@/components/admin/brand-logo"
 import { Select } from "@/components/marketing/Select"
 import { Button } from "@/components/ui/button"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  StepProgress,
+  type StepProgressItem,
+} from "@/components/ui/step-progress"
 import { bootcampTracks } from "@/lib/bootcamp"
 import { cn } from "@/lib/utils"
 
 type Mode = "login" | "register" | "forgot" | "reset"
 
-const REGISTER_STEPS: {
-  id: number
-  label: string
-  icon: LucideIcon
-}[] = [
-  { id: 1, label: "Account", icon: UserRoundIcon },
-  { id: 2, label: "Profile", icon: UsersIcon },
-  { id: 3, label: "Track", icon: GraduationCapIcon },
+const REGISTER_STEPS: StepProgressItem[] = [
+  { id: 1, label: "Account", icon: "user" },
+  { id: 2, label: "Profile", icon: "users-group-rounded" },
+  { id: 3, label: "Track", icon: "square-academic-cap" },
 ]
 
 const genderOptions = [
@@ -104,9 +96,9 @@ function PasswordInput({
         className="absolute top-1/2 right-2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors duration-150 hover:bg-black/4 hover:text-[#001752] active:scale-[0.96]"
       >
         {visible ? (
-          <EyeOffIcon className="size-4" />
+          <SolarIcon name="eye-closed" className="size-4" />
         ) : (
-          <EyeIcon className="size-4" />
+          <SolarIcon name="eye" className="size-4" />
         )}
       </button>
     </div>
@@ -168,66 +160,6 @@ function AuthItem({
       style={{ animationDelay: `${index * 40}ms` }}
     >
       {children}
-    </div>
-  )
-}
-
-function StepProgress({ step }: { step: number }) {
-  const progress =
-    ((Math.max(1, Math.min(step, REGISTER_STEPS.length)) - 1) /
-      (REGISTER_STEPS.length - 1)) *
-    100
-
-  return (
-    <div className="relative mb-6 w-full">
-      <div
-        aria-hidden
-        className="absolute top-[2.5rem] right-[18px] left-[18px] h-[2px] rounded-full bg-black/8"
-      >
-        <div
-          className="h-full rounded-full bg-[#00206F] transition-[width] duration-300 ease-out"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      <div className="relative z-10 flex w-full items-start justify-between">
-        {REGISTER_STEPS.map((item) => {
-          const Icon = item.icon
-          const active = step === item.id
-          const done = step > item.id
-
-          return (
-            <div
-              key={item.id}
-              className="flex flex-col items-center"
-            >
-              <span
-                className={cn(
-                  "mb-2 text-[11px] font-medium transition-colors duration-200 ease-out",
-                  active || done ? "text-[#001752]" : "text-muted-foreground",
-                )}
-              >
-                {item.label}
-              </span>
-              <span
-                className={cn(
-                  "flex size-9 items-center justify-center rounded-full border transition-[background-color,border-color,color,transform,box-shadow] duration-200 ease-out",
-                  done || active
-                    ? "border-[#00206F] bg-[#00206F] text-white shadow-[0_0_0_3px_rgba(0,32,111,0.12)]"
-                    : "border-black/10 bg-[#fafafa] text-muted-foreground",
-                  active && "scale-105",
-                )}
-              >
-                {done ? (
-                  <CheckIcon className="size-4" strokeWidth={2.5} aria-hidden />
-                ) : (
-                  <Icon className="size-4" strokeWidth={2.25} aria-hidden />
-                )}
-              </span>
-            </div>
-          )
-        })}
-      </div>
     </div>
   )
 }
@@ -498,7 +430,7 @@ function AuthScreen() {
             </Link>
 
             {mode === "register" ? (
-              <StepProgress step={registerStep} />
+              <StepProgress step={registerStep} steps={REGISTER_STEPS} />
             ) : null}
 
             <h1

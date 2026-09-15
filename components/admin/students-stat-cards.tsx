@@ -1,13 +1,6 @@
 "use client"
 
 import { useMemo } from "react"
-import {
-  GraduationCapIcon,
-  LaptopIcon,
-  LayersIcon,
-  UsersIcon,
-} from "lucide-react"
-
 import type { Registration } from "@/components/admin/use-admin-dashboard"
 import { StatCards, type StatCardItem } from "@/components/section-cards"
 
@@ -38,7 +31,7 @@ export function StudentsStatCards({
       {
         label: "Total students",
         value: stats.total,
-        icon: UsersIcon,
+        icon: "users-group-rounded",
         accent: "navy",
         details: [
           `${stats.month} joined this month`,
@@ -50,7 +43,7 @@ export function StudentsStatCards({
       {
         label: "New this week",
         value: stats.week,
-        icon: GraduationCapIcon,
+        icon: "square-academic-cap",
         accent: "orange",
         details: [
           `${stats.today} registered today`,
@@ -60,7 +53,7 @@ export function StudentsStatCards({
       {
         label: "Active tracks",
         value: stats.tracks,
-        icon: LayersIcon,
+        icon: "layers",
         accent: "green",
         details: [
           stats.topTrack
@@ -74,7 +67,7 @@ export function StudentsStatCards({
       {
         label: "Laptop ready",
         value: withLaptop,
-        icon: LaptopIcon,
+        icon: "laptop",
         accent: "navy",
         details: [
           `${percentOf(withLaptop, registrations.length || stats.total)} have a laptop`,

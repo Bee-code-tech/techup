@@ -1,9 +1,9 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useCallback, useEffect, useState } from "react"
 import { format } from "date-fns"
-import { CalendarDaysIcon, RadioIcon } from "lucide-react"
-
 type LiveSession = {
   id: string
   title: string
@@ -65,9 +65,9 @@ export function StudentLiveCallout() {
             }
           >
             {isLive ? (
-              <RadioIcon className="size-4" aria-hidden />
+              <SolarIcon name="podcast" className="size-4" aria-hidden />
             ) : (
-              <CalendarDaysIcon className="size-4" aria-hidden />
+              <SolarIcon name="calendar" className="size-4" aria-hidden />
             )}
           </span>
           <div>

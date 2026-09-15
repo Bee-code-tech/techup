@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isNextResponse, requireStudent } from "@/lib/api-auth";
+import { ensureCourseCertificate } from "@/lib/certificates";
 import { db } from "@/lib/db";
 import { recordLearningActivity } from "@/lib/streak";
 
@@ -107,6 +108,14 @@ export async function POST(request: Request, context: RouteContext) {
 
     const streak = await recordLearningActivity(auth.userId);
 
+    let certificate = null;
+    if (passed || existing?.quizPassed) {
+      certificate = await ensureCourseCertificate(
+        auth.userId,
+        moduleRow.courseId,
+      );
+    }
+
     return NextResponse.json({
       ok: true,
       score,
@@ -115,6 +124,14 @@ export async function POST(request: Request, context: RouteContext) {
       review,
       progress,
       streak,
+      courseComplete: Boolean(certificate),
+      certificate: certificate
+        ? {
+            courseId: certificate.courseId,
+            courseTitle: certificate.courseTitle,
+            code: certificate.code,
+          }
+        : null,
     });
   }
 

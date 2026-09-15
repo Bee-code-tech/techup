@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Button } from "@/components/marketing/site-button";
+import { ScholarshipApplyButton } from "@/components/scholarship/scholarship-apply-button";
 import { cn } from "@/lib/cn";
-import { site } from "@/lib/site";
 
 type CourseCardProps = {
   title: string;
@@ -129,15 +129,12 @@ export function CourseCard({
         </div>
 
         <div className="mt-5 grid grid-cols-1 gap-2">
-          <Button
-            href={site.scholarshipFormUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <ScholarshipApplyButton
             size="sm"
             className="w-full rounded-xl"
           >
             Apply For Scholarship
-          </Button>
+          </ScholarshipApplyButton>
           <Button
             href="/contact"
             variant="ghost"

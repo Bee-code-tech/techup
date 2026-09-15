@@ -32,6 +32,8 @@ type SessionContextValue = {
   refreshing: boolean
   error: string
   reload: (options?: { silent?: boolean }) => Promise<void>
+  /** Patch the cached session user without a network round-trip. */
+  applyUser: (next: Partial<SessionUser> & Pick<SessionUser, "id">) => void
   clear: () => void
 }
 
@@ -69,6 +71,33 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     setLoading(false)
     setRefreshing(false)
   }, [])
+
+  const applyUser = useCallback(
+    (next: Partial<SessionUser> & Pick<SessionUser, "id">) => {
+      const current = getCache().user
+      const merged: SessionUser = {
+        id: next.id,
+        name: next.name ?? current?.name ?? "",
+        email: next.email ?? current?.email ?? "",
+        role: next.role ?? current?.role ?? "student",
+        track: next.track !== undefined ? next.track : current?.track,
+        accessTier: next.accessTier ?? current?.accessTier,
+        mustChangePassword:
+          next.mustChangePassword ?? current?.mustChangePassword,
+        avatarUrl:
+          next.avatarUrl !== undefined ? next.avatarUrl : current?.avatarUrl,
+        bio: next.bio !== undefined ? next.bio : current?.bio,
+        whatsapp:
+          next.whatsapp !== undefined ? next.whatsapp : current?.whatsapp,
+      }
+      getCache().user = merged
+      setUser(merged)
+      setError("")
+      setLoading(false)
+      setRefreshing(false)
+    },
+    [],
+  )
 
   const reload = useCallback(async (options?: { silent?: boolean }) => {
     const hasCached = Boolean(getCache().user)
@@ -114,8 +143,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   }, [reload])
 
   const value = useMemo(
-    () => ({ user, loading, refreshing, error, reload, clear }),
-    [user, loading, refreshing, error, reload, clear],
+    () => ({ user, loading, refreshing, error, reload, applyUser, clear }),
+    [user, loading, refreshing, error, reload, applyUser, clear],
   )
 
   return (

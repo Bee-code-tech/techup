@@ -1,24 +1,22 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { useCallback, useEffect, useMemo, useState } from "react"
-import toast from "react-hot-toast"
-import {
-  ArrowRightIcon,
-  CheckCircle2Icon,
-  CircleIcon,
-  Clock3Icon,
-  CreditCardIcon,
-  LockIcon,
-  PlayCircleIcon,
-} from "lucide-react"
+import { SolarIcon } from "@/components/icons/solar-icon"
 
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import toast from "react-hot-toast"
 import {
   ModuleQuizModal,
   type QuizQuestion,
 } from "@/components/dashboard/module-quiz-modal"
 import { MaterialCard } from "@/components/dashboard/courses/material-card"
 import { LearningPanelSkeleton } from "@/components/dashboard/page-skeletons"
+import {
+  CohortCheckoutModal,
+} from "@/components/dashboard/cohort-checkout-modal"
+import { PaymentReturnVerifier } from "@/components/dashboard/payment-return-verifier"
+import { useCohortCheckout } from "@/components/dashboard/use-cohort-checkout"
+import { useStudentLearn } from "@/components/dashboard/use-student-learn"
 import { Button } from "@/components/ui/button"
 import { type MaterialItem } from "@/lib/materials"
 import { cn } from "@/lib/utils"
@@ -62,6 +60,8 @@ export function ModuleLearningPanel({
   moduleId: string
 }) {
   const router = useRouter()
+  const { data: learnData } = useStudentLearn()
+  const checkout = useCohortCheckout({ track: learnData?.track ?? null })
 
   const [loading, setLoading] = useState(true)
   const [moduleData, setModuleData] = useState<ModulePayload | null>(null)
@@ -75,7 +75,9 @@ export function ModuleLearningPanel({
   const [quizPassed, setQuizPassed] = useState(false)
   const [score, setScore] = useState<number | null>(null)
   const [quizOpen, setQuizOpen] = useState(false)
-  const [paying, setPaying] = useState(false)
+  const [openingCheckout, setOpeningCheckout] = useState(false)
+  const [markingComplete, setMarkingComplete] = useState(false)
+  const completingRef = useRef(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -128,60 +130,53 @@ export function ModuleLearningPanel({
   }, [load])
 
   async function completeVideo() {
-    const response = await fetch(
-      `/api/student/modules/${moduleId}/progress`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "complete-video" }),
-      },
-    )
-    if (!response.ok) {
-      toast.error("Could not mark video complete.")
-      return
-    }
+    if (videoCompleted || completingRef.current) return
+    completingRef.current = true
+    setMarkingComplete(true)
+
+    // Unlock quiz immediately — don't wait on a slow DB round-trip.
     setVideoCompleted(true)
     toast.success("Lesson watched — quiz unlocked.")
-    window.dispatchEvent(new Event("learn-progress-updated"))
     window.requestAnimationFrame(() => {
       document
         .getElementById("module-quiz")
         ?.scrollIntoView({ behavior: "smooth", block: "start" })
     })
-  }
 
-  async function startNextModulePayment() {
-    if (!nextModule?.requiresPayment) return
-    setPaying(true)
     try {
       const response = await fetch(
-        `/api/student/modules/${nextModule.id}/pay`,
-        { method: "POST" },
+        `/api/student/modules/${moduleId}/progress`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "complete-video" }),
+        },
       )
-      const payload = (await response.json()) as {
-        error?: string
-        authorizationUrl?: string
-        alreadyUnlocked?: boolean
-        message?: string
-      }
       if (!response.ok) {
-        toast.error(payload.error || "Could not start payment.")
+        setVideoCompleted(false)
+        toast.error("Could not mark video complete. Try again.")
         return
       }
-      if (payload.alreadyUnlocked) {
-        toast.success(payload.message || "Module already unlocked.")
-        router.push(`/dashboard/learn/course/${courseId}/${nextModule.id}`)
-        return
-      }
-      if (payload.authorizationUrl) {
-        window.location.href = payload.authorizationUrl
-        return
-      }
-      toast.error("No checkout URL returned.")
+      // Refresh sidebar quietly in the background (don't block UI).
+      window.setTimeout(() => {
+        window.dispatchEvent(new Event("learn-progress-updated"))
+      }, 0)
     } catch {
-      toast.error("Network error.")
+      setVideoCompleted(false)
+      toast.error("Network error. Try again.")
     } finally {
-      setPaying(false)
+      completingRef.current = false
+      setMarkingComplete(false)
+    }
+  }
+
+  async function openPaidAccessCheckout() {
+    if (!nextModule?.requiresPayment) return
+    setOpeningCheckout(true)
+    try {
+      await checkout.openCheckout()
+    } finally {
+      setOpeningCheckout(false)
     }
   }
 
@@ -193,7 +188,16 @@ export function ModuleLearningPanel({
   const questionCount = moduleData?.questions.length ?? 0
 
   if (loading || !moduleData) {
-    return <LearningPanelSkeleton />
+    return (
+      <>
+        <PaymentReturnVerifier
+          onVerified={async () => {
+            await load()
+          }}
+        />
+        <LearningPanelSkeleton />
+      </>
+    )
   }
 
   const stage: "watch" | "quiz" | "done" = quizPassed
@@ -204,6 +208,18 @@ export function ModuleLearningPanel({
 
   return (
     <div className="flex w-full flex-col gap-5 px-4 py-6 lg:px-6 md:py-8">
+      <PaymentReturnVerifier
+        onVerified={async () => {
+          await load()
+          await checkout.loadCohorts()
+        }}
+      />
+      <CohortCheckoutModal
+        open={checkout.checkoutOpen}
+        onClose={checkout.closeCheckout}
+        cohort={checkout.activeCohort}
+        defaultTrack={learnData?.track ?? null}
+      />
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 space-y-1.5">
           <p className="text-[11px] font-semibold tracking-[0.16em] text-[#00206F]/65 uppercase">
@@ -236,7 +252,7 @@ export function ModuleLearningPanel({
             />
           ) : (
             <div className="flex aspect-video flex-col items-center justify-center gap-2 bg-[#121a2b] px-6 text-center">
-              <PlayCircleIcon className="size-10 text-white/35" aria-hidden />
+              <SolarIcon name="play-circle" className="size-10 text-white/35" aria-hidden />
               <p className="text-sm text-white/65">
                 No video uploaded for this module yet.
               </p>
@@ -247,15 +263,14 @@ export function ModuleLearningPanel({
             <div className="flex items-center gap-2.5 text-sm text-white/80">
               {videoCompleted ? (
                 <>
-                  <CheckCircle2Icon
+                  <SolarIcon name="check-circle"
                     className="size-4 text-emerald-400"
-                    aria-hidden
-                  />
+                    aria-hidden />
                   <span>Lesson marked complete</span>
                 </>
               ) : (
                 <>
-                  <PlayCircleIcon className="size-4 text-[#FB7801]" aria-hidden />
+                  <SolarIcon name="play-circle" className="size-4 text-[#FB7801]" aria-hidden />
                   <span>Watch to the end, or mark complete when ready</span>
                 </>
               )}
@@ -263,10 +278,11 @@ export function ModuleLearningPanel({
             {!videoCompleted && moduleData.videoUrl ? (
               <Button
                 type="button"
+                disabled={markingComplete}
                 onClick={() => void completeVideo()}
-                className="admin-press h-10 rounded-xl bg-white px-4 text-sm font-semibold text-[#001752] hover:bg-white/90"
+                className="admin-press h-10 rounded-xl bg-white px-4 text-sm font-semibold text-[#001752] hover:bg-white/90 disabled:opacity-70"
               >
-                Mark complete
+                {markingComplete ? "Unlocking…" : "Mark complete"}
               </Button>
             ) : null}
           </div>
@@ -312,7 +328,7 @@ export function ModuleLearningPanel({
             {!videoCompleted ? (
               <div className="mt-4 flex items-start gap-3 rounded-xl border border-dashed border-black/10 bg-[#fbfcfe] px-4 py-4">
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#eef2f9] text-[#00206F]">
-                  <LockIcon className="size-4" aria-hidden />
+                  <SolarIcon name="lock-keyhole" className="size-4" aria-hidden />
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-[#001752]">
@@ -372,7 +388,7 @@ export function ModuleLearningPanel({
                       onClick={() => setQuizOpen(true)}
                       className="admin-press h-11 gap-2 rounded-xl bg-[#00206F] px-5 text-white hover:bg-[#001752]"
                     >
-                      <Clock3Icon className="size-4" aria-hidden />
+                      <SolarIcon name="clock-circle" className="size-4" aria-hidden />
                       {score != null ? "Retake quiz" : "Start quiz"}
                     </Button>
                   ) : (
@@ -389,12 +405,12 @@ export function ModuleLearningPanel({
                   {quizPassed && nextModule?.requiresPayment ? (
                     <Button
                       type="button"
-                      disabled={paying}
-                      onClick={() => void startNextModulePayment()}
+                      disabled={openingCheckout}
+                      onClick={() => void openPaidAccessCheckout()}
                       className="admin-press h-11 gap-2 rounded-xl bg-[#FB7801] px-5 text-white hover:brightness-105"
                     >
-                      <CreditCardIcon className="size-4" aria-hidden />
-                      {paying ? "Opening Paystack…" : "Pay to unlock"}
+                      <SolarIcon name="card" className="size-4" aria-hidden />
+                      {openingCheckout ? "Loading…" : "Unlock paid access"}
                     </Button>
                   ) : null}
 
@@ -411,7 +427,7 @@ export function ModuleLearningPanel({
                       className="admin-press h-11 gap-2 rounded-xl bg-[#FB7801] px-5 text-white hover:brightness-105"
                     >
                       Next module
-                      <ArrowRightIcon className="size-4" aria-hidden />
+                      <SolarIcon name="alt-arrow-right" className="size-4" aria-hidden />
                     </Button>
                   ) : null}
 
@@ -489,17 +505,16 @@ function LessonSteps({ stage }: { stage: "watch" | "quiz" | "done" }) {
               )}
             >
               {complete || doneAll ? (
-                <CheckCircle2Icon
+                <SolarIcon name="check-circle"
                   className={cn(
                     "size-3.5",
                     current || (doneAll && index === 2)
                       ? "text-[#FB7801]"
                       : "text-[#00206F]",
                   )}
-                  aria-hidden
-                />
+                  aria-hidden />
               ) : (
-                <CircleIcon className="size-3.5" aria-hidden />
+                <SolarIcon name="record" className="size-3.5" aria-hidden />
               )}
               {step.label}
             </span>

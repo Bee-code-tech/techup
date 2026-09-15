@@ -1,12 +1,12 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import { BookOpenIcon, PlusIcon } from "lucide-react"
-
 import { TutorCoursesSkeleton } from "@/components/dashboard/page-skeletons"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -107,14 +107,14 @@ export default function TutorCoursesPage() {
           onClick={() => void createDraft()}
           className="h-10 gap-2 rounded-xl bg-[#00206F] text-white hover:bg-[#001752]"
         >
-          <PlusIcon className="size-4" />
+          <SolarIcon name="add-circle" className="size-4" />
           {creating ? "Creating…" : "New course"}
         </Button>
       </div>
 
       {courses.length === 0 ? (
         <div className="mt-8 rounded-xl border border-dashed border-black/10 px-6 py-16 text-center">
-          <BookOpenIcon className="mx-auto size-8 text-[#FB7801]" />
+          <SolarIcon name="book" className="mx-auto size-8 text-[#FB7801]" />
           <p className="mt-3 text-sm font-medium text-[#001752]">
             No courses yet
           </p>
@@ -141,7 +141,7 @@ export default function TutorCoursesPage() {
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center text-muted-foreground">
-                    <BookOpenIcon className="size-8 opacity-40" />
+                    <SolarIcon name="book" className="size-8 opacity-40" />
                   </div>
                 )}
               </div>

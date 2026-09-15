@@ -1,5 +1,7 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -16,12 +18,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import {
-  LayoutDashboardIcon,
-  MailIcon,
-  UsersIcon,
-} from "lucide-react"
-
 type AdminUser = {
   name: string
   email: string
@@ -37,19 +33,19 @@ export function AppSidebar({
     {
       title: "Dashboard",
       url: "/dashboard",
-      icon: <LayoutDashboardIcon />,
+      icon: <SolarIcon name="widget-5" />,
       isActive: pathname === "/dashboard",
     },
     {
       title: "Students",
       url: "/dashboard/students",
-      icon: <UsersIcon />,
+      icon: <SolarIcon name="users-group-rounded" />,
       isActive: pathname.startsWith("/dashboard/students"),
     },
     {
       title: "Broadcast",
       url: "/dashboard/broadcast",
-      icon: <MailIcon />,
+      icon: <SolarIcon name="letter" />,
       isActive: pathname.startsWith("/dashboard/broadcast"),
     },
   ]

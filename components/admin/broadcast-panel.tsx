@@ -1,14 +1,9 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
-import {
-  MegaphoneIcon,
-  SendIcon,
-  ShieldCheckIcon,
-  UsersIcon,
-} from "lucide-react"
-
 import type { Registration } from "@/components/admin/use-admin-dashboard"
 import { broadcastEmail } from "@/lib/broadcast-email"
 import { slugifyCampaignKey } from "@/lib/broadcast-campaign-key"
@@ -278,7 +273,7 @@ export function BroadcastPanel({
           />
           <div className="relative flex items-start gap-3.5">
             <span className="flex size-11 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15">
-              <MegaphoneIcon className="size-5 text-[#FFB067]" />
+              <SolarIcon name="megaphone" className="size-5 text-[#FFB067]" />
             </span>
             <div>
               <p className="text-[11px] font-semibold tracking-[0.18em] text-white/55 uppercase">
@@ -302,24 +297,23 @@ export function BroadcastPanel({
                 {
                   label: "Eligible",
                   value: intel.eligible,
-                  icon: UsersIcon,
+                  icon: "users-group-rounded",
                   tone: "navy",
                 },
                 {
                   label: "Already got it",
                   value: intel.alreadyReceived,
-                  icon: ShieldCheckIcon,
+                  icon: "shield-check",
                   tone: "muted",
                 },
                 {
                   label: "Will send",
                   value: sendCount,
-                  icon: SendIcon,
+                  icon: "plain-2",
                   tone: "orange",
                 },
               ] as const
             ).map((item) => {
-              const Icon = item.icon
               return (
                 <div
                   key={item.label}
@@ -333,7 +327,8 @@ export function BroadcastPanel({
                   )}
                 >
                   <div className="flex items-center gap-2">
-                    <Icon
+                    <SolarIcon
+                      name={item.icon}
                       className={cn(
                         "size-3.5",
                         item.tone === "orange"

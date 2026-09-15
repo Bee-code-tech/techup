@@ -1,16 +1,11 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
-import {
-  AlertTriangleIcon,
-  ArrowLeftIcon,
-  BookOpenIcon,
-  LayoutListIcon,
-} from "lucide-react"
-
 import { CoverForm } from "@/components/dashboard/courses/modular/cover-form"
 import { ModulesForm } from "@/components/dashboard/courses/modular/modules-form"
 import { PublishActions } from "@/components/dashboard/courses/modular/publish-actions"
@@ -126,7 +121,7 @@ export function CourseBuilder({ courseId }: { courseId: string }) {
     <div className="px-4 py-6 lg:px-6 md:py-8">
       {!course.published ? (
         <div className="mb-5 flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
-          <AlertTriangleIcon className="size-4 shrink-0" />
+          <SolarIcon name="danger-triangle" className="size-4 shrink-0" />
           This course is unpublished. Students will not see it yet.
         </div>
       ) : null}
@@ -135,7 +130,7 @@ export function CourseBuilder({ courseId }: { courseId: string }) {
         href="/dashboard/courses/manage"
         className="mb-5 inline-flex items-center gap-2 text-sm text-muted-foreground transition-opacity hover:opacity-80"
       >
-        <ArrowLeftIcon className="size-4" />
+        <SolarIcon name="alt-arrow-left" className="size-4" />
         Back to courses
       </Link>
 
@@ -195,7 +190,7 @@ export function CourseBuilder({ courseId }: { courseId: string }) {
         <div className="space-y-5">
           <div className="flex items-center gap-2">
             <span className="rounded-xl bg-[#00206F]/8 p-2 text-[#00206F]">
-              <BookOpenIcon className="size-5" />
+              <SolarIcon name="book" className="size-5" />
             </span>
             <h2 className="text-lg font-semibold text-[#001752]">
               Customize course
@@ -261,7 +256,7 @@ export function CourseBuilder({ courseId }: { courseId: string }) {
         <div className="space-y-5">
           <div className="flex items-center gap-2">
             <span className="rounded-xl bg-[#00206F]/8 p-2 text-[#00206F]">
-              <LayoutListIcon className="size-5" />
+              <SolarIcon name="list" className="size-5" />
             </span>
             <h2 className="text-lg font-semibold text-[#001752]">
               Course modules

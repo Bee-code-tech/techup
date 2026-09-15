@@ -1,23 +1,12 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Image from "next/image"
 import Link from "next/link"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { format } from "date-fns"
 import toast from "react-hot-toast"
-import type { LucideIcon } from "lucide-react"
-import {
-  ArrowRightIcon,
-  BookOpenIcon,
-  CalendarDaysIcon,
-  ClipboardCheckIcon,
-  ExternalLinkIcon,
-  LayersIcon,
-  PlusIcon,
-  RadioIcon,
-  SparklesIcon,
-} from "lucide-react"
-
 import {
   LiveClassModal,
   type TutorLiveSession,
@@ -42,21 +31,21 @@ const ACTIONS: Array<{
   title: string
   href: string
   copy: string
-  icon: LucideIcon
+  icon: string
   accent: string
 }> = [
   {
     title: "My courses",
     href: "/dashboard/courses/manage",
     copy: "Build modules, media, and quizzes",
-    icon: BookOpenIcon,
+    icon: "book",
     accent: "bg-[#eef2f9] text-[#00206F]",
   },
   {
     title: "Assignments",
     href: "/dashboard/assignments/review",
     copy: "Review student submissions",
-    icon: ClipboardCheckIcon,
+    icon: "clipboard-check",
     accent: "bg-[#eefaf3] text-emerald-700",
   },
 ]
@@ -277,9 +266,9 @@ export function TutorOverview() {
               )}
             >
               {featuredIsLive ? (
-                <RadioIcon className="size-5" />
+                <SolarIcon name="podcast" className="size-5" />
               ) : (
-                <CalendarDaysIcon className="size-5" />
+                <SolarIcon name="calendar" className="size-5" />
               )}
             </span>
             <div className="min-w-0">
@@ -311,7 +300,7 @@ export function TutorOverview() {
                     className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[#00206F]"
                   >
                     Open {featuredLive.platform === "zoom" ? "Zoom" : "Meet"}
-                    <ExternalLinkIcon className="size-3.5" />
+                    <SolarIcon name="link-round-angle" className="size-3.5" />
                   </a>
                 </>
               ) : (
@@ -348,7 +337,7 @@ export function TutorOverview() {
                     }
                     className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#FB7801] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#e56c00] disabled:opacity-60"
                   >
-                    <RadioIcon className="size-4" />
+                    <SolarIcon name="podcast" className="size-4" />
                     {liveActionId === featuredLive.id
                       ? "Starting…"
                       : "Start now"}
@@ -370,7 +359,7 @@ export function TutorOverview() {
                 onClick={() => setLiveOpen(true)}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#00206F] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#001752]"
               >
-                <CalendarDaysIcon className="size-4" />
+                <SolarIcon name="calendar" className="size-4" />
                 Go live
               </button>
             )}
@@ -383,19 +372,19 @@ export function TutorOverview() {
           label="Published"
           value={awaiting ? null : String(stats.published)}
           detail="Visible to students"
-          icon={SparklesIcon}
+          icon="stars"
         />
         <StatTile
           label="Drafts"
           value={awaiting ? null : String(stats.drafts)}
           detail="Still in setup"
-          icon={BookOpenIcon}
+          icon="book"
         />
         <StatTile
           label="Modules"
           value={awaiting ? null : String(stats.modules)}
           detail="Across your courses"
-          icon={LayersIcon}
+          icon="layers"
         />
         <button
           type="button"
@@ -426,7 +415,7 @@ export function TutorOverview() {
                   ? "Upcoming class"
                   : "Tap to schedule"
             }
-            icon={stats.activeLive > 0 ? RadioIcon : CalendarDaysIcon}
+            icon={stats.activeLive > 0 ? "podcast" : "calendar"}
             highlight={stats.activeLive > 0 || stats.upcomingLive > 0}
           />
         </button>
@@ -447,7 +436,7 @@ export function TutorOverview() {
               href="/dashboard/courses/manage/new"
               className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#00206F] px-3 text-sm font-medium text-white hover:bg-[#001752]"
             >
-              <PlusIcon className="size-3.5" />
+              <SolarIcon name="add-circle" className="size-3.5" />
               New course
             </Link>
           </div>
@@ -464,7 +453,7 @@ export function TutorOverview() {
                     action.accent,
                   )}
                 >
-                  <action.icon className="size-4" />
+                  <SolarIcon name={action.icon} className="size-4" />
                 </span>
                 <p className="mt-3 text-sm font-semibold text-[#001752]">
                   {action.title}
@@ -473,7 +462,7 @@ export function TutorOverview() {
                   {action.copy}
                 </p>
                 <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#00206F] opacity-80 group-hover:opacity-100">
-                  Open <ArrowRightIcon className="size-3.5" />
+                  Open <SolarIcon name="alt-arrow-right" className="size-3.5" />
                 </span>
               </Link>
             ))}
@@ -538,7 +527,7 @@ export function TutorOverview() {
             href="/dashboard/courses/manage"
             className="inline-flex items-center gap-1 text-sm font-semibold text-[#00206F]"
           >
-            View all <ArrowRightIcon className="size-3.5" />
+            View all <SolarIcon name="alt-arrow-right" className="size-3.5" />
           </Link>
         </div>
 
@@ -548,7 +537,7 @@ export function TutorOverview() {
           </div>
         ) : recent.length === 0 ? (
           <div className="mt-4 rounded-xl border border-dashed border-black/10 px-5 py-10 text-center">
-            <BookOpenIcon className="mx-auto size-7 text-[#FB7801]" />
+            <SolarIcon name="book" className="mx-auto size-7 text-[#FB7801]" />
             <p className="mt-3 text-sm font-medium text-[#001752]">
               No courses yet
             </p>
@@ -581,7 +570,7 @@ export function TutorOverview() {
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-muted-foreground">
-                      <BookOpenIcon className="size-8 opacity-40" />
+                      <SolarIcon name="book" className="size-8 opacity-40" />
                     </div>
                   )}
                 </div>
@@ -630,13 +619,13 @@ function StatTile({
   label,
   value,
   detail,
-  icon: Icon,
+  icon,
   highlight,
 }: {
   label: string
   value: string | null
   detail: string
-  icon: LucideIcon
+  icon: string
   highlight?: boolean
 }) {
   return (
@@ -655,7 +644,7 @@ function StatTile({
               : "bg-[#eef2f9] text-[#00206F]",
           )}
         >
-          <Icon className="size-4" />
+          <SolarIcon name={icon} className="size-4" />
         </span>
         <p className="text-xs font-medium text-muted-foreground">{label}</p>
       </div>

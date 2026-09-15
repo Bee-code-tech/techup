@@ -1,24 +1,11 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Image from "next/image"
 import { useEffect, useId, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import toast from "react-hot-toast"
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  CheckIcon,
-  FileSpreadsheetIcon,
-  ImageIcon,
-  LoaderCircleIcon,
-  PencilIcon,
-  PlusIcon,
-  SparklesIcon,
-  Trash2Icon,
-  UploadIcon,
-  XIcon,
-} from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -131,12 +118,12 @@ export function ModuleQuizEditor({
           >
             {questions.length > 0 ? (
               <>
-                <PencilIcon className="size-3.5" />
+                <SolarIcon name="pen" className="size-3.5" />
                 Edit quiz
               </>
             ) : (
               <>
-                <SparklesIcon className="size-3.5" />
+                <SolarIcon name="stars" className="size-3.5" />
                 Create quiz
               </>
             )}
@@ -370,7 +357,7 @@ function QuizBuilderModal({
               onClick={onClose}
               className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-black/4 hover:text-[#001752]"
             >
-              <XIcon className="size-4" />
+              <SolarIcon name="close-circle" className="size-4" />
             </button>
           </div>
         </header>
@@ -412,7 +399,7 @@ function QuizBuilderModal({
                       className="flex size-8 items-center justify-center rounded-lg border border-dashed border-black/15 text-[#00206F] hover:bg-[#eef2f9]"
                       aria-label="Add question"
                     >
-                      <PlusIcon className="size-3.5" />
+                      <SolarIcon name="add-circle" className="size-3.5" />
                     </button>
                   </div>
                   <Button
@@ -422,7 +409,7 @@ function QuizBuilderModal({
                     className="h-8 text-destructive"
                     onClick={removeActive}
                   >
-                    <Trash2Icon className="size-3.5" />
+                    <SolarIcon name="trash-bin-trash" className="size-3.5" />
                     Remove
                   </Button>
                 </div>
@@ -477,7 +464,7 @@ function QuizBuilderModal({
                       )}
                     >
                       {questionReady(question) ? (
-                        <CheckIcon className="size-3.5" />
+                        <SolarIcon name="check-read" className="size-3.5" />
                       ) : (
                         index + 1
                       )}
@@ -512,7 +499,7 @@ function QuizBuilderModal({
               else onClose()
             }}
           >
-            <ArrowLeftIcon className="size-4" />
+            <SolarIcon name="alt-arrow-left" className="size-4" />
             {step === "start" ? "Cancel" : "Back"}
           </Button>
 
@@ -533,7 +520,7 @@ function QuizBuilderModal({
                   onClick={finish}
                 >
                   Save quiz
-                  <ArrowRightIcon className="size-4" />
+                  <SolarIcon name="alt-arrow-right" className="size-4" />
                 </Button>
               </>
             ) : null}
@@ -625,7 +612,7 @@ function StartStep({
           className="group rounded-2xl border border-black/8 bg-white p-6 text-left transition-[border-color,box-shadow] hover:border-[#00206F]/25 hover:shadow-[0_16px_40px_-28px_rgba(0,32,111,0.45)]"
         >
           <span className="flex size-11 items-center justify-center rounded-xl bg-[#eef2f9] text-[#00206F]">
-            <SparklesIcon className="size-5" />
+            <SolarIcon name="stars" className="size-5" />
           </span>
           <p className="mt-4 text-base font-semibold text-[#001752]">
             Create from scratch
@@ -642,7 +629,7 @@ function StartStep({
           className="group rounded-2xl border border-black/8 bg-white p-6 text-left transition-[border-color,box-shadow] hover:border-[#FB7801]/35 hover:shadow-[0_16px_40px_-28px_rgba(251,120,1,0.35)]"
         >
           <span className="flex size-11 items-center justify-center rounded-xl bg-[#fff4ea] text-[#FB7801]">
-            <UploadIcon className="size-5" />
+            <SolarIcon name="upload" className="size-5" />
           </span>
           <p className="mt-4 text-base font-semibold text-[#001752]">
             Import CSV
@@ -667,7 +654,7 @@ function StartStep({
               }
             }}
           >
-            <FileSpreadsheetIcon className="size-3.5" />
+            <SolarIcon name="document" className="size-3.5" />
             Download template
           </span>
         </button>
@@ -796,7 +783,7 @@ function QuestionEditor({
                       })
                     }
                   >
-                    <Trash2Icon className="size-3.5" />
+                    <SolarIcon name="trash-bin-trash" className="size-3.5" />
                   </Button>
                 ) : null}
               </div>
@@ -848,7 +835,7 @@ function QuestionEditor({
             }))
           }
         >
-          <PlusIcon className="size-3.5" /> Add option
+          <SolarIcon name="add-circle" className="size-3.5" /> Add option
         </Button>
       </div>
     </div>
@@ -992,9 +979,9 @@ function ImageSlot({
             onClick={() => inputRef.current?.click()}
           >
             {uploading ? (
-              <LoaderCircleIcon className="size-3.5 animate-spin" />
+              <SolarIcon name="refresh-circle" className="size-3.5 animate-spin" />
             ) : (
-              <ImageIcon className="size-3.5" />
+              <SolarIcon name="gallery" className="size-3.5" />
             )}
             {url ? "Replace" : "Upload"}
           </Button>

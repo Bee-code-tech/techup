@@ -1,8 +1,9 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useEffect, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
-import { CheckIcon, Link2Icon, XIcon } from "lucide-react"
 import toast from "react-hot-toast"
 
 import { Button } from "@/components/ui/button"
@@ -246,7 +247,7 @@ export function WhatsappGroupNav() {
                       onClick={() => setOpen(false)}
                       className="admin-press flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/80 hover:bg-white/15 hover:text-white"
                     >
-                      <XIcon className="size-4" />
+                      <SolarIcon name="close-circle" className="size-4" />
                     </button>
                   </div>
 
@@ -308,7 +309,7 @@ export function WhatsappGroupNav() {
                             >
                               {filled ? (
                                 <>
-                                  <CheckIcon className="size-3" />
+                                  <SolarIcon name="check-read" className="size-3" />
                                   Ready
                                 </>
                               ) : (
@@ -320,7 +321,7 @@ export function WhatsappGroupNav() {
                           <label className="block">
                             <span className="sr-only">{track.label} invite link</span>
                             <div className="relative">
-                              <Link2Icon className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground/70" />
+                              <SolarIcon name="link" className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground/70" />
                               <Input
                                 value={urls[track.id] || ""}
                                 onChange={(event) =>

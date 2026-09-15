@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/marketing/site-button";
+import { ScholarshipApplyButton } from "@/components/scholarship/scholarship-apply-button";
 import { cn } from "@/lib/cn";
 import { gsap, prefersReducedMotion, registerGsap } from "@/lib/gsap";
 import { navLinks, site } from "@/lib/site";
@@ -16,15 +17,11 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
-  const ctaHref =
-    pathname === "/scholarship"
-      ? site.scholarshipFormUrl
-      : "/auth?mode=register";
-  const ctaLabel =
-    pathname === "/scholarship"
-      ? "Apply for Scholarship"
-      : "Join Free Bootcamp";
-  const ctaIsExternal = ctaHref.startsWith("http");
+  const isScholarshipPage = pathname === "/scholarship";
+  const ctaHref = "/auth?mode=register";
+  const ctaLabel = isScholarshipPage
+    ? "Apply for Scholarship"
+    : "Join Free Bootcamp";
 
   const closeMenu = () => setOpen(false);
 
@@ -131,15 +128,15 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden lg:block" data-nav>
-          <Button
-            href={ctaHref}
-            size="sm"
-            {...(ctaIsExternal
-              ? { target: "_blank", rel: "noopener noreferrer" }
-              : {})}
-          >
-            {ctaLabel}
-          </Button>
+          {isScholarshipPage ? (
+            <ScholarshipApplyButton size="sm">
+              {ctaLabel}
+            </ScholarshipApplyButton>
+          ) : (
+            <Button href={ctaHref} size="sm">
+              {ctaLabel}
+            </Button>
+          )}
         </div>
 
         <button
@@ -198,16 +195,22 @@ export function SiteHeader() {
               );
             })}
             <div data-mobile-cta>
-              <Button
-                href={ctaHref}
-                className="mt-2 w-full"
-                onClick={closeMenu}
-                {...(ctaIsExternal
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-              >
-                {ctaLabel}
-              </Button>
+              {isScholarshipPage ? (
+                <ScholarshipApplyButton
+                  className="mt-2 w-full"
+                  onClick={closeMenu}
+                >
+                  {ctaLabel}
+                </ScholarshipApplyButton>
+              ) : (
+                <Button
+                  href={ctaHref}
+                  className="mt-2 w-full"
+                  onClick={closeMenu}
+                >
+                  {ctaLabel}
+                </Button>
+              )}
             </div>
           </Container>
         </nav>

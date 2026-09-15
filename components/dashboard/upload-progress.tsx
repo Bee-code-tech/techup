@@ -1,6 +1,6 @@
 "use client"
 
-import { LoaderCircleIcon } from "lucide-react"
+import { SolarIcon } from "@/components/icons/solar-icon"
 
 import { cn } from "@/lib/utils"
 
@@ -27,7 +27,7 @@ export function UploadProgressBar({
     >
       <div className="flex items-center justify-between gap-3 text-xs">
         <span className="inline-flex items-center gap-1.5 font-medium text-[#001752]">
-          <LoaderCircleIcon className="size-3.5 animate-spin text-[#00206F]" />
+          <SolarIcon name="refresh-circle" className="size-3.5 animate-spin text-[#00206F]" />
           {label}
         </span>
         <span className="tabular-nums font-semibold text-[#00206F]">

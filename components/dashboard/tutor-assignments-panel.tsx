@@ -1,18 +1,11 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { format, formatDistanceToNow, isBefore, startOfDay } from "date-fns"
 import type { DateRange } from "react-day-picker"
 import toast from "react-hot-toast"
-import {
-  CalendarDaysIcon,
-  ClipboardCheckIcon,
-  ExternalLinkIcon,
-  PlusIcon,
-  SparklesIcon,
-  XIcon,
-} from "lucide-react"
-
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -288,7 +281,7 @@ export function TutorAssignmentsPanel({
         </div>
         {!loading ? (
           <div className="inline-flex items-center gap-2 rounded-lg border border-black/8 bg-white px-3 py-2 text-sm text-[#001752]">
-            <SparklesIcon className="size-4 text-[#FB7801]" />
+            <SolarIcon name="stars" className="size-4 text-[#FB7801]" />
             {pendingTotal} awaiting review
           </div>
         ) : null}
@@ -325,7 +318,7 @@ export function TutorAssignmentsPanel({
               </p>
             ) : assignments.length === 0 ? (
               <div className="px-5 py-12 text-center">
-                <ClipboardCheckIcon className="mx-auto size-8 text-[#00206F]/35" />
+                <SolarIcon name="clipboard-check" className="mx-auto size-8 text-[#00206F]/35" />
                 <p className="mt-3 font-medium text-[#001752]">
                   No assignments yet
                 </p>
@@ -336,7 +329,7 @@ export function TutorAssignmentsPanel({
                   className="mt-4 h-10 rounded-lg bg-[#00206F] text-white hover:bg-[#001752]"
                   onClick={() => setTab("create")}
                 >
-                  <PlusIcon className="size-4" />
+                  <SolarIcon name="add-circle" className="size-4" />
                   Create assignment
                 </Button>
               </div>
@@ -524,7 +517,7 @@ export function TutorAssignmentsPanel({
                         />
                       }
                     >
-                      <CalendarDaysIcon className="size-4 shrink-0 text-muted-foreground" />
+                      <SolarIcon name="calendar" className="size-4 shrink-0 text-muted-foreground" />
                       <span className="truncate">{rangeLabel}</span>
                     </PopoverTrigger>
                     <PopoverContent
@@ -553,7 +546,7 @@ export function TutorAssignmentsPanel({
                       aria-label="Clear date range"
                       onClick={() => setDateRange(undefined)}
                     >
-                      <XIcon className="size-4" />
+                      <SolarIcon name="close-circle" className="size-4" />
                     </Button>
                   ) : null}
                 </div>
@@ -731,7 +724,7 @@ function SubmissionReviewCard({
           rel="noreferrer"
           className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[#00206F]"
         >
-          Open attachment <ExternalLinkIcon className="size-3.5" />
+          Open attachment <SolarIcon name="link-round-angle" className="size-3.5" />
         </a>
       ) : null}
 

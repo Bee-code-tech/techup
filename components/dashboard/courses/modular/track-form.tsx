@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { PencilIcon, XIcon } from "lucide-react"
+import { SolarIcon } from "@/components/icons/solar-icon"
 
+import { useEffect, useState } from "react"
 import { Select } from "@/components/marketing/Select"
 import { Button } from "@/components/ui/button"
 
@@ -47,11 +47,11 @@ export function TrackForm({
         >
           {editing ? (
             <>
-              <XIcon className="size-3.5" /> Cancel
+              <SolarIcon name="close-circle" className="size-3.5" /> Cancel
             </>
           ) : (
             <>
-              <PencilIcon className="size-3.5" /> Edit
+              <SolarIcon name="pen" className="size-3.5" /> Edit
             </>
           )}
         </Button>

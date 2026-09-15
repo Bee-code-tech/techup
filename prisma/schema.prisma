@@ -45,6 +45,12 @@ model User {
   moduleUnlocks      ModuleUnlock[]
   passwordResets     PasswordResetToken[]
   notifications      Notification[]
+  cohortEnrollments  CohortEnrollment[]
+  scholarshipApps    ScholarshipApplication[]
+  conversationsAsStudent Conversation[] @relation("ConversationStudent")
+  conversationsAsTutor   Conversation[] @relation("ConversationTutor")
+  messagesSent       Message[]
+  certificates       Certificate[]
 }
 
 /// A tutor may be assigned to many tracks; a track may have many tutors.
@@ -204,7 +210,7 @@ model AssignmentSubmission {
 model Notification {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   userId    String    @db.ObjectId
-  /// assignment | grade | live | payment | course | system | alert
+  /// assignment | grade | live | payment | course | system | alert | message
   type      String
   title     String
   body      String    @default("")
@@ -228,8 +234,8 @@ model LiveSession {
   joinUrl     String
   /// free | paid | both
   audience    String    @default("both")
-  /// When the class is scheduled to start
-  scheduledAt DateTime  @default(now())
+  /// When the class is scheduled to start (nullable for legacy rows)
+  scheduledAt DateTime? @default(now())
   isActive    Boolean   @default(true)
   endedAt     DateTime?
   createdAt   DateTime  @default(now())
@@ -246,17 +252,165 @@ model Payment {
   id                String   @id @default(auto()) @map("_id") @db.ObjectId
   userId            String   @db.ObjectId
   moduleId          String?  @db.ObjectId
+  cohortId          String?  @db.ObjectId
+  enrollmentId      String?  @db.ObjectId
+  installmentId     String?  @db.ObjectId
+  /// module | cohort_full | cohort_installment | scholarship_remnant
+  kind              String   @default("module")
   amount            Int
   currency          String   @default("NGN")
   paystackReference String   @unique
   /// pending | success | failed
   status            String   @default("pending")
+  couponCode        String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id])
 
   @@index([userId])
+  @@index([cohortId])
+  @@index([enrollmentId])
+  @@index([status])
+}
+
+model Cohort {
+  id                           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                         String
+  description                  String    @default("")
+  /// Full price in kobo
+  priceKobo                    Int
+  currency                     String    @default("NGN")
+  /// draft | active | closed
+  status                       String    @default("draft")
+  tracks                       String[]
+  scholarshipEnabled           Boolean   @default(true)
+  /// 0-100 percent off full price
+  scholarshipPercentOff        Int       @default(70)
+  scholarshipConsentText       String    @default("I understand this scholarship covers 100% of tuition marketing value. I agree to pay the remaining configured commitment fee and certificate costs by the deadline, or forfeit my scholarship.")
+  /// Days after award to pay remnant (null = no auto-remove)
+  scholarshipDeadlineDays      Int       @default(14)
+  installmentEnabled           Boolean   @default(true)
+  installmentCount             Int       @default(3)
+  /// Percents that must sum to 100, e.g. [40,30,30]
+  installmentPercents          Int[]     @default([40, 30, 30])
+  /// Days before each due date to email reminders, e.g. [3,1]
+  installmentReminderDays      Int[]     @default([3, 1])
+  /// Days overdue before enrollment is revoked
+  installmentOverdueRemoveDays Int       @default(3)
+  /// Spacing between installment due dates
+  installmentIntervalDays      Int       @default(30)
+  startsAt                     DateTime?
+  endsAt                       DateTime?
+  createdAt                    DateTime  @default(now())
+  updatedAt                    DateTime  @updatedAt
+
+  coupons       Coupon[]
+  enrollments   CohortEnrollment[]
+  scholarships  ScholarshipApplication[]
+
+  @@index([status])
+}
+
+model Coupon {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  code       String    @unique
+  percentOff Int
+  cohortId   String?   @db.ObjectId
+  maxUses    Int?
+  usedCount  Int       @default(0)
+  expiresAt  DateTime?
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  cohort Cohort? @relation(fields: [cohortId], references: [id])
+
+  @@index([cohortId])
+  @@index([isActive])
+}
+
+model ScholarshipApplication {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  cohortId        String    @db.ObjectId
+  userId          String?   @db.ObjectId
+  fullName        String
+  email           String
+  ageRange        String
+  gender          String
+  whatsapp        String
+  country         String
+  education       String
+  referralSource  String
+  track           String
+  laptop          String
+  internet        String
+  dailyHours      String
+  onlineBefore    String
+  careerGoals     String
+  consentAccepted Boolean   @default(false)
+  /// awarded | revoked | expired | paid
+  status          String    @default("awarded")
+  percentOff      Int
+  amountDueKobo   Int
+  payDeadline     DateTime?
+  revokedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  cohort Cohort @relation(fields: [cohortId], references: [id])
+  user   User?  @relation(fields: [userId], references: [id])
+
+  @@index([cohortId])
+  @@index([email])
+  @@index([status])
+  @@index([userId])
+}
+
+model CohortEnrollment {
+  id                       String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId                   String   @db.ObjectId
+  cohortId                 String   @db.ObjectId
+  track                    String
+  /// full | installment | scholarship
+  paymentType              String
+  status                   String   @default("active")
+  scholarshipApplicationId String?  @db.ObjectId
+  couponCode               String?
+  totalDueKobo             Int
+  amountPaidKobo           Int      @default(0)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  user         User                  @relation(fields: [userId], references: [id])
+  cohort       Cohort                @relation(fields: [cohortId], references: [id])
+  installments InstallmentSchedule[]
+
+  @@unique([userId, cohortId])
+  @@index([cohortId])
+  @@index([userId])
+  @@index([status])
+}
+
+model InstallmentSchedule {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  enrollmentId  String    @db.ObjectId
+  index         Int
+  percent       Int
+  amountKobo    Int
+  dueAt         DateTime
+  /// pending | paid | overdue | waived
+  status        String    @default("pending")
+  paidAt        DateTime?
+  paymentId     String?   @db.ObjectId
+  remindersSent Int[]     @default([])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  enrollment CohortEnrollment @relation(fields: [enrollmentId], references: [id])
+
+  @@index([enrollmentId])
+  @@index([dueAt, status])
 }
 
 model ModuleUnlock {
@@ -338,4 +492,71 @@ model SiteSettings {
   whatsappGroupUrl  String?
   whatsappGroupUrls Json?
   updatedAt         DateTime @updatedAt
+}
+
+/// One DM thread between a student and a tutor (usually same track).
+model Conversation {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  studentId       String    @db.ObjectId
+  tutorId         String    @db.ObjectId
+  track           String
+  lastMessageAt   DateTime?
+  lastMessageText String?
+  studentUnread   Int       @default(0)
+  tutorUnread     Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  student  User      @relation("ConversationStudent", fields: [studentId], references: [id])
+  tutor    User      @relation("ConversationTutor", fields: [tutorId], references: [id])
+  messages Message[]
+
+  @@unique([studentId, tutorId])
+  @@index([tutorId, lastMessageAt])
+  @@index([studentId, lastMessageAt])
+  @@index([track])
+}
+
+model Message {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String    @db.ObjectId
+  senderId       String    @db.ObjectId
+  /// text | image | file | audio | video
+  kind           String    @default("text")
+  body           String    @default("")
+  /// Public media URL (Tigris)
+  mediaUrl       String?
+  mediaKey       String?
+  mediaName      String?
+  mediaMime      String?
+  mediaSize      Int?
+  /// Duration in seconds for audio/video
+  mediaDuration  Int?
+  createdAt      DateTime  @default(now())
+  readAt         DateTime?
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  sender       User         @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+}
+
+model Certificate {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  courseId      String   @db.ObjectId
+  studentName   String
+  courseTitle   String
+  tutorName     String?
+  /// Public verification-style code (download only; no public page)
+  code          String   @unique
+  completedAt   DateTime
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
 }

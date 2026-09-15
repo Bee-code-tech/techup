@@ -1,5 +1,7 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -20,19 +22,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import type { Role } from "@/lib/roles"
-import {
-  BookOpenIcon,
-  ClipboardCheckIcon,
-  ClipboardListIcon,
-  GraduationCapIcon,
-  LayoutDashboardIcon,
-  MailIcon,
-  SettingsIcon,
-  TrophyIcon,
-  UserCogIcon,
-  UsersIcon,
-} from "lucide-react"
-
 type DashUser = {
   name: string
   email: string
@@ -44,7 +33,7 @@ function settingsItem(pathname: string) {
   return {
     title: "Settings",
     url: "/dashboard/settings",
-    icon: <SettingsIcon />,
+    icon: <SolarIcon name="settings" />,
     isActive: pathname.startsWith("/dashboard/settings"),
   }
 }
@@ -55,26 +44,38 @@ function navForRole(role: Role | string, pathname: string) {
       {
         title: "Overview",
         url: "/dashboard",
-        icon: <LayoutDashboardIcon />,
+        icon: <SolarIcon name="widget-5" />,
         isActive: pathname === "/dashboard",
       },
       {
         title: "Students",
         url: "/dashboard/students",
-        icon: <UsersIcon />,
+        icon: <SolarIcon name="users-group-rounded" />,
         isActive: pathname.startsWith("/dashboard/students"),
       },
       {
         title: "Tutors",
         url: "/dashboard/tutors",
-        icon: <UserCogIcon />,
+        icon: <SolarIcon name="user-id" />,
         isActive: pathname.startsWith("/dashboard/tutors"),
       },
       {
         title: "Broadcast",
         url: "/dashboard/broadcast",
-        icon: <MailIcon />,
+        icon: <SolarIcon name="letter" />,
         isActive: pathname.startsWith("/dashboard/broadcast"),
+      },
+      {
+        title: "Payments",
+        url: "/dashboard/payments",
+        icon: <SolarIcon name="card" />,
+        isActive: pathname.startsWith("/dashboard/payments"),
+      },
+      {
+        title: "Scholarships",
+        url: "/dashboard/scholarships",
+        icon: <SolarIcon name="square-academic-cap" />,
+        isActive: pathname.startsWith("/dashboard/scholarships"),
       },
       settingsItem(pathname),
     ]
@@ -85,19 +86,25 @@ function navForRole(role: Role | string, pathname: string) {
       {
         title: "Overview",
         url: "/dashboard",
-        icon: <LayoutDashboardIcon />,
+        icon: <SolarIcon name="widget-5" />,
         isActive: pathname === "/dashboard",
       },
       {
         title: "My courses",
         url: "/dashboard/courses/manage",
-        icon: <BookOpenIcon />,
+        icon: <SolarIcon name="book" />,
         isActive: pathname.startsWith("/dashboard/courses/manage"),
+      },
+      {
+        title: "Messages",
+        url: "/dashboard/messages",
+        icon: <SolarIcon name="chat-round-dots" />,
+        isActive: pathname.startsWith("/dashboard/messages"),
       },
       {
         title: "Assignments",
         url: "/dashboard/assignments/review",
-        icon: <ClipboardCheckIcon />,
+        icon: <SolarIcon name="clipboard-check" />,
         isActive: pathname.startsWith("/dashboard/assignments/review"),
       },
       settingsItem(pathname),
@@ -108,28 +115,40 @@ function navForRole(role: Role | string, pathname: string) {
     {
       title: "Overview",
       url: "/dashboard",
-      icon: <LayoutDashboardIcon />,
+      icon: <SolarIcon name="widget-5" />,
       isActive: pathname === "/dashboard",
     },
     {
       title: "My learning",
       url: "/dashboard/learn",
-      icon: <GraduationCapIcon />,
+      icon: <SolarIcon name="square-academic-cap" />,
       isActive: pathname.startsWith("/dashboard/learn"),
     },
     {
       title: "Assignments",
       url: "/dashboard/assignments",
-      icon: <ClipboardListIcon />,
+      icon: <SolarIcon name="clipboard-list" />,
       isActive:
         pathname.startsWith("/dashboard/assignments") &&
         !pathname.startsWith("/dashboard/assignments/review"),
     },
     {
+      title: "Messages",
+      url: "/dashboard/messages",
+      icon: <SolarIcon name="chat-round-dots" />,
+      isActive: pathname.startsWith("/dashboard/messages"),
+    },
+    {
       title: "Leaderboard",
       url: "/dashboard/leaderboard",
-      icon: <TrophyIcon />,
+      icon: <SolarIcon name="cup-star" />,
       isActive: pathname.startsWith("/dashboard/leaderboard"),
+    },
+    {
+      title: "Certificates",
+      url: "/dashboard/certificates",
+      icon: <SolarIcon name="diploma" />,
+      isActive: pathname.startsWith("/dashboard/certificates"),
     },
     settingsItem(pathname),
   ]

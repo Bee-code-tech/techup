@@ -1,17 +1,11 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Image from "next/image"
 import { useEffect, useId, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import toast from "react-hot-toast"
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  CheckCircle2Icon,
-  Clock3Icon,
-  XIcon,
-} from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -204,6 +198,7 @@ export function ModuleQuizModal({
   const optionImages = question?.optionImageUrls || []
   const hasOptionImages = optionImages.some(Boolean)
   const answeredCount = answers.filter((value) => value >= 0).length
+  // Fill by question position so the last question shows a full bar.
   const progressPercent =
     questions.length === 0
       ? 0
@@ -211,10 +206,7 @@ export function ModuleQuizModal({
         ? 100
         : phase === "intro"
           ? 0
-          : Math.round(
-              ((step + (answers[step] >= 0 ? 0.35 : 0)) / questions.length) *
-                100,
-            )
+          : Math.round(((step + 1) / questions.length) * 100)
   const timerUrgent = secondsLeft <= 30 && phase === "quiz"
 
   function startQuiz() {
@@ -305,7 +297,7 @@ export function ModuleQuizModal({
               onClick={requestClose}
               className="admin-press flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-black/4 hover:text-[#001752]"
             >
-              <XIcon className="size-4" />
+              <SolarIcon name="close-circle" className="size-4" />
             </button>
           </div>
 
@@ -333,7 +325,7 @@ export function ModuleQuizModal({
                     : "bg-[#eef2f9] text-[#00206F]",
                 )}
               >
-                <Clock3Icon className="size-3.5" aria-hidden />
+                <SolarIcon name="clock-circle" className="size-3.5" aria-hidden />
                 {formatClock(secondsLeft)}
               </p>
             </div>
@@ -476,13 +468,12 @@ export function ModuleQuizModal({
                     : "border-[#FB7801]/25 bg-[#fff8f1]",
                 )}
               >
-                <CheckCircle2Icon
+                <SolarIcon name="check-circle"
                   className={cn(
                     "mx-auto size-8",
                     result.passed ? "text-emerald-600" : "text-[#FB7801]",
                   )}
-                  aria-hidden
-                />
+                  aria-hidden />
                 <p className="mt-3 text-2xl font-semibold tracking-tight text-[#001752]">
                   {result.score}%
                 </p>
@@ -577,7 +568,7 @@ export function ModuleQuizModal({
                 disabled={step === 0 || submitting}
                 className="admin-press h-11 gap-1.5 rounded-xl"
               >
-                <ArrowLeftIcon className="size-4" aria-hidden />
+                <SolarIcon name="alt-arrow-left" className="size-4" aria-hidden />
                 Back
               </Button>
               <Button
@@ -592,7 +583,7 @@ export function ModuleQuizModal({
                     ? "Submit"
                     : "Next"}
                 {!submitting && step < questions.length - 1 ? (
-                  <ArrowRightIcon className="size-4" aria-hidden />
+                  <SolarIcon name="alt-arrow-right" className="size-4" aria-hidden />
                 ) : null}
               </Button>
             </div>

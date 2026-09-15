@@ -1,14 +1,9 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  RefreshCwIcon,
-  SendIcon,
-} from "lucide-react"
-
 import type { BroadcastRecord } from "@/components/admin/use-admin-dashboard"
 import { bootcampTracks } from "@/lib/bootcamp"
 import { Button } from "@/components/ui/button"
@@ -235,7 +230,7 @@ export function BroadcastHistory({
                         className="h-8 rounded-lg px-2.5 text-xs"
                         onClick={() => onReuse?.(item)}
                       >
-                        <RefreshCwIcon className="size-3.5" />
+                        <SolarIcon name="refresh" className="size-3.5" />
                         <span className="hidden lg:inline">Load</span>
                       </Button>
                       <Button
@@ -245,7 +240,7 @@ export function BroadcastHistory({
                         disabled={!canSendRemaining || pendingId === item.id}
                         onClick={() => void sendRemaining(item)}
                       >
-                        <SendIcon className="size-3.5" />
+                        <SolarIcon name="plain-2" className="size-3.5" />
                         <span className="hidden lg:inline">
                           {pendingId === item.id
                             ? "Sending..."
@@ -309,7 +304,7 @@ export function BroadcastHistory({
               disabled={page <= 1}
               onClick={() => setPage((current) => Math.max(1, current - 1))}
             >
-              <ChevronLeftIcon className="size-4" />
+              <SolarIcon name="alt-arrow-left" className="size-4" />
               <span className="sr-only sm:not-sr-only sm:ml-1">Prev</span>
             </Button>
             <Button
@@ -323,7 +318,7 @@ export function BroadcastHistory({
               }
             >
               <span className="sr-only sm:not-sr-only sm:mr-1">Next</span>
-              <ChevronRightIcon className="size-4" />
+              <SolarIcon name="alt-arrow-right" className="size-4" />
             </Button>
           </div>
         </div>

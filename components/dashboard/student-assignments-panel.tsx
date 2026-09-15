@@ -1,14 +1,10 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useCallback, useEffect, useState } from "react"
 import { format, formatDistanceToNow } from "date-fns"
 import toast from "react-hot-toast"
-import {
-  ClipboardListIcon,
-  ExternalLinkIcon,
-  SendIcon,
-} from "lucide-react"
-
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -116,7 +112,7 @@ export function StudentAssignmentsPanel() {
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : assignments.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-black/10 bg-white px-5 py-12 text-center">
-            <ClipboardListIcon className="mx-auto size-8 text-[#00206F]/35" />
+            <SolarIcon name="clipboard-list" className="mx-auto size-8 text-[#00206F]/35" />
             <p className="mt-3 font-medium text-[#001752]">Nothing assigned yet</p>
             <p className="mt-1 text-sm text-muted-foreground">
               When tutors publish work, it will show up here.
@@ -181,7 +177,7 @@ export function StudentAssignmentsPanel() {
                           setAttachmentUrl(row.submission?.attachmentUrl || "")
                         }}
                       >
-                        <SendIcon className="size-3.5" />
+                        <SolarIcon name="plain-2" className="size-3.5" />
                         {pendingReview ? "Update submission" : "Submit work"}
                       </Button>
                     ) : null}
@@ -192,7 +188,7 @@ export function StudentAssignmentsPanel() {
                         rel="noreferrer"
                         className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-black/10 px-3 text-sm font-medium text-[#00206F]"
                       >
-                        Your file <ExternalLinkIcon className="size-3.5" />
+                        Your file <SolarIcon name="link-round-angle" className="size-3.5" />
                       </a>
                     ) : null}
                   </div>

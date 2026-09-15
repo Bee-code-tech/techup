@@ -134,14 +134,19 @@ export function useStudentLearn() {
   }, [load])
 
   useEffect(() => {
+    let timer: number | null = null
     const onProgress = () => {
-      void load({ silent: true, force: true })
+      if (timer != null) window.clearTimeout(timer)
+      timer = window.setTimeout(() => {
+        void load({ silent: true, force: true })
+      }, 250)
     }
     window.addEventListener("learn-progress-updated", onProgress)
-    return () =>
+    return () => {
       window.removeEventListener("learn-progress-updated", onProgress)
+      if (timer != null) window.clearTimeout(timer)
+    }
   }, [load])
-
   return {
     data,
     loading,

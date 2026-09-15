@@ -1,33 +1,23 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Image from "next/image"
 import Link from "next/link"
 import { useMemo } from "react"
-import type { LucideIcon } from "lucide-react"
-import {
-  ArrowRightIcon,
-  BadgeCheckIcon,
-  BookOpenIcon,
-  CheckCircle2Icon,
-  CircleDashedIcon,
-  FlameIcon,
-  LayersIcon,
-  LockIcon,
-  MailIcon,
-  PlayCircleIcon,
-  SparklesIcon,
-  TrophyIcon,
-} from "lucide-react"
-
+import { CohortCheckoutModal } from "@/components/dashboard/cohort-checkout-modal"
+import { useCohortCheckout } from "@/components/dashboard/use-cohort-checkout"
 import {
   courseHref,
   type LearnCourse,
   type LearnModule,
 } from "@/components/dashboard/learn-courses"
+import { PaymentReturnVerifier } from "@/components/dashboard/payment-return-verifier"
 import { StudentLiveCallout } from "@/components/dashboard/student-live-callout"
 import { useSessionUser } from "@/components/dashboard/use-session"
 import { useStudentLearn } from "@/components/dashboard/use-student-learn"
 import { Skeleton } from "@/components/ui/skeleton"
+import { formatNgnFromKobo } from "@/lib/cohort-pricing"
 import { bootcampTracks } from "@/lib/bootcamp"
 import { cn } from "@/lib/utils"
 
@@ -83,8 +73,9 @@ function tutorInitials(name: string) {
 
 export function StudentOverview() {
   const session = useSessionUser()
-  const { data, loading } = useStudentLearn()
+  const { data, loading, reload: reloadLearn } = useStudentLearn()
   const user = session.user
+  const checkout = useCohortCheckout({ track: data?.track ?? user?.track ?? null })
 
   const firstName = user?.name?.split(" ")[0] || "there"
   const track = data?.track ?? user?.track ?? null
@@ -100,6 +91,8 @@ export function StudentOverview() {
         ? [data.tutor]
         : []
   const awaiting = loading && !data
+  const isPaid = user?.accessTier === "paid"
+  const joinCohort = checkout.cohorts[0] ?? null
 
   const summary = useMemo(() => {
     const modules = courses.flatMap((course) => course.modules)
@@ -144,6 +137,12 @@ export function StudentOverview() {
 
   return (
     <div className="flex flex-col gap-5 px-4 py-6 lg:px-6 md:py-8">
+      <PaymentReturnVerifier
+        onVerified={async () => {
+          await reloadLearn()
+          await checkout.loadCohorts()
+        }}
+      />
       <section className="admin-panel overflow-hidden">
         <div className="overflow-hidden bg-[#001752] px-5 py-6 text-white sm:px-7 sm:py-7">
           <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
@@ -168,6 +167,25 @@ export function StudentOverview() {
                   </>
                 )}
               </p>
+              {!isPaid && joinCohort ? (
+                <button
+                  type="button"
+                  onClick={() => void checkout.openCheckout(joinCohort)}
+                  className="admin-press mt-5 inline-flex h-11 items-center gap-2 rounded-xl bg-[#FB7801] px-4 text-sm font-semibold text-white hover:brightness-105"
+                >
+                  <SolarIcon name="card" className="size-4" aria-hidden />
+                  {joinCohort.scholarship?.status === "awarded"
+                    ? "Unlock paid access"
+                    : "Join cohort"}
+                  <span className="text-white/80">
+                    · {formatNgnFromKobo(
+                      joinCohort.scholarship?.status === "awarded"
+                        ? joinCohort.scholarship.amountDueKobo
+                        : joinCohort.priceKobo,
+                    )}
+                  </span>
+                </button>
+              ) : null}
             </div>
 
             <div className="rounded-xl border border-white/10 bg-white/8 p-4">
@@ -189,7 +207,7 @@ export function StudentOverview() {
                 </div>
                 <div className="text-right">
                   <p className="inline-flex items-center gap-1 text-sm font-semibold text-[#FB7801]">
-                    <FlameIcon className="size-3.5" />
+                    <SolarIcon name="fire" className="size-3.5" />
                     {awaiting ? "—" : `${data?.currentStreak ?? 0} day`}
                   </p>
                   <p className="mt-0.5 text-xs text-white/55">
@@ -215,7 +233,7 @@ export function StudentOverview() {
           label="Modules completed"
           awaiting={awaiting}
           value={summary.completed}
-          icon={TrophyIcon}
+          icon="cup-star"
           accent="orange"
           detail={`${summary.completed} of ${summary.total} finished`}
         />
@@ -223,7 +241,7 @@ export function StudentOverview() {
           label="Active learning"
           awaiting={awaiting}
           value={summary.inProgress}
-          icon={CircleDashedIcon}
+          icon="restart-circle"
           accent="navy"
           detail={
             summary.quizReady > 0
@@ -235,7 +253,7 @@ export function StudentOverview() {
           label="Courses"
           awaiting={awaiting}
           value={summary.coursesDone}
-          icon={LayersIcon}
+          icon="layers"
           accent="green"
           detail={`${summary.coursesDone} of ${summary.courseCount} complete`}
         />
@@ -243,7 +261,7 @@ export function StudentOverview() {
           label="Access"
           awaiting={awaiting}
           value={user?.accessTier === "paid" ? "Paid" : "Free"}
-          icon={user?.accessTier === "paid" ? BadgeCheckIcon : LockIcon}
+          icon={user?.accessTier === "paid" ? "verified-check" : "lock-keyhole"}
           accent={user?.accessTier === "paid" ? "green" : "navy"}
           detail={
             summary.paidLocked > 0
@@ -277,7 +295,7 @@ export function StudentOverview() {
                 className="admin-press inline-flex items-center gap-1 text-sm font-semibold text-[#00206F]"
               >
                 All courses
-                <ArrowRightIcon className="size-3.5" aria-hidden />
+                <SolarIcon name="alt-arrow-right" className="size-3.5" aria-hidden />
               </Link>
             </div>
 
@@ -289,10 +307,9 @@ export function StudentOverview() {
               </div>
             ) : courses.length === 0 ? (
               <div className="px-5 py-10 text-center sm:px-6">
-                <SparklesIcon
+                <SolarIcon name="stars"
                   className="mx-auto size-6 text-[#FB7801]"
-                  aria-hidden
-                />
+                  aria-hidden />
                 <p className="mt-3 text-sm font-medium text-[#001752]">
                   No courses published yet
                 </p>
@@ -338,10 +355,9 @@ export function StudentOverview() {
                                 {completed}/{total} modules · {percent}%
                               </p>
                             </div>
-                            <ArrowRightIcon
+                            <SolarIcon name="alt-arrow-right"
                               className="mt-1 size-4 shrink-0 text-[#00206F]/50"
-                              aria-hidden
-                            />
+                              aria-hidden />
                           </div>
                           <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-[#eef2f9]">
                             <div
@@ -401,7 +417,7 @@ export function StudentOverview() {
                       href={`mailto:${person.email}`}
                       className="admin-press mt-3 inline-flex h-10 items-center gap-2 rounded-xl border border-black/8 bg-[#f7f8fb] px-3 text-sm font-medium text-[#001752] transition-[background-color] duration-150 hover:bg-white"
                     >
-                      <MailIcon className="size-4 text-[#00206F]" aria-hidden />
+                      <SolarIcon name="letter" className="size-4 text-[#00206F]" aria-hidden />
                       Email {person.name.split(" ")[0] || "tutor"}
                     </a>
                   </li>
@@ -426,12 +442,19 @@ export function StudentOverview() {
               href="/dashboard/learn"
               className="admin-press mt-4 inline-flex h-10 items-center gap-2 rounded-xl bg-[#00206F] px-4 text-sm font-semibold text-white hover:bg-[#001752]"
             >
-              <BookOpenIcon className="size-4" aria-hidden />
+              <SolarIcon name="book" className="size-4" aria-hidden />
               Open my learning
             </Link>
           </section>
         </aside>
       </div>
+
+      <CohortCheckoutModal
+        open={checkout.checkoutOpen}
+        onClose={checkout.closeCheckout}
+        cohort={checkout.activeCohort}
+        defaultTrack={track}
+      />
     </div>
   )
 }
@@ -439,14 +462,14 @@ export function StudentOverview() {
 function StatCard({
   label,
   value,
-  icon: Icon,
+  icon,
   accent,
   detail,
   awaiting,
 }: {
   label: string
   value: string | number
-  icon: LucideIcon
+  icon: string
   accent: "navy" | "orange" | "green"
   detail: string
   awaiting: boolean
@@ -462,7 +485,7 @@ function StatCard({
             accent === "navy" && "bg-[#00206F]/8 text-[#00206F]",
           )}
         >
-          <Icon className="size-4" strokeWidth={2.25} aria-hidden />
+          <SolarIcon name={icon} className="size-4" aria-hidden />
         </span>
         <p className="text-[12px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
           {label}
@@ -522,7 +545,7 @@ function ContinueCard({
           className="admin-press mt-4 inline-flex h-11 items-center gap-2 rounded-xl bg-[#00206F] px-4 text-sm font-semibold text-white hover:bg-[#001752]"
         >
           Browse courses
-          <ArrowRightIcon className="size-4" aria-hidden />
+          <SolarIcon name="alt-arrow-right" className="size-4" aria-hidden />
         </Link>
       </section>
     )
@@ -565,16 +588,16 @@ function ContinueCard({
               className="admin-press inline-flex h-11 items-center gap-2 rounded-xl bg-[#FB7801] px-4 text-sm font-semibold text-white hover:brightness-105"
             >
               {done ? (
-                <CheckCircle2Icon className="size-4" aria-hidden />
+                <SolarIcon name="check-circle" className="size-4" aria-hidden />
               ) : (
-                <PlayCircleIcon className="size-4" aria-hidden />
+                <SolarIcon name="play-circle" className="size-4" aria-hidden />
               )}
               {module.progress?.videoCompleted && !done
                 ? "Take quiz"
                 : done
                   ? "Review module"
                   : "Resume lesson"}
-              <ArrowRightIcon className="size-4" aria-hidden />
+              <SolarIcon name="alt-arrow-right" className="size-4" aria-hidden />
             </Link>
             <span
               className={cn(

@@ -1,9 +1,9 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
-import { Trash2Icon } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -54,7 +54,7 @@ export function PublishActions({
         className="h-9 text-muted-foreground hover:text-destructive"
         onClick={() => setOpen(true)}
       >
-        <Trash2Icon className="size-4" />
+        <SolarIcon name="trash-bin-trash" className="size-4" />
       </Button>
 
       {open && typeof document !== "undefined"

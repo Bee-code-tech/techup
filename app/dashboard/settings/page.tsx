@@ -1,16 +1,9 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useEffect, useRef, useState } from "react"
 import toast from "react-hot-toast"
-import {
-  CameraIcon,
-  CheckIcon,
-  KeyRoundIcon,
-  LoaderCircleIcon,
-  ShieldCheckIcon,
-  UserRoundIcon,
-} from "lucide-react"
-
 import { useSessionUser } from "@/components/dashboard/use-session"
 import {
   useProfile,
@@ -129,6 +122,18 @@ export default function SettingsPage() {
 
   function syncForm(user: ProfileUser) {
     applyProfile(user)
+    session.applyUser({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      track: user.track,
+      accessTier: user.accessTier,
+      mustChangePassword: user.mustChangePassword,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      whatsapp: user.whatsapp,
+    })
     const next = hydrateFromProfile(user)
     setName(next.name)
     setEmail(next.email)
@@ -159,48 +164,47 @@ export default function SettingsPage() {
 
     setUploading(true)
     try {
+      const contentType = file.type || "image/jpeg"
       const signRes = await fetch("/api/auth/avatar/sign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({
+          filename: file.name,
+          contentType,
+          size: file.size,
+        }),
       })
       const signed = (await signRes.json()) as {
         error?: string
-        cloudName?: string
-        apiKey?: string
-        timestamp?: number
-        folder?: string
-        signature?: string
+        uploadUrl?: string
+        publicUrl?: string
+        contentType?: string
       }
-      if (!signRes.ok || !signed.cloudName) {
+      if (!signRes.ok || !signed.uploadUrl || !signed.publicUrl) {
         toast.error(signed.error || "Upload signing failed.")
         return
       }
 
-      const form = new FormData()
-      form.append("file", file)
-      form.append("api_key", signed.apiKey!)
-      form.append("timestamp", String(signed.timestamp))
-      form.append("signature", signed.signature!)
-      form.append("folder", signed.folder!)
-
-      const uploadRes = await fetch(
-        `https://api.cloudinary.com/v1_1/${signed.cloudName}/image/upload`,
-        { method: "POST", body: form },
-      )
-      const uploaded = (await uploadRes.json()) as {
-        secure_url?: string
-        error?: { message?: string }
-      }
-      if (!uploadRes.ok || !uploaded.secure_url) {
-        toast.error(uploaded.error?.message || "Image upload failed.")
+      const uploadRes = await fetch(signed.uploadUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": signed.contentType || contentType,
+        },
+        body: file,
+      })
+      if (!uploadRes.ok) {
+        toast.error(
+          uploadRes.status === 403
+            ? "Storage denied the upload. Check Tigris CORS/permissions."
+            : "Image upload failed.",
+        )
         return
       }
 
       const saveRes = await fetch("/api/auth/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ avatarUrl: uploaded.secure_url }),
+        body: JSON.stringify({ avatarUrl: signed.publicUrl }),
       })
       const savePayload = (await saveRes.json()) as {
         error?: string
@@ -212,8 +216,7 @@ export default function SettingsPage() {
       }
 
       if (savePayload.user) syncForm(savePayload.user)
-      else setAvatarUrl(uploaded.secure_url)
-      await session.reload({ silent: true })
+      else setAvatarUrl(signed.publicUrl)
       toast.success("Profile photo updated.")
     } catch {
       toast.error("Upload network error.")
@@ -240,8 +243,9 @@ export default function SettingsPage() {
       }
       if (payload.user) syncForm(payload.user)
       else setAvatarUrl(null)
-      await session.reload({ silent: true })
       toast.success("Photo removed.")
+    } catch {
+      toast.error("Network error.")
     } finally {
       setUploading(false)
     }
@@ -252,8 +256,8 @@ export default function SettingsPage() {
     setSavingProfile(true)
     try {
       const body: Record<string, unknown> = {
-        name,
-        email,
+        name: name.trim(),
+        email: email.trim(),
         bio,
         whatsapp,
       }
@@ -278,7 +282,6 @@ export default function SettingsPage() {
         return
       }
       if (payload.user) syncForm(payload.user)
-      await session.reload({ silent: true })
       toast.success("Profile saved.")
     } catch {
       toast.error("Network error.")
@@ -308,7 +311,6 @@ export default function SettingsPage() {
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
-      await session.reload({ silent: true })
       toast.success("Password updated.")
     } catch {
       toast.error("Network error.")
@@ -373,9 +375,9 @@ export default function SettingsPage() {
                   )}
                   <span className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition-opacity duration-150 ease-[var(--ease-out)] group-hover:opacity-100">
                     {uploading ? (
-                      <LoaderCircleIcon className="size-5 animate-spin text-white" />
+                      <SolarIcon name="refresh-circle" className="size-5 animate-spin text-white" />
                     ) : (
-                      <CameraIcon className="size-5 text-white" />
+                      <SolarIcon name="camera" className="size-5 text-white" />
                     )}
                   </span>
                 </button>
@@ -442,7 +444,7 @@ export default function SettingsPage() {
         >
           <div className="flex items-start gap-3 border-b border-black/5 px-5 py-4 sm:px-6">
             <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#eef2f9] text-[#00206F]">
-              <UserRoundIcon className="size-4" aria-hidden />
+              <SolarIcon name="user" className="size-4" aria-hidden />
             </span>
             <div>
               <h2 className="text-lg font-semibold tracking-tight text-[#001752]">
@@ -508,21 +510,35 @@ export default function SettingsPage() {
                   </Field>
                   <Field label="Gender">
                     <Select
-                      value={gender || genderOptions[2].value}
+                      value={
+                        genderOptions.some((option) => option.value === gender)
+                          ? gender
+                          : genderOptions[2].value
+                      }
                       onValueChange={setGender}
                       options={genderOptions}
                     />
                   </Field>
                   <Field label="Education">
                     <Select
-                      value={education || educationOptions[1].value}
+                      value={
+                        educationOptions.some(
+                          (option) => option.value === education,
+                        )
+                          ? education
+                          : educationOptions[1].value
+                      }
                       onValueChange={setEducation}
                       options={educationOptions}
                     />
                   </Field>
                   <Field label="Laptop">
                     <Select
-                      value={laptop || "yes"}
+                      value={
+                        laptopOptions.some((option) => option.value === laptop)
+                          ? laptop
+                          : "yes"
+                      }
                       onValueChange={setLaptop}
                       options={laptopOptions}
                     />
@@ -538,9 +554,9 @@ export default function SettingsPage() {
                 className="admin-press h-11 gap-2 rounded-xl bg-[#00206F] px-5 text-white hover:bg-[#001752]"
               >
                 {savingProfile ? (
-                  <LoaderCircleIcon className="size-4 animate-spin" />
+                  <SolarIcon name="refresh-circle" className="size-4 animate-spin" />
                 ) : (
-                  <CheckIcon className="size-4" aria-hidden />
+                  <SolarIcon name="check-read" className="size-4" aria-hidden />
                 )}
                 {savingProfile ? "Saving…" : "Save changes"}
               </Button>
@@ -554,7 +570,7 @@ export default function SettingsPage() {
         >
           <div className="flex items-start gap-3 border-b border-black/5 bg-[#fbfcfe] px-5 py-4 sm:px-6">
             <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#fff1e6] text-[#FB7801]">
-              <ShieldCheckIcon className="size-4" aria-hidden />
+              <SolarIcon name="shield-check" className="size-4" aria-hidden />
             </span>
             <div>
               <h2 className="text-lg font-semibold tracking-tight text-[#001752]">
@@ -606,9 +622,9 @@ export default function SettingsPage() {
               className="admin-press h-11 w-full gap-2 rounded-xl bg-[#001752] px-5 text-white hover:bg-[#00133f]"
             >
               {savingPassword ? (
-                <LoaderCircleIcon className="size-4 animate-spin" />
+                <SolarIcon name="refresh-circle" className="size-4 animate-spin" />
               ) : (
-                <KeyRoundIcon className="size-4" aria-hidden />
+                <SolarIcon name="key" className="size-4" aria-hidden />
               )}
               {savingPassword ? "Updating…" : "Update password"}
             </Button>

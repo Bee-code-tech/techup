@@ -1,17 +1,8 @@
 "use client"
 
-import Image from "next/image"
-import {
-  ExternalLinkIcon,
-  FileArchiveIcon,
-  FileIcon,
-  FileTextIcon,
-  ImageIcon,
-  Link2Icon,
-  Trash2Icon,
-  VideoIcon,
-} from "lucide-react"
+import { SolarIcon } from "@/components/icons/solar-icon"
 
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import {
   getMaterialKind,
@@ -61,7 +52,7 @@ export function MaterialCard({
             <span className="truncate">{subtitle}</span>
           </p>
         </div>
-        <ExternalLinkIcon className="size-3.5 shrink-0 text-muted-foreground opacity-70 transition-opacity group-hover:opacity-100" />
+        <SolarIcon name="link-round-angle" className="size-3.5 shrink-0 text-muted-foreground opacity-70 transition-opacity group-hover:opacity-100" />
         {onRemove ? (
           <Button
             type="button"
@@ -74,7 +65,7 @@ export function MaterialCard({
               onRemove()
             }}
           >
-            <Trash2Icon className="size-3.5" />
+            <SolarIcon name="trash-bin-trash" className="size-3.5" />
           </Button>
         ) : null}
       </div>
@@ -83,18 +74,18 @@ export function MaterialCard({
 }
 
 function KindBadge({ kind }: { kind: ReturnType<typeof getMaterialKind> }) {
-  const Icon =
+  const iconName =
     kind === "pdf"
-      ? FileTextIcon
+      ? "document-text"
       : kind === "image"
-        ? ImageIcon
+        ? "gallery"
         : kind === "zip"
-          ? FileArchiveIcon
+          ? "zip-file"
           : kind === "video"
-            ? VideoIcon
+            ? "videocamera"
             : kind === "link"
-              ? Link2Icon
-              : FileIcon
+              ? "link"
+              : "document"
 
   return (
     <span
@@ -108,7 +99,7 @@ function KindBadge({ kind }: { kind: ReturnType<typeof getMaterialKind> }) {
         kind === "file" && "bg-[#78909C] text-white",
       )}
     >
-      <Icon className="size-2.5" aria-hidden />
+      <SolarIcon name={iconName} className="size-2.5" aria-hidden />
     </span>
   )
 }
@@ -163,13 +154,13 @@ function MaterialPreview({
       )}
     >
       {kind === "zip" ? (
-        <FileArchiveIcon className="size-7 text-[#FB7801]" />
+        <SolarIcon name="zip-file" className="size-7 text-[#FB7801]" />
       ) : kind === "video" ? (
-        <VideoIcon className="size-7 text-[#00206F]" />
+        <SolarIcon name="videocamera" className="size-7 text-[#00206F]" />
       ) : kind === "link" ? (
-        <Link2Icon className="size-7 text-[#5C6BC0]" />
+        <SolarIcon name="link" className="size-7 text-[#5C6BC0]" />
       ) : (
-        <FileIcon className="size-7 text-[#78909C]" />
+        <SolarIcon name="document" className="size-7 text-[#78909C]" />
       )}
       <span className="text-[10px] font-semibold tracking-wide text-[#001752]/70 uppercase">
         {materialLabel(kind)}

@@ -1,13 +1,8 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  SearchIcon,
-} from "lucide-react"
+import { SolarIcon } from "@/components/icons/solar-icon"
 
+import { useEffect, useMemo, useState } from "react"
 import type { Registration } from "@/components/admin/use-admin-dashboard"
 import {
   StudentActionButton,
@@ -140,7 +135,7 @@ export function StudentsTable({
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative sm:flex-1">
-          <SearchIcon className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
+          <SolarIcon name="magnifer" className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -158,7 +153,7 @@ export function StudentsTable({
             }
           >
             <span className="truncate">{trackLabel}</span>
-            <ChevronDownIcon className="size-4 text-muted-foreground" />
+            <SolarIcon name="alt-arrow-down" className="size-4 text-muted-foreground" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="min-w-56">
             <DropdownMenuRadioGroup
@@ -331,7 +326,7 @@ export function StudentsTable({
                 disabled={page <= 1}
                 onClick={() => setPage((current) => Math.max(1, current - 1))}
               >
-                <ChevronLeftIcon className="size-4" />
+                <SolarIcon name="alt-arrow-left" className="size-4" />
                 <span className="sr-only sm:not-sr-only sm:ml-1">Prev</span>
               </Button>
               <Button
@@ -345,7 +340,7 @@ export function StudentsTable({
                 }
               >
                 <span className="sr-only sm:not-sr-only sm:mr-1">Next</span>
-                <ChevronRightIcon className="size-4" />
+                <SolarIcon name="alt-arrow-right" className="size-4" />
               </Button>
             </div>
           </div>

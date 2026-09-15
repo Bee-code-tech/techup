@@ -1,8 +1,9 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
-import { ImageIcon, PencilIcon, XIcon } from "lucide-react"
 import toast from "react-hot-toast"
 
 import { Button } from "@/components/ui/button"
@@ -61,11 +62,11 @@ export function CoverForm({
         >
           {editing ? (
             <>
-              <XIcon className="size-3.5" /> Cancel
+              <SolarIcon name="close-circle" className="size-3.5" /> Cancel
             </>
           ) : (
             <>
-              <PencilIcon className="size-3.5" /> {url ? "Edit" : "Add"}
+              <SolarIcon name="pen" className="size-3.5" /> {url ? "Edit" : "Add"}
             </>
           )}
         </Button>
@@ -78,7 +79,7 @@ export function CoverForm({
           </div>
         ) : (
           <div className="mt-3 flex h-40 items-center justify-center rounded-xl border border-dashed border-black/10 bg-[#fafafa]">
-            <ImageIcon className="size-8 text-muted-foreground" />
+            <SolarIcon name="gallery" className="size-8 text-muted-foreground" />
           </div>
         )
       ) : (

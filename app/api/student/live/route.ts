@@ -43,7 +43,7 @@ export async function GET() {
         status: "live" as const,
         trackLabel: bootcampTracks[live.track] || live.track,
         tutorName: live.tutor.name,
-        scheduledAt: live.scheduledAt.toISOString(),
+        scheduledAt: live.scheduledAt?.toISOString() ?? live.createdAt.toISOString(),
         createdAt: live.createdAt.toISOString(),
       },
     })
@@ -77,7 +77,7 @@ export async function GET() {
       status: "upcoming" as const,
       trackLabel: bootcampTracks[upcoming.track] || upcoming.track,
       tutorName: upcoming.tutor.name,
-      scheduledAt: upcoming.scheduledAt.toISOString(),
+      scheduledAt: upcoming.scheduledAt?.toISOString() ?? upcoming.createdAt.toISOString(),
       createdAt: upcoming.createdAt.toISOString(),
     },
   })

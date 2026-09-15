@@ -1,5 +1,7 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useEffect, useState } from "react"
 import {
   closestCenter,
@@ -16,15 +18,6 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import {
-  GripVerticalIcon,
-  LoaderCircleIcon,
-  PencilIcon,
-  PlusCircleIcon,
-  SaveIcon,
-  XIcon,
-} from "lucide-react"
-
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -65,7 +58,7 @@ function SortableRow({
         {...listeners}
         aria-label="Drag to reorder"
       >
-        <GripVerticalIcon className="size-4" />
+        <SolarIcon name="hamburger-menu" className="size-4" />
       </button>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-[#001752]">
@@ -95,7 +88,7 @@ function SortableRow({
         className="h-8 gap-1"
         onClick={() => onEdit(moduleRow.id)}
       >
-        <PencilIcon className="size-3.5" />
+        <SolarIcon name="pen" className="size-3.5" />
         Edit
       </Button>
     </div>
@@ -181,9 +174,9 @@ export function ModulesForm({
               onClick={() => void handleSaveOrder()}
             >
               {savingOrder ? (
-                <LoaderCircleIcon className="size-3.5 animate-spin" />
+                <SolarIcon name="refresh-circle" className="size-3.5 animate-spin" />
               ) : (
-                <SaveIcon className="size-3.5" />
+                <SolarIcon name="diskette" className="size-3.5" />
               )}
               Save order
             </Button>
@@ -197,11 +190,11 @@ export function ModulesForm({
           >
             {creating ? (
               <>
-                <XIcon className="size-3.5" /> Cancel
+                <SolarIcon name="close-circle" className="size-3.5" /> Cancel
               </>
             ) : (
               <>
-                <PlusCircleIcon className="size-3.5" /> Add module
+                <SolarIcon name="add-circle" className="size-3.5" /> Add module
               </>
             )}
           </Button>

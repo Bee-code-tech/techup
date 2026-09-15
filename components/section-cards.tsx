@@ -1,13 +1,6 @@
 "use client"
 
-import type { LucideIcon } from "lucide-react"
-import {
-  CalendarDaysIcon,
-  LayersIcon,
-  TrendingUpIcon,
-  UsersIcon,
-} from "lucide-react"
-
+import { SolarIcon } from "@/components/icons/solar-icon"
 import {
   Card,
   CardDescription,
@@ -19,7 +12,8 @@ import { cn } from "@/lib/utils"
 export type StatCardItem = {
   label: string
   value: number
-  icon: LucideIcon
+  /** Solar Bold Duotone base name, e.g. `"users-group-rounded"` */
+  icon: string
   accent: "navy" | "orange" | "green"
   details: string[]
   tone?: "up" | "down" | "neutral"
@@ -59,7 +53,6 @@ export function StatCards({ cards }: { cards: StatCardItem[] }) {
   return (
     <div className="admin-stagger grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       {cards.map((card) => {
-        const Icon = card.icon
         return (
           <Card
             key={card.label}
@@ -80,7 +73,7 @@ export function StatCards({ cards }: { cards: StatCardItem[] }) {
                       card.accent === "navy" && "bg-[#00206F]/8 text-[#00206F]",
                     )}
                   >
-                    <Icon className="size-4" strokeWidth={2.25} />
+                    <SolarIcon name={card.icon} className="size-4" />
                   </span>
                   <CardDescription className="text-[12px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
                     {card.label}
@@ -137,7 +130,7 @@ export function SectionCards({
     {
       label: "Total registrations",
       value: total,
-      icon: UsersIcon,
+      icon: "users-group-rounded",
       accent: "navy",
       details: [
         `${month} this month · ${monthShare} of all`,
@@ -149,7 +142,7 @@ export function SectionCards({
     {
       label: "Registered today",
       value: today,
-      icon: CalendarDaysIcon,
+      icon: "calendar",
       accent: "orange",
       details: [todayDelta.text, `Yesterday closed at ${yesterday}`],
       tone: todayDelta.tone,
@@ -157,7 +150,7 @@ export function SectionCards({
     {
       label: "This week",
       value: week,
-      icon: TrendingUpIcon,
+      icon: "graph-up",
       accent: "navy",
       details: [
         `${weekAvg.toFixed(1)} avg / day · ${weekShare} of total`,
@@ -167,7 +160,7 @@ export function SectionCards({
     {
       label: "Active tracks",
       value: tracks,
-      icon: LayersIcon,
+      icon: "layers",
       accent: "green",
       details: [
         topTrack

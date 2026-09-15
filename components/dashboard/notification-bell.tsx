@@ -1,17 +1,10 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import Link from "next/link"
 import { useCallback, useEffect, useState } from "react"
 import { formatDistanceToNow } from "date-fns"
-import {
-  BellIcon,
-  BookOpenIcon,
-  ClipboardCheckIcon,
-  CreditCardIcon,
-  RadioIcon,
-  SparklesIcon,
-} from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import {
   Popover,
@@ -34,15 +27,17 @@ function iconForType(type: string) {
   switch (type) {
     case "assignment":
     case "grade":
-      return ClipboardCheckIcon
+      return "clipboard-check"
     case "live":
-      return RadioIcon
+      return "podcast"
     case "payment":
-      return CreditCardIcon
+      return "card"
     case "course":
-      return BookOpenIcon
+      return "book"
+    case "message":
+      return "chat-round-dots"
     default:
-      return SparklesIcon
+      return "stars"
   }
 }
 
@@ -121,7 +116,7 @@ export function NotificationBell() {
           />
         }
       >
-        <BellIcon className="size-4" />
+        <SolarIcon name="bell" className="size-4" />
         {unreadCount > 0 ? (
           <span className="absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FB7801] px-1 text-[10px] font-semibold text-white">
             {unreadCount > 9 ? "9+" : unreadCount}
@@ -157,7 +152,7 @@ export function NotificationBell() {
           ) : (
             <ul>
               {items.map((item) => {
-                const Icon = iconForType(item.type)
+                const iconName = iconForType(item.type)
                 const unread = !item.readAt
                 const content = (
                   <div
@@ -175,7 +170,7 @@ export function NotificationBell() {
                           : "bg-[#eef2f9] text-[#00206F]",
                       )}
                     >
-                      <Icon className="size-3.5" />
+                      <SolarIcon name={iconName} className="size-3.5" />
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">

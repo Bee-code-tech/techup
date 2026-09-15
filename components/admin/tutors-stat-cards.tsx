@@ -1,13 +1,6 @@
 "use client"
 
 import { useMemo } from "react"
-import {
-  LayersIcon,
-  ShieldCheckIcon,
-  UserPlusIcon,
-  UsersIcon,
-} from "lucide-react"
-
 import { StatCards, type StatCardItem } from "@/components/section-cards"
 
 export type TutorStatRow = {
@@ -35,7 +28,7 @@ export function TutorsStatCards({
       {
         label: "Total tutors",
         value: tutors.length,
-        icon: UsersIcon,
+        icon: "users-group-rounded",
         accent: "navy",
         details: [
           tutors.length === 1
@@ -47,7 +40,7 @@ export function TutorsStatCards({
       {
         label: "Track assignments",
         value: assignments,
-        icon: LayersIcon,
+        icon: "layers",
         accent: "orange",
         details: [
           `${assignments} tutor–track link${assignments === 1 ? "" : "s"}`,
@@ -57,7 +50,7 @@ export function TutorsStatCards({
       {
         label: "Uncovered tracks",
         value: open,
-        icon: UserPlusIcon,
+        icon: "user-plus",
         accent: "green",
         details: [
           open === 0
@@ -69,7 +62,7 @@ export function TutorsStatCards({
       {
         label: "Bootcamp tracks",
         value: trackCount,
-        icon: ShieldCheckIcon,
+        icon: "shield-check",
         accent: "navy",
         details: [
           `${trackCount} bootcamp tracks total`,

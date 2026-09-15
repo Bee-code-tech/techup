@@ -1,10 +1,10 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useEffect, useId, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import toast from "react-hot-toast"
-import { PencilIcon, XIcon } from "lucide-react"
-
 import type { Registration } from "@/components/admin/use-admin-dashboard"
 import { bootcampTracks, laptopLabels } from "@/lib/bootcamp"
 import { Select } from "@/components/marketing/Select"
@@ -290,7 +290,7 @@ export function StudentEditModal({
               onClick={onClose}
               className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/15 hover:text-white active:scale-[0.97] disabled:opacity-50"
             >
-              <XIcon className="size-4" />
+              <SolarIcon name="close-circle" className="size-4" />
             </button>
           </div>
 
@@ -516,7 +516,7 @@ export function StudentActionButton({
       className="h-8 rounded-lg border-black/[0.08] px-2.5 text-xs"
       onClick={onClick}
     >
-      <PencilIcon className="size-3.5" />
+      <SolarIcon name="pen" className="size-3.5" />
       <span className="hidden sm:inline">Edit</span>
     </Button>
   )

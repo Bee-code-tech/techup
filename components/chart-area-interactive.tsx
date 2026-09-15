@@ -1,5 +1,7 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useMemo, useState } from "react"
 import {
   Area,
@@ -8,8 +10,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
-import { TrendingUpIcon } from "lucide-react"
-
 import {
   Card,
   CardContent,
@@ -217,7 +217,7 @@ export function ChartAreaInteractive({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-1.5 rounded-md bg-[#00206F]/6 px-2.5 py-1 text-[11px] font-semibold tracking-[0.14em] text-[#00206F] uppercase">
-              <TrendingUpIcon className="size-3.5" />
+              <SolarIcon name="graph-up" className="size-3.5" />
               Momentum
             </div>
             <CardTitle className="text-xl font-semibold tracking-tight text-[#001752]">

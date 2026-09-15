@@ -1,9 +1,11 @@
-import Image from "next/image";
-import { Section } from "@/components/layout/Section";
-import { Stagger } from "@/components/motion/Stagger";
-import { Button } from "@/components/marketing/site-button";
-import { SectionHeading } from "@/components/marketing/SectionHeading";
-import { site } from "@/lib/site";
+"use client"
+
+import Image from "next/image"
+import { Section } from "@/components/layout/Section"
+import { Stagger } from "@/components/motion/Stagger"
+import { Button } from "@/components/marketing/site-button"
+import { SectionHeading } from "@/components/marketing/SectionHeading"
+import { ScholarshipApplyButton } from "@/components/scholarship/scholarship-apply-button"
 
 const paths = [
   {
@@ -16,6 +18,7 @@ const paths = [
     href: "/auth?mode=register",
     solid: false,
     image: "/journey.png",
+    scholarship: false,
   },
   {
     title: "New Cohort",
@@ -27,6 +30,7 @@ const paths = [
     href: "/courses",
     solid: true,
     image: "/journey-cohort.jpg",
+    scholarship: false,
   },
   {
     title: "Scholarship Program",
@@ -35,11 +39,12 @@ const paths = [
     badge: "SCHOLARSHIP",
     badgeTone: "orange" as const,
     cta: "Apply Now",
-    href: site.scholarshipFormUrl,
+    href: "/scholarship",
     solid: false,
     image: "/journey-scholarship.jpg",
+    scholarship: true,
   },
-];
+]
 
 export function KickstartJourney() {
   return (
@@ -78,20 +83,26 @@ export function KickstartJourney() {
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {path.description}
               </p>
-              <Button
-                href={path.href}
-                variant={path.solid ? "primary" : "ghost"}
-                className="mt-5 w-full rounded-xl sm:mt-6"
-                {...(path.href.startsWith("http")
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-              >
-                {path.cta}
-              </Button>
+              {path.scholarship ? (
+                <ScholarshipApplyButton
+                  variant="ghost"
+                  className="mt-5 w-full rounded-xl sm:mt-6"
+                >
+                  {path.cta}
+                </ScholarshipApplyButton>
+              ) : (
+                <Button
+                  href={path.href}
+                  variant={path.solid ? "primary" : "ghost"}
+                  className="mt-5 w-full rounded-xl sm:mt-6"
+                >
+                  {path.cta}
+                </Button>
+              )}
             </div>
           </article>
         ))}
       </Stagger>
     </Section>
-  );
+  )
 }

@@ -1,13 +1,6 @@
 "use client"
 
 import { useMemo } from "react"
-import {
-  MailIcon,
-  MegaphoneIcon,
-  SendIcon,
-  UsersIcon,
-} from "lucide-react"
-
 import type {
   BroadcastRecord,
   Registration,
@@ -59,7 +52,7 @@ export function BroadcastStatCards({
       {
         label: "Broadcasts sent",
         value: broadcasts.length,
-        icon: MegaphoneIcon,
+        icon: "megaphone",
         accent: "navy",
         details: [
           `${sentThisMonth} this month`,
@@ -71,7 +64,7 @@ export function BroadcastStatCards({
       {
         label: "Emails delivered",
         value: emailsDelivered,
-        icon: SendIcon,
+        icon: "plain-2",
         accent: "orange",
         details: [
           `${avgRecipients.toFixed(1)} avg recipients / send`,
@@ -83,7 +76,7 @@ export function BroadcastStatCards({
       {
         label: "Sent today",
         value: sentToday,
-        icon: MailIcon,
+        icon: "letter",
         accent: "green",
         details: [
           `${sentThisMonth} in ${new Date().toLocaleDateString("en-NG", { month: "long" })}`,
@@ -95,7 +88,7 @@ export function BroadcastStatCards({
       {
         label: "Audience size",
         value: registrations.length,
-        icon: UsersIcon,
+        icon: "users-group-rounded",
         accent: "navy",
         details: [
           "Students available for broadcast",

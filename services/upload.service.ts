@@ -6,6 +6,7 @@ export type UploadFolder =
   | "materials"
   | "avatars"
   | "quiz"
+  | "chat"
 
 export type UploadResult = {
   url: string

@@ -1,16 +1,11 @@
 "use client"
 
+import { SolarIcon } from "@/components/icons/solar-icon"
+
 import { useEffect, useId, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import { format, isBefore, isSameDay, startOfDay } from "date-fns"
 import toast from "react-hot-toast"
-import {
-  CalendarDaysIcon,
-  ExternalLinkIcon,
-  RadioIcon,
-  XIcon,
-} from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Input } from "@/components/ui/input"
@@ -289,7 +284,7 @@ export function LiveClassModal({
             onClick={onClose}
             className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
           >
-            <XIcon className="size-4" />
+            <SolarIcon name="close-circle" className="size-4" />
           </button>
         </header>
 
@@ -395,7 +390,7 @@ export function LiveClassModal({
                     />
                   }
                 >
-                  <CalendarDaysIcon className="size-4 text-muted-foreground" />
+                  <SolarIcon name="calendar" className="size-4 text-muted-foreground" />
                   {format(date, "MMM d, yyyy")}
                 </PopoverTrigger>
                 <PopoverContent
@@ -551,9 +546,9 @@ function SessionRow({
           )}
         >
           {tone === "live" ? (
-            <RadioIcon className="size-3.5" />
+            <SolarIcon name="podcast" className="size-3.5" />
           ) : (
-            <CalendarDaysIcon className="size-3.5" />
+            <SolarIcon name="calendar" className="size-3.5" />
           )}
           {tone === "live" ? "Live now" : "Upcoming"}
         </p>
@@ -570,7 +565,7 @@ function SessionRow({
           rel="noreferrer"
           className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-[#00206F]"
         >
-          Open link <ExternalLinkIcon className="size-3" />
+          Open link <SolarIcon name="link-round-angle" className="size-3" />
         </a>
       </div>
       <Button
