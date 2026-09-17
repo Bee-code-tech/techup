@@ -203,13 +203,24 @@ function QuizBuilderModal({
       setVisible(false)
       return
     }
+    // Seed only when the modal opens — do not reset draft if parent
+    // `questions` identity changes while the tutor is editing/importing.
     const hasQuiz = initialQuestions.length > 0
-    setDraft(hasQuiz ? initialQuestions.map((q) => ({ ...q })) : [])
+    setDraft(
+      hasQuiz
+        ? initialQuestions.map((q) => ({
+            ...q,
+            options: [...q.options],
+            optionImageUrls: [...q.optionImageUrls],
+          }))
+        : [],
+    )
     setStep(hasQuiz ? "build" : "start")
     setActiveIndex(0)
     const frame = window.requestAnimationFrame(() => setVisible(true))
     return () => window.cancelAnimationFrame(frame)
-  }, [open, initialQuestions])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- seed on open only
+  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -257,7 +268,9 @@ function QuizBuilderModal({
       setDraft(next)
       setActiveIndex(0)
       setStep("build")
-      toast.success(`Imported ${next.length} questions.`)
+      toast.success(
+        `Imported ${next.length} question${next.length === 1 ? "" : "s"}. Review correct answers, then save.`,
+      )
     } catch {
       toast.error("Could not read CSV file.")
     }

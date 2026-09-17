@@ -136,19 +136,38 @@ export function ModuleQuizModal({
           }),
         },
       )
-      const payload = (await response.json()) as {
+
+      const raw = await response.text()
+      let payload: {
         error?: string
         passed?: boolean
         score?: number
         review?: QuizReviewItem[]
         passMark?: number
-      }
-      if (!response.ok) {
-        toast.error(payload.error || "Quiz submit failed.")
+      } = {}
+      try {
+        payload = raw ? (JSON.parse(raw) as typeof payload) : {}
+      } catch {
+        toast.error(
+          response.ok
+            ? "Quiz submit returned an invalid response."
+            : `Quiz submit failed (${response.status}). Try again.`,
+        )
         submittingRef.current = false
-        setSubmitting(false)
         return
       }
+
+      if (!response.ok) {
+        toast.error(
+          payload.error ||
+            (response.status === 503
+              ? "Database is unreachable. Try again in a moment."
+              : "Quiz submit failed."),
+        )
+        submittingRef.current = false
+        return
+      }
+
       const nextResult: QuizResult = {
         passed: Boolean(payload.passed),
         score: payload.score ?? 0,
@@ -166,7 +185,9 @@ export function ModuleQuizModal({
         )
       }
     } catch {
-      toast.error("Network error.")
+      toast.error(
+        "Could not reach the server. Check your connection and try again.",
+      )
       submittingRef.current = false
     } finally {
       setSubmitting(false)

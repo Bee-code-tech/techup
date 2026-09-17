@@ -141,25 +141,76 @@ function parseCsvRows(text: string): string[][] {
 }
 
 function headerKey(value: string) {
-  return value.trim().toLowerCase().replace(/[\s-]+/g, "_")
+  return value
+    .replace(/^\uFEFF/, "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_")
 }
 
-function parseCorrectIndex(raw: string, optionCount: number) {
-  const value = raw.trim()
-  if (!value) return 0
+const CORRECT_HEADERS = [
+  "correct_answer",
+  "correct_option",
+  "correct_index",
+  "correctindex",
+  "correct",
+  "answer_key",
+  "answer",
+  "key",
+] as const
 
-  const letter = value.toUpperCase()
+/**
+ * Resolve a CSV "correct" cell to a 0-based option index.
+ * Accepts: A/B/C, 1/2/3 (1-based), 0-based index, "Option B", or exact option text.
+ */
+export function parseCorrectIndex(
+  raw: string,
+  options: string[],
+): { index: number; matched: boolean } {
+  const optionCount = options.length
+  const value = raw.trim()
+  if (!value || optionCount === 0) return { index: 0, matched: false }
+
+  const cleaned = value
+    .replace(/^(?:option|choice|answer)\s+/i, "")
+    .replace(/^[(\[]/, "")
+    .replace(/[)\].:]+$/g, "")
+    .trim()
+
+  const letter = cleaned.toUpperCase()
   if (/^[A-Z]$/.test(letter)) {
     const index = letter.charCodeAt(0) - 65
-    return index >= 0 && index < optionCount ? index : 0
+    if (index >= 0 && index < optionCount) return { index, matched: true }
   }
 
-  const asNumber = Number(value)
-  if (!Number.isFinite(asNumber)) return 0
-  // Support 1-based (CSV common) and 0-based
-  if (asNumber >= 1 && asNumber <= optionCount) return asNumber - 1
-  if (asNumber >= 0 && asNumber < optionCount) return asNumber
-  return 0
+  const asNumber = Number(cleaned)
+  if (Number.isFinite(asNumber)) {
+    if (asNumber >= 1 && asNumber <= optionCount) {
+      return { index: asNumber - 1, matched: true }
+    }
+    if (asNumber >= 0 && asNumber < optionCount) {
+      return { index: asNumber, matched: true }
+    }
+  }
+
+  const lower = value.toLowerCase()
+  const byExact = options.findIndex(
+    (option) => option.trim().toLowerCase() === lower,
+  )
+  if (byExact >= 0) return { index: byExact, matched: true }
+
+  const cleanedLower = cleaned.toLowerCase()
+  const byCleaned = options.findIndex(
+    (option) => option.trim().toLowerCase() === cleanedLower,
+  )
+  if (byCleaned >= 0) return { index: byCleaned, matched: true }
+
+  return { index: 0, matched: false }
+}
+
+function optionTokenRank(token: string) {
+  if (/^\d+$/.test(token)) return Number(token)
+  return token.toLowerCase().charCodeAt(0) - 96
 }
 
 /**
@@ -174,7 +225,7 @@ export function parseQuizCsv(text: string): {
   ok: false
   error: string
 } {
-  const rows = parseCsvRows(text)
+  const rows = parseCsvRows(text.replace(/^\uFEFF/, ""))
   if (rows.length < 2) {
     return {
       ok: false,
@@ -190,7 +241,7 @@ export function parseQuizCsv(text: string): {
     ["prompt_image", "question_image", "image", "prompt_image_url"].includes(h),
   )
   const correctIdx = headers.findIndex((h) =>
-    ["correct", "answer", "correct_index", "correctindex", "key"].includes(h),
+    (CORRECT_HEADERS as readonly string[]).includes(h),
   )
 
   if (promptIdx < 0) {
@@ -200,7 +251,16 @@ export function parseQuizCsv(text: string): {
     }
   }
 
-  const optionCols: Array<{ text: number; image: number | null }> = []
+  if (correctIdx < 0) {
+    return {
+      ok: false,
+      error:
+        'CSV must include a "correct" column. Use A/B/C, 1/2/3, or the exact option text.',
+    }
+  }
+
+  const optionCols: Array<{ text: number; image: number | null; rank: number }> =
+    []
   headers.forEach((header, index) => {
     const match =
       header.match(/^option_?([a-z]|\d+)$/) ||
@@ -217,13 +277,14 @@ export function parseQuizCsv(text: string): {
       `choice${token}_image`,
     ]
     const image = headers.findIndex((h) => imageHeaderCandidates.includes(h))
-    optionCols.push({ text: index, image: image >= 0 ? image : null })
+    optionCols.push({
+      text: index,
+      image: image >= 0 ? image : null,
+      rank: optionTokenRank(token),
+    })
   })
 
-  // Also support option1_image paired when option1 exists (already handled)
-  // Fallback: unlabeled consecutive option_a style already covered.
   if (optionCols.length < 2) {
-    // Fallback: treat columns after prompt (excluding known meta) as options
     const reserved = new Set(
       [promptIdx, promptImageIdx, correctIdx].filter((i) => i >= 0),
     )
@@ -236,10 +297,17 @@ export function parseQuizCsv(text: string): {
         header.startsWith("choice") ||
         /^[a-d]$/.test(header)
       ) {
-        optionCols.push({ text: index, image: null })
+        const token = header.replace(/^(option|opt|choice)_?/, "") || header
+        optionCols.push({
+          text: index,
+          image: null,
+          rank: optionTokenRank(token),
+        })
       }
     })
   }
+
+  optionCols.sort((a, b) => a.rank - b.rank)
 
   if (optionCols.length < 2) {
     return {
@@ -256,7 +324,6 @@ export function parseQuizCsv(text: string): {
       image == null ? "" : String(row[image] ?? "").trim(),
     )
 
-    // Drop trailing empty option pairs
     while (
       options.length > 2 &&
       !options[options.length - 1] &&
@@ -266,16 +333,22 @@ export function parseQuizCsv(text: string): {
       optionImageUrls.pop()
     }
 
+    const rawCorrect = String(row[correctIdx] ?? "")
+    const correct = parseCorrectIndex(rawCorrect, options)
+    if (!correct.matched) {
+      return {
+        ok: false,
+        error: `Row ${r + 1}: Could not resolve correct answer "${rawCorrect.trim() || "(empty)"}". Use A/B/C, 1/2/3, or the exact option text.`,
+      }
+    }
+
     const draft: QuizQuestionInput = {
       prompt: String(row[promptIdx] ?? ""),
       promptImageUrl:
         promptImageIdx >= 0 ? String(row[promptImageIdx] ?? "") : null,
       options,
       optionImageUrls,
-      correctIndex: parseCorrectIndex(
-        correctIdx >= 0 ? String(row[correctIdx] ?? "") : "1",
-        options.length,
-      ),
+      correctIndex: correct.index,
     }
 
     const validated = validateQuizQuestion(draft)
