@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server"
 
 import { isNextResponse, requireTutorOrAdmin } from "@/lib/api-auth"
-import { bootcampTracks } from "@/lib/bootcamp"
 import { db } from "@/lib/db"
 import { expectedStudentsForSession } from "@/lib/live-attendance"
+import { isAllTracksLive, liveTrackLabel } from "@/lib/live-session"
 
 export const runtime = "nodejs"
 
@@ -37,8 +37,12 @@ export async function GET(_request: Request, context: RouteContext) {
     db.course.findMany({
       where:
         auth.role === "admin"
-          ? { track: session.track }
-          : { track: session.track, tutorId: auth.userId },
+          ? isAllTracksLive(session.track)
+            ? {}
+            : { track: session.track }
+          : isAllTracksLive(session.track)
+            ? { tutorId: auth.userId }
+            : { track: session.track, tutorId: auth.userId },
       select: { id: true, title: true },
       orderBy: { title: "asc" },
     }),
@@ -50,7 +54,7 @@ export async function GET(_request: Request, context: RouteContext) {
     session: {
       id: session.id,
       title: session.title,
-      trackLabel: bootcampTracks[session.track] || session.track,
+      trackLabel: liveTrackLabel(session.track),
       endedAt: session.endedAt?.toISOString() ?? null,
       recordingStatus: session.recordingStatus,
       recordingUrl: session.recordingUrl,

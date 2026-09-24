@@ -1,7 +1,50 @@
+import { bootcampTracks } from "@/lib/bootcamp"
+
 /** In-app classroom vs leftover Zoom/Meet links. */
 
 export const LIVE_CLASS_CAP = 100
 export const LIVEKIT_PLATFORM = "livekit"
+export const LIVE_ALL_TRACKS = "all"
+
+export function isAllTracksLive(track?: string | null) {
+  return track === LIVE_ALL_TRACKS
+}
+
+export function liveTrackLabel(track?: string | null) {
+  if (isAllTracksLive(track)) return "All tracks"
+  return bootcampTracks[track || ""] || track || "Track"
+}
+
+export function liveSessionAllowsTrack(
+  sessionTrack: string,
+  studentTrack?: string | null,
+) {
+  if (!studentTrack) return false
+  return isAllTracksLive(sessionTrack) || sessionTrack === studentTrack
+}
+
+export function isAllowedLiveTrack(track: string) {
+  return isAllTracksLive(track) || Boolean(bootcampTracks[track])
+}
+
+export function liveTrackOptions() {
+  return [
+    { id: LIVE_ALL_TRACKS, label: liveTrackLabel(LIVE_ALL_TRACKS) },
+    ...Object.entries(bootcampTracks).map(([id, label]) => ({ id, label })),
+  ]
+}
+
+export function pickPreferredLiveSession<T extends { track: string }>(
+  sessions: T[],
+  studentTrack: string,
+) {
+  return (
+    sessions.find((session) => session.track === studentTrack) ??
+    sessions.find((session) => isAllTracksLive(session.track)) ??
+    sessions[0] ??
+    null
+  )
+}
 
 export function isInAppLive(platform?: string | null) {
   return platform === LIVEKIT_PLATFORM

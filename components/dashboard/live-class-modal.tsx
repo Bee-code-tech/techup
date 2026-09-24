@@ -7,7 +7,11 @@ import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import { format, isBefore, isSameDay, startOfDay } from "date-fns"
 import toast from "react-hot-toast"
-import { isInAppLive, LIVEKIT_PLATFORM } from "@/lib/live-session"
+import {
+  isInAppLive,
+  LIVE_ALL_TRACKS,
+  LIVEKIT_PLATFORM,
+} from "@/lib/live-session"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Input } from "@/components/ui/input"
@@ -154,7 +158,11 @@ export function LiveClassModal({
       setVisible(false)
       return
     }
-    setTrack(tracks[0]?.id || "")
+    setTrack(
+      tracks.find((item) => item.id === LIVE_ALL_TRACKS)?.id ||
+        tracks[0]?.id ||
+        "",
+    )
     setTitle("Live class")
     setPlatform(LIVEKIT_PLATFORM)
     setJoinUrl("")

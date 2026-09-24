@@ -34,7 +34,6 @@ export async function PATCH(request: Request, context: RouteContext) {
     await db.liveSession.updateMany({
       where: {
         tutorId: session.tutorId,
-        track: session.track,
         isActive: true,
         NOT: { id: session.id },
       },

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db"
-import { audienceAllowsStudent } from "@/lib/live-session"
+import { audienceAllowsStudent, isAllTracksLive } from "@/lib/live-session"
 
 export async function markLiveJoin(options: {
   sessionId: string
@@ -39,7 +39,10 @@ export async function expectedStudentsForSession(options: {
   audience: string
 }) {
   const students = await db.user.findMany({
-    where: { role: "student", track: options.track },
+    where: {
+      role: "student",
+      ...(isAllTracksLive(options.track) ? {} : { track: options.track }),
+    },
     select: { id: true, name: true, email: true, accessTier: true, avatarUrl: true },
     orderBy: { name: "asc" },
   })

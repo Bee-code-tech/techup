@@ -2,13 +2,18 @@ import { describe, expect, it } from "vitest"
 
 import {
   audienceAllowsStudent,
+  isAllowedLiveTrack,
   isInAppLive,
   formatLiveDuration,
   isLiveRoomPath,
   liveJoinHref,
   livePlatformLabel,
+  liveSessionAllowsTrack,
   liveSessionChannel,
   liveSessionDurationMs,
+  liveTrackLabel,
+  liveTrackOptions,
+  pickPreferredLiveSession,
 } from "@/lib/live-session"
 
 describe("live-session helpers", () => {
@@ -49,6 +54,25 @@ describe("live-session helpers", () => {
     )
     expect(isLiveRoomPath("/dashboard/live/manage")).toBe(false)
     expect(liveSessionChannel("abc")).toBe("live:session:abc")
+  })
+
+  it("lets every track into an all-tracks class", () => {
+    expect(liveSessionAllowsTrack("all", "frontend")).toBe(true)
+    expect(liveSessionAllowsTrack("all", "backend")).toBe(true)
+    expect(liveSessionAllowsTrack("frontend", "backend")).toBe(false)
+    expect(liveSessionAllowsTrack("frontend", "frontend")).toBe(true)
+    expect(liveTrackLabel("all")).toBe("All tracks")
+    expect(isAllowedLiveTrack("all")).toBe(true)
+    expect(isAllowedLiveTrack("backend")).toBe(true)
+    expect(isAllowedLiveTrack("unknown")).toBe(false)
+    expect(liveTrackOptions()[0]).toEqual({ id: "all", label: "All tracks" })
+    expect(pickPreferredLiveSession(
+      [
+        { id: "1", track: "all" },
+        { id: "2", track: "frontend" },
+      ],
+      "frontend",
+    )?.id).toBe("2")
   })
 
   it("measures class length from start to end", () => {

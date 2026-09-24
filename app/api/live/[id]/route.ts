@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server"
 
 import { isNextResponse, requireAnyAuth } from "@/lib/api-auth"
-import { bootcampTracks } from "@/lib/bootcamp"
 import { db } from "@/lib/db"
 import {
   audienceAllowsStudent,
   isInAppLive,
   liveJoinHref,
   livePlatformLabel,
+  liveSessionAllowsTrack,
+  liveTrackLabel,
 } from "@/lib/live-session"
 import { livekitConfigured } from "@/lib/livekit"
 
@@ -40,7 +41,7 @@ export async function GET(_request: Request, context: RouteContext) {
       where: { id: auth.userId },
       select: { track: true, accessTier: true },
     })
-    if (!user?.track || user.track !== session.track) {
+    if (!liveSessionAllowsTrack(session.track, user?.track)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
     if (!audienceAllowsStudent(user.accessTier, session.audience)) {
@@ -67,7 +68,7 @@ export async function GET(_request: Request, context: RouteContext) {
       audience: session.audience,
       isActive: session.isActive,
       status,
-      trackLabel: bootcampTracks[session.track] || session.track,
+      trackLabel: liveTrackLabel(session.track),
       tutorName: session.tutor.name,
       platformLabel: livePlatformLabel(session.platform),
       scheduledAt:

@@ -5,6 +5,7 @@ import { db } from "@/lib/db"
 import {
   audienceAllowsStudent,
   isInAppLive,
+  liveSessionAllowsTrack,
   LIVE_CLASS_CAP,
 } from "@/lib/live-session"
 import { markLiveJoin } from "@/lib/live-attendance"
@@ -60,7 +61,7 @@ export async function POST(_request: Request, context: RouteContext) {
       where: { id: auth.userId },
       select: { track: true, accessTier: true, name: true },
     })
-    if (!user?.track || user.track !== session.track) {
+    if (!liveSessionAllowsTrack(session.track, user?.track)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
     if (!audienceAllowsStudent(user.accessTier, session.audience)) {

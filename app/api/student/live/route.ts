@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server"
 import { isNextResponse, requireStudent } from "@/lib/api-auth"
-import { bootcampTracks } from "@/lib/bootcamp"
 import { db } from "@/lib/db"
 import {
   isInAppLive,
   liveJoinHref,
   livePlatformLabel,
+  liveTrackLabel,
+  pickPreferredLiveSession,
+  LIVE_ALL_TRACKS,
 } from "@/lib/live-session"
 
 export async function GET() {
@@ -25,17 +27,20 @@ export async function GET() {
       ? [{ audience: "both" }, { audience: "paid" }, { audience: "free" }]
       : [{ audience: "both" }, { audience: "free" }]
 
-  const live = await db.liveSession.findFirst({
-    where: {
-      track: user.track,
-      isActive: true,
-      OR: audienceFilter,
-    },
-    orderBy: { scheduledAt: "desc" },
-    include: {
-      tutor: { select: { name: true } },
-    },
-  })
+  const live = pickPreferredLiveSession(
+    await db.liveSession.findMany({
+      where: {
+        track: { in: [user.track, LIVE_ALL_TRACKS] },
+        isActive: true,
+        OR: audienceFilter,
+      },
+      orderBy: { scheduledAt: "desc" },
+      include: {
+        tutor: { select: { name: true } },
+      },
+    }),
+    user.track,
+  )
 
   if (live) {
     return NextResponse.json({
@@ -48,7 +53,7 @@ export async function GET() {
         platformLabel: livePlatformLabel(live.platform),
         audience: live.audience,
         status: "live" as const,
-        trackLabel: bootcampTracks[live.track] || live.track,
+        trackLabel: liveTrackLabel(live.track),
         tutorName: live.tutor.name,
         scheduledAt: live.scheduledAt?.toISOString() ?? live.createdAt.toISOString(),
         createdAt: live.createdAt.toISOString(),
@@ -56,19 +61,22 @@ export async function GET() {
     })
   }
 
-  const upcoming = await db.liveSession.findFirst({
-    where: {
-      track: user.track,
-      isActive: false,
-      endedAt: null,
-      scheduledAt: { gte: new Date() },
-      OR: audienceFilter,
-    },
-    orderBy: { scheduledAt: "asc" },
-    include: {
-      tutor: { select: { name: true } },
-    },
-  })
+  const upcoming = pickPreferredLiveSession(
+    await db.liveSession.findMany({
+      where: {
+        track: { in: [user.track, LIVE_ALL_TRACKS] },
+        isActive: false,
+        endedAt: null,
+        scheduledAt: { gte: new Date() },
+        OR: audienceFilter,
+      },
+      orderBy: { scheduledAt: "asc" },
+      include: {
+        tutor: { select: { name: true } },
+      },
+    }),
+    user.track,
+  )
 
   if (!upcoming) {
     return NextResponse.json({ session: null })
@@ -84,7 +92,7 @@ export async function GET() {
       platformLabel: livePlatformLabel(upcoming.platform),
       audience: upcoming.audience,
       status: "upcoming" as const,
-      trackLabel: bootcampTracks[upcoming.track] || upcoming.track,
+      trackLabel: liveTrackLabel(upcoming.track),
       tutorName: upcoming.tutor.name,
       scheduledAt: upcoming.scheduledAt?.toISOString() ?? upcoming.createdAt.toISOString(),
       createdAt: upcoming.createdAt.toISOString(),
