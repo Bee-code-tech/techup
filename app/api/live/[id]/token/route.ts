@@ -61,7 +61,7 @@ export async function POST(_request: Request, context: RouteContext) {
       where: { id: auth.userId },
       select: { track: true, accessTier: true, name: true },
     })
-    if (!liveSessionAllowsTrack(session.track, user?.track)) {
+    if (!user || !liveSessionAllowsTrack(session.track, user.track)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
     if (!audienceAllowsStudent(user.accessTier, session.audience)) {
