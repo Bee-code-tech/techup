@@ -4,6 +4,7 @@ import { SolarIcon } from "@/components/icons/solar-icon"
 
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { format } from "date-fns"
 import toast from "react-hot-toast"
@@ -15,6 +16,7 @@ import { TutorCoursesSkeleton } from "@/components/dashboard/page-skeletons"
 import { useSessionUser } from "@/components/dashboard/use-session"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
+import { isInAppLive, liveJoinHref, livePlatformLabel } from "@/lib/live-session"
 import { cn } from "@/lib/utils"
 
 type CourseRow = {
@@ -58,7 +60,10 @@ export function TutorOverview() {
   const [live, setLive] = useState<TutorLiveSession[]>([])
   const [loading, setLoading] = useState(true)
   const [liveOpen, setLiveOpen] = useState(false)
+  const [liveMode, setLiveMode] = useState<"instant" | "schedule">("instant")
   const [liveActionId, setLiveActionId] = useState<string | null>(null)
+  const [livekitConfigured, setLivekitConfigured] = useState(false)
+  const router = useRouter()
 
   const load = useCallback(async () => {
     try {
@@ -73,6 +78,7 @@ export function TutorOverview() {
       const livePayload = (await liveRes.json().catch(() => ({}))) as {
         sessions?: TutorLiveSession[]
         tracks?: Array<{ id: string; label: string }>
+        livekitConfigured?: boolean
       }
       if (coursesRes.ok) {
         setCourses(coursesPayload.courses || [])
@@ -86,6 +92,7 @@ export function TutorOverview() {
       setTracks(nextTracks)
       if (liveRes.ok) {
         setLive(livePayload.sessions || [])
+        setLivekitConfigured(Boolean(livePayload.livekitConfigured))
       }
     } finally {
       setLoading(false)
@@ -118,6 +125,14 @@ export function TutorOverview() {
       }
       toast.success(action === "start" ? "You're live." : "Live session ended.")
       await load()
+      const current = live.find((row) => row.id === id)
+      if (
+        action === "start" &&
+        current &&
+        (current.inApp || isInAppLive(current.platform))
+      ) {
+        router.push(`/dashboard/live/${id}`)
+      }
     } catch {
       toast.error("Network error.")
     } finally {
@@ -164,6 +179,11 @@ export function TutorOverview() {
   const featuredWhen = featuredLive?.scheduledAt
     ? format(new Date(featuredLive.scheduledAt), "EEE, MMM d · h:mm a")
     : null
+  const featuredInApp = Boolean(
+    featuredLive &&
+      (featuredLive.inApp || isInAppLive(featuredLive.platform)),
+  )
+  const featuredHref = featuredLive ? liveJoinHref(featuredLive) : ""
 
   return (
     <div className="flex flex-col gap-5 px-4 py-6 lg:px-6 md:py-8">
@@ -293,15 +313,25 @@ export function TutorOverview() {
                     {featuredWhen ? ` · ${featuredWhen}` : ""}
                     {featuredIsLive ? " · students can join now" : ""}
                   </p>
-                  <a
-                    href={featuredLive.joinUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[#00206F]"
-                  >
-                    Open {featuredLive.platform === "zoom" ? "Zoom" : "Meet"}
-                    <SolarIcon name="link-round-angle" className="size-3.5" />
-                  </a>
+                  {featuredInApp ? (
+                    <Link
+                      href={featuredHref}
+                      className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[#00206F]"
+                    >
+                      Enter classroom
+                      <SolarIcon name="videocamera" className="size-3.5" />
+                    </Link>
+                  ) : (
+                    <a
+                      href={featuredLive.joinUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[#00206F]"
+                    >
+                      Open {livePlatformLabel(featuredLive.platform)}
+                      <SolarIcon name="link-round-angle" className="size-3.5" />
+                    </a>
+                  )}
                 </>
               ) : (
                 <>
@@ -309,7 +339,7 @@ export function TutorOverview() {
                     Start a live session
                   </h2>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Schedule a class or go live with a Zoom or Meet link.
+                    Schedule a class or go live in the TechUp classroom.
                   </p>
                 </>
               )}
@@ -346,22 +376,41 @@ export function TutorOverview() {
                 <button
                   type="button"
                   disabled={awaiting}
-                  onClick={() => setLiveOpen(true)}
+                  onClick={() => {
+                    setLiveMode("schedule")
+                    setLiveOpen(true)
+                  }}
                   className="inline-flex h-11 items-center justify-center rounded-xl border border-black/10 bg-white px-4 text-sm font-semibold text-[#001752] transition-colors hover:bg-[#f7f8fb]"
                 >
                   Schedule
                 </button>
               </>
             ) : (
-              <button
-                type="button"
-                disabled={awaiting}
-                onClick={() => setLiveOpen(true)}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#00206F] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#001752]"
-              >
-                <SolarIcon name="calendar" className="size-4" />
-                Go live
-              </button>
+              <>
+                <button
+                  type="button"
+                  disabled={awaiting}
+                  onClick={() => {
+                    setLiveMode("instant")
+                    setLiveOpen(true)
+                  }}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#FB7801] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#e56c00]"
+                >
+                  <SolarIcon name="podcast" className="size-4" />
+                  Go live now
+                </button>
+                <button
+                  type="button"
+                  disabled={awaiting}
+                  onClick={() => {
+                    setLiveMode("schedule")
+                    setLiveOpen(true)
+                  }}
+                  className="inline-flex h-11 items-center justify-center rounded-xl border border-black/10 bg-white px-4 text-sm font-semibold text-[#001752] transition-colors hover:bg-[#f7f8fb]"
+                >
+                  Schedule
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -388,7 +437,10 @@ export function TutorOverview() {
         />
         <button
           type="button"
-          onClick={() => setLiveOpen(true)}
+          onClick={() => {
+            setLiveMode("instant")
+            setLiveOpen(true)
+          }}
           className="text-left"
         >
           <StatTile
@@ -609,6 +661,8 @@ export function TutorOverview() {
         onClose={() => setLiveOpen(false)}
         tracks={tracks}
         sessions={live}
+        livekitConfigured={livekitConfigured}
+        initialMode={liveMode}
         onChanged={load}
       />
     </div>

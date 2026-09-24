@@ -2,6 +2,18 @@ import { NextResponse } from "next/server"
 import { isNextResponse, requireTutorOrAdmin } from "@/lib/api-auth"
 import { bootcampTracks } from "@/lib/bootcamp"
 import { db } from "@/lib/db"
+import { markLiveJoin } from "@/lib/live-attendance"
+import {
+  isInAppLive,
+  liveJoinHref,
+  liveSessionDurationMs,
+  LIVEKIT_PLATFORM,
+} from "@/lib/live-session"
+import {
+  defaultLivePlatform,
+  ensureLiveRoom,
+  livekitConfigured,
+} from "@/lib/livekit"
 
 async function tutorTracks(userId: string, role: string) {
   if (role === "admin") return Object.keys(bootcampTracks)
@@ -12,31 +24,47 @@ async function tutorTracks(userId: string, role: string) {
   return rows.map((row) => row.track)
 }
 
-function mapSession(session: {
-  id: string
-  track: string
-  title: string
-  platform: string
-  joinUrl: string
-  audience: string
-  isActive: boolean
-  scheduledAt?: Date | null
-  endedAt: Date | null
-  createdAt: Date
-}) {
+function mapSession(
+  session: {
+    id: string
+    track: string
+    title: string
+    platform: string
+    joinUrl: string
+    audience: string
+    isActive: boolean
+    scheduledAt?: Date | null
+    endedAt: Date | null
+    createdAt: Date
+    recordingStatus?: string
+    attendance?: Array<{ role: string }>
+  },
+) {
   const scheduledAt = session.scheduledAt ?? session.createdAt
+  const joinedCount = (session.attendance || []).filter(
+    (row) => row.role === "student",
+  ).length
   return {
     id: session.id,
     track: session.track,
     title: session.title,
     platform: session.platform,
-    joinUrl: session.joinUrl,
+    joinUrl: liveJoinHref(session),
+    inApp: isInAppLive(session.platform),
     audience: session.audience,
     isActive: session.isActive,
     trackLabel: bootcampTracks[session.track] || session.track,
     scheduledAt: scheduledAt.toISOString(),
     createdAt: session.createdAt.toISOString(),
     endedAt: session.endedAt?.toISOString() ?? null,
+    joinedCount,
+    durationMs: liveSessionDurationMs({
+      scheduledAt,
+      createdAt: session.createdAt,
+      endedAt: session.endedAt,
+      isActive: session.isActive,
+    }),
+    recordingStatus: session.recordingStatus || "idle",
   }
 }
 
@@ -52,11 +80,15 @@ export async function GET() {
         : { tutorId: auth.userId, track: { in: tracks } },
     orderBy: [{ isActive: "desc" }, { scheduledAt: "asc" }, { createdAt: "desc" }],
     take: 50,
+    include: {
+      attendance: { select: { role: true } },
+    },
   })
 
   return NextResponse.json({
     tracks: tracks.map((id) => ({ id, label: bootcampTracks[id] || id })),
     sessions: sessions.map(mapSession),
+    livekitConfigured: livekitConfigured(),
   })
 }
 
@@ -76,7 +108,13 @@ export async function POST(request: Request) {
   const body = (await request.json()) as CreateBody
   const track = String(body.track ?? "").trim()
   const title = String(body.title ?? "Live class").trim() || "Live class"
-  const platform = body.platform === "zoom" ? "zoom" : "meet"
+  const requestedPlatform = String(body.platform ?? defaultLivePlatform())
+  const platform =
+    requestedPlatform === "zoom"
+      ? "zoom"
+      : requestedPlatform === LIVEKIT_PLATFORM
+        ? LIVEKIT_PLATFORM
+        : "meet"
   const joinUrl = String(body.joinUrl ?? "").trim()
   const audience =
     body.audience === "free" || body.audience === "paid"
@@ -90,7 +128,13 @@ export async function POST(request: Request) {
       { status: 403 },
     )
   }
-  if (!/^https?:\/\//i.test(joinUrl)) {
+  if (platform === LIVEKIT_PLATFORM && !livekitConfigured()) {
+    return NextResponse.json(
+      { error: "In-app classroom is not configured yet." },
+      { status: 503 },
+    )
+  }
+  if (platform !== LIVEKIT_PLATFORM && !/^https?:\/\//i.test(joinUrl)) {
     return NextResponse.json(
       { error: "Enter a valid Zoom or Google Meet URL." },
       { status: 400 },
@@ -117,19 +161,37 @@ export async function POST(request: Request) {
     })
   }
 
-  const session = await db.liveSession.create({
+  const created = await db.liveSession.create({
     data: {
       track,
       tutorId: auth.userId,
       title,
       platform,
-      joinUrl,
+      joinUrl:
+        platform === LIVEKIT_PLATFORM ? "in-app" : joinUrl,
       audience,
       scheduledAt,
       isActive: goLiveNow,
       endedAt: null,
     },
   })
+
+  const session =
+    platform === LIVEKIT_PLATFORM
+      ? await db.liveSession.update({
+          where: { id: created.id },
+          data: { joinUrl: `/dashboard/live/${created.id}` },
+        })
+      : created
+
+  if (goLiveNow && platform === LIVEKIT_PLATFORM) {
+    await ensureLiveRoom(session.id)
+    await markLiveJoin({
+      sessionId: session.id,
+      userId: auth.userId,
+      role: auth.role,
+    })
+  }
 
   return NextResponse.json({
     ok: true,

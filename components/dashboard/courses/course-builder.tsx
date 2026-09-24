@@ -26,6 +26,7 @@ export type BuilderCourse = {
   coverUrl: string | null
   coverKey?: string | null
   published: boolean
+  tutor?: { id: string; name: string; email: string } | null
   modules: Array<{
     id: string
     title: string
@@ -142,6 +143,7 @@ export function CourseBuilder({ courseId }: { courseId: string }) {
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <p className="text-sm text-muted-foreground">
               Complete all fields ({completed}/{checklist.length})
+              {course.tutor?.name ? ` · ${course.tutor.name}` : ""}
             </p>
             {course.published ? (
               <Badge className="border-none bg-emerald-100 text-emerald-700 hover:bg-emerald-100">

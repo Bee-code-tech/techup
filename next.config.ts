@@ -1,6 +1,12 @@
 import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
+  transpilePackages: [
+    "livekit-client",
+    "livekit-server-sdk",
+    "@livekit/components-react",
+    "@livekit/components-core",
+  ],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },

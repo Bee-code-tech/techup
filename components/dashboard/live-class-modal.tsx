@@ -4,8 +4,10 @@ import { SolarIcon } from "@/components/icons/solar-icon"
 
 import { useEffect, useId, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
+import { useRouter } from "next/navigation"
 import { format, isBefore, isSameDay, startOfDay } from "date-fns"
 import toast from "react-hot-toast"
+import { isInAppLive, LIVEKIT_PLATFORM } from "@/lib/live-session"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Input } from "@/components/ui/input"
@@ -32,10 +34,14 @@ export type TutorLiveSession = {
   trackLabel: string
   platform: string
   joinUrl: string
+  inApp?: boolean
   audience: string
   isActive: boolean
   scheduledAt?: string | null
   endedAt?: string | null
+  joinedCount?: number
+  durationMs?: number | null
+  recordingStatus?: string
 }
 
 const TIME_OPTIONS = Array.from({ length: 24 * 4 }, (_, index) => {
@@ -96,15 +102,20 @@ export function LiveClassModal({
   onClose,
   tracks,
   sessions,
+  livekitConfigured = false,
+  initialMode = "instant",
   onChanged,
 }: {
   open: boolean
   onClose: () => void
   tracks: LiveTrackOption[]
   sessions: TutorLiveSession[]
+  livekitConfigured?: boolean
+  initialMode?: "instant" | "schedule"
   onChanged: () => Promise<void> | void
 }) {
   const titleId = useId()
+  const router = useRouter()
   const [visible, setVisible] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [track, setTrack] = useState("")
@@ -112,6 +123,7 @@ export function LiveClassModal({
   const [platform, setPlatform] = useState("meet")
   const [joinUrl, setJoinUrl] = useState("")
   const [audience, setAudience] = useState("both")
+  const [mode, setMode] = useState<"instant" | "schedule">(initialMode)
   const [date, setDate] = useState<Date>(() => new Date())
   const [time, setTime] = useState(nextQuarterTime)
   const [pending, setPending] = useState(false)
@@ -130,8 +142,12 @@ export function LiveClassModal({
     [date, time],
   )
   const goesLiveNow =
+    mode === "instant" ||
     scheduledAtValue.getTime() <= Date.now() + 2 * 60 * 1000
-  const scheduledPreview = format(scheduledAtValue, "EEEE, MMM d · h:mm a")
+  const scheduledPreview =
+    mode === "instant"
+      ? "Starts immediately"
+      : format(scheduledAtValue, "EEEE, MMM d · h:mm a")
 
   useEffect(() => {
     if (!open) {
@@ -140,15 +156,16 @@ export function LiveClassModal({
     }
     setTrack(tracks[0]?.id || "")
     setTitle("Live class")
-    setPlatform("meet")
+    setPlatform(LIVEKIT_PLATFORM)
     setJoinUrl("")
     setAudience("both")
+    setMode(initialMode)
     setDate(new Date())
     setTime(nextQuarterTime())
     setCalendarOpen(false)
     const frame = window.requestAnimationFrame(() => setVisible(true))
     return () => window.cancelAnimationFrame(frame)
-  }, [open, tracks])
+  }, [open, tracks, livekitConfigured, initialMode])
 
   useEffect(() => {
     if (!open) return
@@ -165,7 +182,10 @@ export function LiveClassModal({
     event.preventDefault()
     setPending(true)
     try {
-      const scheduledAt = combineDateAndTime(date, time).toISOString()
+      const scheduledAt =
+        mode === "instant"
+          ? new Date().toISOString()
+          : combineDateAndTime(date, time).toISOString()
       const response = await fetch("/api/tutor/live", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -180,7 +200,7 @@ export function LiveClassModal({
       })
       const payload = (await response.json()) as {
         error?: string
-        session?: { isActive?: boolean }
+        session?: { id?: string; isActive?: boolean; inApp?: boolean }
       }
       if (!response.ok) {
         toast.error(payload.error || "Could not create session.")
@@ -192,6 +212,13 @@ export function LiveClassModal({
       setJoinUrl("")
       await onChanged()
       onClose()
+      if (
+        payload.session?.id &&
+        payload.session.isActive &&
+        payload.session.inApp
+      ) {
+        router.push(`/dashboard/live/${payload.session.id}`)
+      }
     } catch {
       toast.error("Network error.")
     } finally {
@@ -236,6 +263,11 @@ export function LiveClassModal({
       }
       toast.success("You're live.")
       await onChanged()
+      const current = sessions.find((row) => row.id === id)
+      if (current && (current.inApp || isInAppLive(current.platform))) {
+        onClose()
+        router.push(`/dashboard/live/${id}`)
+      }
     } catch {
       toast.error("Network error.")
     } finally {
@@ -275,7 +307,7 @@ export function LiveClassModal({
               Live class
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {scheduledPreview}
+              {scheduledPreview} · TechUp classroom
             </p>
           </div>
           <button
@@ -329,6 +361,41 @@ export function LiveClassModal({
               />
             </Field>
 
+            <div className="sm:col-span-2 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setMode("instant")}
+                className={cn(
+                  "rounded-xl border px-3 py-2.5 text-left",
+                  mode === "instant"
+                    ? "border-[#FB7801]/40 bg-[#fff8f1]"
+                    : "border-border/80 bg-transparent",
+                )}
+              >
+                <p className="text-sm font-semibold text-[#001752]">
+                  Go live now
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Skip the calendar. Start immediately.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("schedule")}
+                className={cn(
+                  "rounded-xl border px-3 py-2.5 text-left",
+                  mode === "schedule"
+                    ? "border-[#00206F]/25 bg-[#f4f7fc]"
+                    : "border-border/80 bg-transparent",
+                )}
+              >
+                <p className="text-sm font-semibold text-[#001752]">Schedule</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Pick a date and time for later.
+                </p>
+              </button>
+            </div>
+
             <Field label="Track">
               <Select
                 value={track || null}
@@ -354,28 +421,18 @@ export function LiveClassModal({
               </Select>
             </Field>
 
-            <Field label="Platform">
-              <Select
-                value={platform}
-                onValueChange={(value) => {
-                  if (value != null) setPlatform(String(value))
-                }}
-                modal={false}
-                items={[
-                  { value: "meet", label: "Google Meet" },
-                  { value: "zoom", label: "Zoom" },
-                ]}
-              >
-                <SelectTrigger className={fieldControlClass}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent align="start" alignItemWithTrigger={false}>
-                  <SelectItem value="meet">Google Meet</SelectItem>
-                  <SelectItem value="zoom">Zoom</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
+            <div className="sm:col-span-2 rounded-xl border border-[#00206F]/10 bg-[#f4f7fc] px-3 py-3 text-sm text-[#001752]">
+              Students join inside TechUp. No Zoom or Meet link.
+              {!livekitConfigured ? (
+                <p className="mt-1 text-xs text-[#FB7801]">
+                  Add LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET to
+                  .env, then restart the server.
+                </p>
+              ) : null}
+            </div>
 
+            {mode === "schedule" ? (
+              <>
             <Field label="Date">
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger
@@ -453,6 +510,8 @@ export function LiveClassModal({
                 </SelectContent>
               </Select>
             </Field>
+              </>
+            ) : null}
 
             <Field label="Audience" className="sm:col-span-2">
               <Select
@@ -478,15 +537,37 @@ export function LiveClassModal({
               </Select>
             </Field>
 
-            <Field label="Join URL" className="sm:col-span-2">
-              <Input
-                value={joinUrl}
-                onChange={(e) => setJoinUrl(e.target.value)}
-                placeholder="https://meet.google.com/..."
-                required
-                className={fieldControlClass}
-              />
-            </Field>
+            {platform === "meet" || platform === "zoom" ? (
+              <>
+                <Field label="Join URL" className="sm:col-span-2">
+                  <Input
+                    value={joinUrl}
+                    onChange={(e) => setJoinUrl(e.target.value)}
+                    placeholder="https://meet.google.com/..."
+                    required
+                    className={fieldControlClass}
+                  />
+                </Field>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPlatform(LIVEKIT_PLATFORM)
+                    setJoinUrl("")
+                  }}
+                  className="sm:col-span-2 text-left text-xs font-medium text-[#00206F] underline-offset-2 hover:underline"
+                >
+                  Back to TechUp classroom
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setPlatform("meet")}
+                className="sm:col-span-2 text-left text-xs font-medium text-muted-foreground underline-offset-2 hover:underline"
+              >
+                Use a Zoom or Meet link instead
+              </button>
+            )}
           </form>
         </div>
 
@@ -502,7 +583,11 @@ export function LiveClassModal({
           <Button
             type="submit"
             form="live-class-form"
-            disabled={pending || tracks.length === 0}
+            disabled={
+              pending ||
+              tracks.length === 0 ||
+              (platform === LIVEKIT_PLATFORM && !livekitConfigured)
+            }
             className={cn(
               "h-10 rounded-lg text-white",
               goesLiveNow
@@ -559,14 +644,23 @@ function SessionRow({
           {session.trackLabel} ·{" "}
           {formatSessionWhen(session.scheduledAt) || "Unscheduled"}
         </p>
-        <a
-          href={session.joinUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-[#00206F]"
-        >
-          Open link <SolarIcon name="link-round-angle" className="size-3" />
-        </a>
+        {session.inApp || isInAppLive(session.platform) ? (
+          <a
+            href={`/dashboard/live/${session.id}`}
+            className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-[#00206F]"
+          >
+            Open classroom <SolarIcon name="videocamera" className="size-3" />
+          </a>
+        ) : (
+          <a
+            href={session.joinUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-[#00206F]"
+          >
+            Open link <SolarIcon name="link-round-angle" className="size-3" />
+          </a>
+        )}
       </div>
       <Button
         type="button"

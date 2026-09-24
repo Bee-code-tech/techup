@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/site-header"
 import { Button } from "@/components/ui/button"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { isLiveRoomPath } from "@/lib/live-session"
 
 function titleForPath(pathname: string, role?: string | null) {
   if (pathname === "/dashboard") {
@@ -20,7 +21,9 @@ function titleForPath(pathname: string, role?: string | null) {
   if (pathname.startsWith("/dashboard/broadcast")) return "Broadcast"
   if (pathname.startsWith("/dashboard/payments")) return "Payments"
   if (pathname.startsWith("/dashboard/scholarships")) return "Scholarships"
-  if (pathname.startsWith("/dashboard/courses/manage")) return "My courses"
+  if (pathname.startsWith("/dashboard/courses/manage")) {
+    return role === "admin" ? "Courses" : "My courses"
+  }
   if (pathname.startsWith("/dashboard/live/manage")) return "Live class"
   if (pathname.startsWith("/dashboard/assignments")) return "Assignments"
   if (pathname.startsWith("/dashboard/messages")) return "Messages"
@@ -31,6 +34,7 @@ function titleForPath(pathname: string, role?: string | null) {
   if (pathname.startsWith("/dashboard/learn/")) return "Learning"
   if (pathname.startsWith("/dashboard/learn")) return "My learning"
   if (pathname === "/dashboard/live") return "Live class"
+  if (isLiveRoomPath(pathname)) return "Live classroom"
   return "Dashboard"
 }
 
@@ -41,6 +45,32 @@ export function DashboardChrome({ children }: { children: React.ReactNode }) {
   const title = titleForPath(pathname, session.user?.role)
   const awaitingFirstSession = session.loading && !session.user
   const inCoursePlayer = pathname.startsWith("/dashboard/learn/course/")
+  const inLiveRoom = isLiveRoomPath(pathname)
+
+  if (inLiveRoom) {
+    return (
+      <TooltipProvider>
+        <div className="min-h-svh bg-[#f5f7fb] text-[#0b1426]">
+          {awaitingFirstSession ? (
+            <div className="flex h-dvh items-center justify-center text-sm text-muted-foreground">
+              Opening classroom…
+            </div>
+          ) : session.error || !session.user ? (
+            <div className="flex h-dvh flex-col items-center justify-center gap-3">
+              <p className="text-sm text-destructive">
+                {session.error || "Session unavailable."}
+              </p>
+              <Button onClick={() => void session.reload({ silent: false })}>
+                Retry
+              </Button>
+            </div>
+          ) : (
+            children
+          )}
+        </div>
+      </TooltipProvider>
+    )
+  }
 
   return (
     <TooltipProvider>

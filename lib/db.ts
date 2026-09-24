@@ -6,7 +6,7 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 /** Bump when models are added so hot-reload drops stale clients. */
-const PRISMA_SCHEMA_VERSION = 8;
+const PRISMA_SCHEMA_VERSION = 9;
 
 function createClient() {
   return new PrismaClient({

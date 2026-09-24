@@ -21,4 +21,31 @@ describe("roles payment routes", () => {
     expect(canAccessPath("tutor", "/dashboard/messages")).toBe(true)
     expect(canAccessPath("admin", "/dashboard/messages")).toBe(false)
   })
+
+  it("allows tutors and admins to manage live classes", () => {
+    expect(canAccessPath("tutor", "/dashboard/live/manage")).toBe(true)
+    expect(canAccessPath("admin", "/dashboard/live/manage")).toBe(true)
+    expect(canAccessPath("student", "/dashboard/live/manage")).toBe(false)
+  })
+
+  it("allows students tutors and admins into a live classroom", () => {
+    expect(canAccessPath("student", "/dashboard/live/64b1f0c8a1b2c3d4e5f60789")).toBe(
+      true,
+    )
+    expect(canAccessPath("tutor", "/dashboard/live/64b1f0c8a1b2c3d4e5f60789")).toBe(
+      true,
+    )
+    expect(canAccessPath("admin", "/dashboard/live/64b1f0c8a1b2c3d4e5f60789")).toBe(
+      true,
+    )
+  })
+
+  it("allows admin and tutor to manage courses", () => {
+    expect(canAccessPath("admin", "/dashboard/courses/manage")).toBe(true)
+    expect(canAccessPath("tutor", "/dashboard/courses/manage")).toBe(true)
+    expect(
+      canAccessPath("admin", "/dashboard/courses/manage/abc/edit"),
+    ).toBe(true)
+    expect(canAccessPath("student", "/dashboard/courses/manage")).toBe(false)
+  })
 })

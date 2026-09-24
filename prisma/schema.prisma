@@ -41,6 +41,7 @@ model User {
   assignmentsCreated Assignment[]       @relation("AssignmentTutor")
   submissions        AssignmentSubmission[]
   liveSessions       LiveSession[]
+  liveAttendance     LiveAttendance[]
   payments           Payment[]
   moduleUnlocks      ModuleUnlock[]
   passwordResets     PasswordResetToken[]
@@ -111,8 +112,11 @@ model Module {
   questions   QuizQuestion[]
   progress    ModuleProgress[]
   unlocks     ModuleUnlock[]
+  liveSessionId String?  @db.ObjectId
+  isLiveRecording Boolean @default(false)
 
   @@index([courseId])
+  @@index([liveSessionId])
 }
 
 model QuizQuestion {
@@ -229,7 +233,7 @@ model LiveSession {
   track       String
   tutorId     String    @db.ObjectId
   title       String    @default("Live class")
-  /// zoom | meet
+  /// zoom | meet | livekit
   platform    String
   joinUrl     String
   /// free | paid | both
@@ -238,14 +242,38 @@ model LiveSession {
   scheduledAt DateTime? @default(now())
   isActive    Boolean   @default(true)
   endedAt     DateTime?
+  /// idle | recording | ready | failed
+  recordingStatus String @default("idle")
+  egressId       String?
+  recordingKey   String?
+  recordingUrl   String?
+  publishedModuleId String? @db.ObjectId
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  tutor User @relation(fields: [tutorId], references: [id])
+  tutor      User             @relation(fields: [tutorId], references: [id])
+  attendance LiveAttendance[]
 
   @@index([track, isActive])
   @@index([tutorId])
   @@index([scheduledAt])
+}
+
+model LiveAttendance {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  sessionId String    @db.ObjectId
+  userId    String    @db.ObjectId
+  role      String
+  joinedAt  DateTime  @default(now())
+  leftAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  session LiveSession @relation(fields: [sessionId], references: [id])
+  user    User        @relation(fields: [userId], references: [id])
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
 }
 
 model Payment {

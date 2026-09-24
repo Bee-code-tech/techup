@@ -45,6 +45,7 @@ export async function GET() {
             order: true,
             videoUrl: true,
             passMark: true,
+            isLiveRecording: true,
           },
         },
         tutor: {

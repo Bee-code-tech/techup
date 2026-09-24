@@ -60,6 +60,18 @@ function navForRole(role: Role | string, pathname: string) {
         isActive: pathname.startsWith("/dashboard/tutors"),
       },
       {
+        title: "Courses",
+        url: "/dashboard/courses/manage",
+        icon: <SolarIcon name="book" />,
+        isActive: pathname.startsWith("/dashboard/courses/manage"),
+      },
+      {
+        title: "Live class",
+        url: "/dashboard/live/manage",
+        icon: <SolarIcon name="videocamera" />,
+        isActive: pathname.startsWith("/dashboard/live"),
+      },
+      {
         title: "Broadcast",
         url: "/dashboard/broadcast",
         icon: <SolarIcon name="letter" />,
@@ -94,6 +106,12 @@ function navForRole(role: Role | string, pathname: string) {
         url: "/dashboard/courses/manage",
         icon: <SolarIcon name="book" />,
         isActive: pathname.startsWith("/dashboard/courses/manage"),
+      },
+      {
+        title: "Live class",
+        url: "/dashboard/live/manage",
+        icon: <SolarIcon name="videocamera" />,
+        isActive: pathname.startsWith("/dashboard/live"),
       },
       {
         title: "Messages",

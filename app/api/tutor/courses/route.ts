@@ -42,10 +42,28 @@ export async function GET() {
     },
   });
 
+  const tutors =
+    auth.role === "admin"
+      ? await db.user.findMany({
+          where: { role: "tutor" },
+          orderBy: { name: "asc" },
+          select: {
+            id: true,
+            name: true,
+            tutorTracks: { select: { track: true } },
+          },
+        })
+      : []
+
   return NextResponse.json({
     tracks: allowedTracks.map((id) => ({
       id,
       label: bootcampTracks[id] || id,
+    })),
+    tutors: tutors.map((tutor) => ({
+      id: tutor.id,
+      name: tutor.name,
+      tracks: tutor.tutorTracks.map((row) => row.track),
     })),
     courses: courses.map((course) => ({
       id: course.id,
@@ -71,6 +89,7 @@ type CreateBody = {
   order?: number
   coverUrl?: string
   coverKey?: string
+  tutorId?: string
 }
 
 export async function POST(request: Request) {
@@ -101,16 +120,36 @@ export async function POST(request: Request) {
     );
   }
 
-  const tutorId =
-    auth.role === "admin"
-      ? (
-          await db.tutorTrack.findFirst({
-            where: { track },
-            orderBy: { createdAt: "asc" },
-            select: { tutorId: true },
-          })
-        )?.tutorId || auth.userId
-      : auth.userId;
+  let tutorId = auth.userId
+  if (auth.role === "admin") {
+    const requestedTutorId = String(body.tutorId ?? "").trim()
+    if (requestedTutorId) {
+      const tutor = await db.user.findUnique({
+        where: { id: requestedTutorId },
+        select: { id: true, role: true },
+      })
+      if (!tutor || tutor.role !== "tutor") {
+        return NextResponse.json(
+          { error: "Pick a valid tutor to own this course." },
+          { status: 400 },
+        )
+      }
+      tutorId = tutor.id
+    } else {
+      const fallback = await db.tutorTrack.findFirst({
+        where: { track },
+        orderBy: { createdAt: "asc" },
+        select: { tutorId: true },
+      })
+      if (!fallback?.tutorId) {
+        return NextResponse.json(
+          { error: "Assign a tutor to this track before creating a course." },
+          { status: 400 },
+        )
+      }
+      tutorId = fallback.tutorId
+    }
+  }
 
   const course = await db.course.create({
     data: {

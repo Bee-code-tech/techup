@@ -279,6 +279,40 @@ body {
   }
 }
 
+@keyframes live-react-up {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.92);
+  }
+  14% {
+    opacity: 1;
+    transform: translateY(0) scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-84px) scale(1);
+  }
+}
+
+.live-react {
+  animation: live-react-up 1.85s var(--ease-out) forwards;
+}
+
+.live-room button:not(:disabled) {
+  cursor: pointer;
+}
+
+.live-room button:disabled {
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-react {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .admin-card-hover:hover {
     border-color: color-mix(in srgb, var(--navy) 14%, transparent);

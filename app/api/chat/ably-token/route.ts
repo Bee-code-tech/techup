@@ -22,6 +22,7 @@ export async function GET() {
     capability: {
       [`chat:inbox:${auth.userId}`]: ["subscribe", "presence"],
       "chat:conversation:*": ["subscribe", "publish", "presence"],
+      "live:session:*": ["subscribe", "publish", "presence"],
     },
   })
 

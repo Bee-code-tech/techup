@@ -220,6 +220,11 @@ export function LearnModulesSidebar({
                   <span className="min-w-0 flex-1">
                     <span className="line-clamp-2 text-sm font-medium">
                       {moduleRow.title}
+                      {moduleRow.isLiveRecording ? (
+                        <span className="ml-1.5 rounded-full bg-[#fff1e6] px-1.5 py-0.5 text-[10px] font-semibold text-[#c05600]">
+                          Live
+                        </span>
+                      ) : null}
                     </span>
                     <span
                       className={cn(

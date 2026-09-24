@@ -2,13 +2,17 @@
 
 import { SolarIcon } from "@/components/icons/solar-icon"
 
+import Link from "next/link"
 import { useCallback, useEffect, useState } from "react"
 import { format } from "date-fns"
+import { isInAppLive, livePlatformLabel } from "@/lib/live-session"
 type LiveSession = {
   id: string
   title: string
   platform: string
   joinUrl: string
+  inApp?: boolean
+  platformLabel?: string
   audience: string
   trackLabel: string
   tutorName: string
@@ -41,8 +45,11 @@ export function StudentLiveCallout() {
 
   if (!session) return null
 
-  const platformLabel = session.platform === "zoom" ? "Zoom" : "Google Meet"
+  const inApp = Boolean(session.inApp || isInAppLive(session.platform))
+  const platformLabel =
+    session.platformLabel || livePlatformLabel(session.platform)
   const isLive = session.status !== "upcoming"
+  const joinHref = inApp ? `/dashboard/live/${session.id}` : session.joinUrl
   const when = session.scheduledAt
     ? format(new Date(session.scheduledAt), "EEE, MMM d · h:mm a")
     : null
@@ -90,14 +97,23 @@ export function StudentLiveCallout() {
           </div>
         </div>
         {isLive ? (
-          <a
-            href={session.joinUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="admin-press inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[#00206F] px-4 text-sm font-semibold text-white hover:bg-[#001752]"
-          >
-            Join {platformLabel}
-          </a>
+          inApp ? (
+            <Link
+              href={joinHref}
+              className="admin-press inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[#00206F] px-4 text-sm font-semibold text-white hover:bg-[#001752]"
+            >
+              Join class
+            </Link>
+          ) : (
+            <a
+              href={joinHref}
+              target="_blank"
+              rel="noreferrer"
+              className="admin-press inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[#00206F] px-4 text-sm font-semibold text-white hover:bg-[#001752]"
+            >
+              Join {platformLabel}
+            </a>
+          )
         ) : (
           <div className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl border border-[#00206F]/15 bg-white px-4 text-sm font-semibold text-[#00206F]">
             Starts {when ? format(new Date(session.scheduledAt!), "h:mm a") : "soon"}

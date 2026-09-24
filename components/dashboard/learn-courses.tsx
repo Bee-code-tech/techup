@@ -13,6 +13,7 @@ export type LearnModule = {
   access: string
   unlocked: boolean
   lockedReason: "paid" | "sequence" | null
+  isLiveRecording?: boolean
   progress: {
     videoCompleted: boolean
     quizPassed: boolean
